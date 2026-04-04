@@ -27,7 +27,7 @@ body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;color:var(--t1);ba
 .mono{font-family:'JetBrains Mono',monospace}
 
 /* LAYOUT */
-.wrap{max-width:920px;margin:0 auto;padding:20px 24px 80px}
+.wrap{max-width:1200px;margin:0 auto;padding:20px 32px 80px}
 
 /* HERO */
 .hero{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid var(--bdr)}
@@ -39,7 +39,7 @@ body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;color:var(--t1);ba
 
 /* NAV */
 .nav{display:flex;gap:4px;margin-bottom:32px;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:12px;padding:4px;border:1px solid var(--bdr);position:sticky;top:12px;z-index:50}
-.nav-btn{font-family:'DM Sans';font-size:13px;font-weight:700;padding:10px 24px;cursor:pointer;border:none;background:transparent;color:var(--t3);border-radius:8px;transition:all .2s}
+.nav-btn{font-family:'DM Sans';font-size:13px;font-weight:700;padding:9px 16px;cursor:pointer;border:none;background:transparent;color:var(--t3);border-radius:8px;transition:all .2s;white-space:nowrap}
 .nav-btn:hover{color:var(--t2);background:var(--card2)}
 .nav-btn.on{color:var(--t1);background:var(--card2);box-shadow:var(--shadow)}
 .page{display:none;opacity:0;transition:opacity .25s ease}.page.show{display:block}.page.show.visible{opacity:1}
@@ -2776,16 +2776,51 @@ function renderRaces() {
             (r.gct ? '<div class="mn"><div class="mnl">GCT</div><div class="mnv mono">' + r.gct + 'ms</div></div>' : '') +
             (r.pw ? '<div class="mn"><div class="mnl">Power</div><div class="mnv mono">' + r.pw + 'W</div></div>' : '') +
           '</div>' +
-          '<div class="splits"><div class="splits-h">Estimated km splits</div>' +
-            r.splits.map(function(s) {
-              var pct = 30 + ((maxP - s.secs) / (maxP - minP || 1)) * 60;
-              var cls = s.secs <= minP + 2 ? 'split-fast' : s.secs >= maxP - 2 ? 'split-slow' : 'split-avg';
-              return '<div class="split-row">' +
-                '<div class="split-km">' + s.k + '</div>' +
-                '<div class="split-bar ' + cls + '" style="width:' + pct + '%">' + s.p + '</div>' +
+          (function() {
+            // Try real Strava laps first
+            var dayEntries = LAPS_DATA[r.ds];
+            var realLaps = null;
+            if (dayEntries && dayEntries.length) {
+              var best = dayEntries[0], bestDiff = Math.abs((dayEntries[0].dist_km||0) - r.dist);
+              for (var di = 1; di < dayEntries.length; di++) {
+                var diff = Math.abs((dayEntries[di].dist_km||0) - r.dist);
+                if (diff < bestDiff) { bestDiff = diff; best = dayEntries[di]; }
+              }
+              if (best.laps && best.laps.length > 0) realLaps = best.laps.filter(function(l){ return l.dist >= 0.2; });
+            }
+            if (realLaps && realLaps.length > 0) {
+              var lapPaces = realLaps.map(function(l){ return l.pace ? paceToSecs(l.pace) : null; }).filter(Boolean);
+              var minLP = lapPaces.length ? Math.min.apply(null,lapPaces) : 0;
+              var maxLP = lapPaces.length ? Math.max.apply(null,lapPaces) : 0;
+              var avgPaceS = paceToSecs(r.pace);
+              return '<div class="splits"><div class="splits-h">km Splits <span style="font-weight:400;color:var(--grn);font-size:9px;text-transform:none;letter-spacing:0">&#x2713; Strava</span></div>' +
+                realLaps.map(function(lap, i) {
+                  var ps = lap.pace ? paceToSecs(lap.pace) : avgPaceS;
+                  var pct = 30 + ((maxLP - ps) / (maxLP - minLP || 1)) * 60;
+                  var cls = ps <= (avgPaceS||ps) ? 'split-fast' : ps <= (avgPaceS||ps) + 20 ? 'split-avg' : 'split-slow';
+                  var distLabel = lap.dist >= 0.9 && lap.dist <= 1.1 ? 'km ' + lap.n : lap.dist.toFixed(1) + 'k';
+                  var timeStr = lap.time ? ' (' + Math.floor(lap.time/60) + ':' + (lap.time%60<10?'0':'') + (lap.time%60) + ')' : '';
+                  return '<div class="split-row">' +
+                    '<div class="split-km">' + distLabel + '</div>' +
+                    '<div class="split-bar ' + cls + '" style="width:' + pct + '%">' + (lap.pace||'–') + '/km' + timeStr + '</div>' +
+                  '</div>';
+                }).join('') +
               '</div>';
-            }).join('') +
-          '</div>' +
+            }
+            // Fallback: estimated (labelled clearly)
+            var minP2 = Math.min.apply(null,r.splits.map(function(s){return s.secs;}));
+            var maxP2 = Math.max.apply(null,r.splits.map(function(s){return s.secs;}));
+            return '<div class="splits"><div class="splits-h">km Splits <span style="font-weight:400;color:var(--t3);font-size:9px;text-transform:none;letter-spacing:0">estimated — no Strava data</span></div>' +
+              r.splits.map(function(s) {
+                var pct = 30 + ((maxP2 - s.secs) / (maxP2 - minP2 || 1)) * 60;
+                var cls = s.secs <= minP2 + 2 ? 'split-fast' : s.secs >= maxP2 - 2 ? 'split-slow' : 'split-avg';
+                return '<div class="split-row">' +
+                  '<div class="split-km">' + s.k + '</div>' +
+                  '<div class="split-bar ' + cls + '" style="width:' + pct + '%">' + s.p + '</div>' +
+                '</div>';
+              }).join('') +
+            '</div>';
+          })() +
         '</div>' +
       '</div>';
     }).join('');
