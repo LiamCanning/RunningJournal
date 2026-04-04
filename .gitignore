@@ -1,0 +1,15 @@
+# Strava OAuth tokens and secrets
+.strava_token
+*.token
+config.py
+
+# Sync state
+last_sync_timestamp.txt
+sync_log.jsonl
+strava_activity_cache.json
+strava_api_activities.csv
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
