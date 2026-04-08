@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Liam's Running Journal</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -23,7 +23,7 @@
   --shadow:0 1px 4px rgba(0,0,0,.05),0 1px 2px rgba(0,0,0,.03);
   --shadowL:0 4px 20px rgba(0,0,0,.07);
 }
-body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;color:var(--t1);background:var(--bg);line-height:1.45;-webkit-font-smoothing:antialiased}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--t1);background:var(--bg);line-height:1.45;-webkit-font-smoothing:antialiased}
 .mono{font-family:'JetBrains Mono',monospace}
 
 /* LAYOUT */
@@ -39,7 +39,7 @@ body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;color:var(--t1);ba
 
 /* NAV */
 .nav{display:flex;gap:4px;margin-bottom:32px;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:14px;padding:5px;border:1px solid var(--bdr);position:sticky;top:12px;z-index:50}
-.nav-btn{font-family:'DM Sans';font-size:14px;font-weight:700;padding:12px 0;cursor:pointer;border:none;background:transparent;color:var(--t3);border-radius:10px;transition:all .2s;white-space:nowrap;flex:1;text-align:center}
+.nav-btn{font-family:'Inter';font-size:14px;font-weight:700;padding:12px 0;cursor:pointer;border:none;background:transparent;color:var(--t3);border-radius:10px;transition:all .2s;white-space:nowrap;flex:1;text-align:center}
 .nav-btn:hover{color:var(--t2);background:var(--card2)}
 .nav-btn.on{color:var(--t1);background:var(--card2);box-shadow:var(--shadow)}
 .page{display:none;opacity:0;transition:opacity .25s ease}.page.show{display:block}.page.show.visible{opacity:1}
@@ -110,7 +110,7 @@ body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;color:var(--t1);ba
 
 /* RACE/INT DISTANCE TABS */
 .dtabs{display:flex;gap:4px;margin-bottom:20px;flex-wrap:wrap;background:var(--card);border-radius:10px;padding:4px;border:1px solid var(--bdr)}
-.dtab{font-family:'DM Sans';font-size:12px;font-weight:700;padding:8px 16px;cursor:pointer;border:none;background:transparent;color:var(--t3);border-radius:6px;transition:all .15s}
+.dtab{font-family:'Inter';font-size:12px;font-weight:700;padding:8px 16px;cursor:pointer;border:none;background:transparent;color:var(--t3);border-radius:6px;transition:all .15s}
 .dtab.on{background:var(--card2);color:var(--t1);box-shadow:var(--shadow)}
 .dtab:hover:not(.on){background:var(--card2);color:var(--t2)}
 
@@ -155,7 +155,7 @@ body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;color:var(--t1);ba
 
 /* INTERVAL CARDS — Expandable style like races */
 .int-toolbar{display:flex;gap:8px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
-.int-toolbar .cmp-toggle{font-family:'DM Sans';font-size:12px;font-weight:700;padding:10px 20px;border:2px solid var(--bdr);border-radius:10px;background:var(--card);color:var(--t2);cursor:pointer;transition:all .2s;margin-left:auto}
+.int-toolbar .cmp-toggle{font-family:'Inter';font-size:12px;font-weight:700;padding:10px 20px;border:2px solid var(--bdr);border-radius:10px;background:var(--card);color:var(--t2);cursor:pointer;transition:all .2s;margin-left:auto}
 .int-toolbar .cmp-toggle:hover{border-color:var(--bdr2);color:var(--t1)}
 .int-toolbar .cmp-toggle.active{border-color:var(--grn);background:var(--grnSoft);color:var(--grn)}
 .int-count{font-size:13px;color:var(--t3);font-weight:600}
@@ -185,7 +185,7 @@ body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;color:var(--t1);ba
 .ct th{text-align:left;padding:10px 14px;font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--t3);font-weight:700;border-bottom:2px solid var(--bdr)}
 .ct th.best{border-bottom-color:var(--grn);color:var(--grn)}
 .ct td{padding:8px 14px;border-bottom:1px solid var(--bdr);font-family:'JetBrains Mono';font-weight:600;font-size:12px}
-.ct td:first-child{font-family:'DM Sans';color:var(--t3);font-size:11px;font-weight:600}
+.ct td:first-child{font-family:'Inter';color:var(--t3);font-size:11px;font-weight:600}
 .ct td.bv{color:var(--grn);font-weight:700}
 .ct tr:last-child td{border:none}
 
@@ -1246,6 +1246,20 @@ races.forEach(function(r) { if (!bestByDist[r.cat] || r.timeSecs < bestByDist[r.
 // ===== INTERVALS =====
 var intPatterns = /x1km|x400|x800|x1'|x1\s*min|x\s*60s|track|pista|intervals?|benchmark|mile|20-15-5-10|10x|12x|6x|5x|4x|3x|\d+km\s*@/i;
 
+// Parse MM:SS rep splits from a Strava description string
+// e.g. "5x1km con 90\"\n3:38, 3:40, 3:38, 3:40, 3:48" → ["3:38","3:40","3:38","3:40","3:48"]
+function parseDescSplits(desc) {
+  if (!desc) return null;
+  var groups = desc.match(/\d{1,2}:\d{2}(?:\s*[,;]\s*\d{1,2}:\d{2})+/g);
+  if (!groups) return null;
+  var best = groups.reduce(function(a, b) {
+    return (a.match(/\d{1,2}:\d{2}/g)||[]).length >= (b.match(/\d{1,2}:\d{2}/g)||[]).length ? a : b;
+  });
+  var times = best.match(/\d{1,2}:\d{2}/g);
+  if (!times || times.length < 2) return null;
+  return times;
+}
+
 // Parse rep structure from title: "6x1km" → { reps: 6, distM: 1000, intervalType: "distance" }
 // "10x1min" → { reps: 10, distM: null, timeSecs: 60, intervalType: "time" }
 // "6x400/300m" → { reps: 6, distM: 400, recoveryM: 300, intervalType: "distance" }
@@ -1430,8 +1444,53 @@ allRuns.forEach(function(r) {
     dist: Math.round(r.dist*100)/100, time: secsToTime(r.timeSecs), timeSecs: r.timeSecs,
     pace: r.pace, best: bestRepPace, bestPaceRaw: r.bestPace,
     hr: r.hr, mhr: r.mhr, cad: r.cad, stride: r.stride, gct: r.gct, pw: r.pw,
-    repInfo: repInfo, repData: repData,
+    repInfo: repInfo, repData: repData, repSource: 'estimated',
   });
+});
+
+// Supplement interval rep data with real Strava splits from LAPS_DATA
+// Priority: 1) description splits, 2) real fast laps, 3) keep estimated
+ints.forEach(function(iv) {
+  var dayEntries = LAPS_DATA[iv.ds];
+  if (!dayEntries || !dayEntries.length) return;
+  // Match by closest distance
+  var best = dayEntries[0], bestDiff = Math.abs((dayEntries[0].dist_km || 0) - iv.dist);
+  for (var di = 1; di < dayEntries.length; di++) {
+    var diff = Math.abs((dayEntries[di].dist_km || 0) - iv.dist);
+    if (diff < bestDiff) { bestDiff = diff; best = dayEntries[di]; }
+  }
+
+  // 1. Description splits (e.g. "3:38, 3:40, 3:38, 3:40, 3:48")
+  var descTimes = parseDescSplits(best.desc);
+  if (descTimes && descTimes.length >= 2) {
+    var reps = descTimes.map(function(t, i) {
+      var ps = paceToSecs(t);
+      return { num: i + 1, time: t, timeSecs: ps, paceSecs: ps, pace: t, distanceKm: null, isFromDesc: true };
+    });
+    var fastestPs = Math.min.apply(null, reps.map(function(r) { return r.paceSecs; }));
+    iv.repData = { reps: reps, repDist: null, repLabel: descTimes.length + ' reps', intervalType: 'distance' };
+    iv.best = secsToTimeMS(Math.round(fastestPs));
+    iv.repSource = 'desc';
+    return;
+  }
+
+  // 2. Real Strava laps — keep only fast laps (reps, not warmup/recovery)
+  var laps = best.laps;
+  if (!laps || laps.length < 2) return;
+  var avgS = paceToSecs(iv.pace);
+  if (!avgS) return;
+  var threshold = avgS * 0.92; // laps >8% faster than avg are reps
+  var fastLaps = laps.filter(function(l) { return l.dist >= 0.2 && l.pace && paceToSecs(l.pace) < threshold; });
+  if (fastLaps.length >= 2) {
+    var reps = fastLaps.map(function(l, i) {
+      var ps = paceToSecs(l.pace);
+      return { num: i + 1, time: secsToTimeMS(l.time), timeSecs: l.time, paceSecs: ps, pace: l.pace, distanceKm: l.dist.toFixed(2), isFromDesc: false };
+    });
+    var fastestPs = Math.min.apply(null, reps.map(function(r) { return r.paceSecs; }));
+    iv.repData = { reps: reps, repDist: fastLaps[0].dist, repLabel: fastLaps.length + ' reps', intervalType: 'distance' };
+    iv.best = secsToTimeMS(Math.round(fastestPs));
+    iv.repSource = 'strava';
+  }
 });
 
 // ===== TRAINING PLAN — Apr 3 to Oct 4, 2026 =====
@@ -2503,6 +2562,12 @@ document.getElementById('pg-health').innerHTML =
       }).join('') +
       '</div>' +
       '<div style="font-size:11px;color:var(--t3);margin-top:12px;font-weight:500">Based on ' + totalWithHR + ' runs with HR data \u2022 Zones set by lactate threshold</div>' +
+      '<div style="font-size:11px;color:var(--t3);margin-top:14px;line-height:1.7;border-top:1px solid var(--bdr);padding-top:12px">' +
+        '<strong style="color:var(--t2)">What these zones mean for marathon training:</strong><br>' +
+        'For marathon fitness, aim for <strong style="color:var(--grn)">70–80% of runs in Z1–Z2</strong> (easy aerobic base), ~10% in Z3 (steady/tempo), ~10% in Z4 (threshold, your marathon race zone), and under 5% in Z5 (very hard anaerobic). ' +
+        'Z4 runs should feel hard but controlled — that\'s right around your LTHR of ' + z.lthr + ' bpm. ' +
+        'If too much of your volume is in Z3 ("no man\'s land"), easy runs may not be easy enough.' +
+      '</div>' +
     '</div></div>';
   })() +
 
@@ -2515,7 +2580,14 @@ document.getElementById('pg-health').innerHTML =
         var arrow = f.good ? '\u25B2' : '\u25BC';
         diffStr = '<div class="trend ' + cls + '">' + arrow + ' ' + sign + f.diff + (f.unit === 'W' ? 'W' : f.unit === 'ms' ? 'ms' : '') + ' vs prev</div>';
       }
-      return '<div class="fc"><div class="sl">' + f.label + '</div><div class="fv mono">' + (f.val || '--') + '</div><div class="sd">' + f.unit + '</div>' + diffStr + '</div>';
+      var explainers = {
+        'Cadence': 'Optimal: 170–185 spm. Higher cadence = shorter ground contact, less injury risk. Under 165 often means overstriding.',
+        'Stride length': 'Increases naturally with speed — don\'t force it. Overstriding (foot landing ahead of hips) causes braking forces and injury risk.',
+        'Ground contact': 'Time your foot spends on the ground each step. Lower = more efficient. Elite runners: ~160–200ms. Recreational: 240–280ms. Yours is in a solid range.',
+        'Power': 'Running power in watts — useful for consistent effort on hilly terrain. More reliable than pace on climbs.',
+      };
+      var explainerText = explainers[f.label] || '';
+      return '<div class="fc"><div class="sl">' + f.label + '</div><div class="fv mono">' + (f.val || '--') + '</div><div class="sd">' + f.unit + '</div>' + diffStr + (explainerText ? '<div style="font-size:10px;color:var(--t3);margin-top:6px;line-height:1.5">' + explainerText + '</div>' : '') + '</div>';
     }).join('') +
   '</div></div>' +
 
@@ -2580,14 +2652,14 @@ document.getElementById('pg-health').innerHTML =
     var ageDiff = p.age - p.bioAge;
     return '<div class="sec"><div class="sec-h">Fitness profile</div>' +
       '<div class="profile-grid">' +
-        '<div class="profile-item"><div class="pi-label">Bio age</div><div class="pi-val mono" style="color:var(--grn)">' + p.bioAge + '</div><div style="font-size:10px;color:var(--grn);font-weight:700">' + ageDiff + ' years younger</div></div>' +
-        '<div class="profile-item"><div class="pi-label">VO2max</div><div class="pi-val mono">' + p.vo2max + '</div><div style="font-size:10px;color:var(--t3)">ml/kg/min</div></div>' +
-        '<div class="profile-item"><div class="pi-label">LTHR</div><div class="pi-val mono">' + p.lthr + '</div><div style="font-size:10px;color:var(--t3)">bpm</div></div>' +
-        '<div class="profile-item"><div class="pi-label">Max HR</div><div class="pi-val mono">' + GARMIN_HR_ZONES.max + '</div><div style="font-size:10px;color:var(--t3)">bpm</div></div>' +
-        '<div class="profile-item"><div class="pi-label">Resting HR</div><div class="pi-val mono">' + GARMIN_HR_ZONES.rest + '</div><div style="font-size:10px;color:var(--t3)">bpm</div></div>' +
-        '<div class="profile-item"><div class="pi-label">Weight</div><div class="pi-val mono">' + p.weight + '</div><div style="font-size:10px;color:var(--t3)">kg</div></div>' +
+        '<div class="profile-item"><div class="pi-label">Bio age</div><div class="pi-val mono" style="color:var(--grn)">' + p.bioAge + '</div><div style="font-size:10px;color:var(--grn);font-weight:700">' + ageDiff + ' years younger</div><div style="font-size:10px;color:var(--t3);margin-top:4px;line-height:1.5">Garmin\'s estimate of aerobic age based on VO2max + resting HR. ' + ageDiff + ' years younger than chronological — excellent.</div></div>' +
+        '<div class="profile-item"><div class="pi-label">VO2max</div><div class="pi-val mono">' + p.vo2max + '</div><div style="font-size:10px;color:var(--t3)">ml/kg/min</div><div style="font-size:10px;color:var(--t3);margin-top:4px;line-height:1.5">Max oxygen your body can use. Recreational runners: 40–50. Good: 50–55. Elite marathoners: 65–75. At ' + p.vo2max + ' you\'re at the top of "good".</div></div>' +
+        '<div class="profile-item"><div class="pi-label">LTHR</div><div class="pi-val mono">' + p.lthr + '</div><div style="font-size:10px;color:var(--t3)">bpm</div><div style="font-size:10px;color:var(--t3);margin-top:4px;line-height:1.5">Lactate threshold HR — the point where lactic acid starts to build. Tempo runs: just below ' + p.lthr + '. Z4 intervals: at or just above. Marathon race effort will be ~160–170.</div></div>' +
+        '<div class="profile-item"><div class="pi-label">Max HR</div><div class="pi-val mono">' + GARMIN_HR_ZONES.max + '</div><div style="font-size:10px;color:var(--t3)">bpm</div><div style="font-size:10px;color:var(--t3);margin-top:4px;line-height:1.5">Genetically determined — not a fitness indicator. Used to calibrate all your training zones. Higher is neither good nor bad.</div></div>' +
+        '<div class="profile-item"><div class="pi-label">Resting HR</div><div class="pi-val mono">' + GARMIN_HR_ZONES.rest + '</div><div style="font-size:10px;color:var(--t3)">bpm</div><div style="font-size:10px;color:var(--t3);margin-top:4px;line-height:1.5">Measured at rest (usually morning). Under 60 is athletic, under 50 is elite-level. At ' + GARMIN_HR_ZONES.rest + ' bpm you\'re in excellent shape. Watch for spikes — they signal fatigue or illness.</div></div>' +
+        '<div class="profile-item"><div class="pi-label">Weight</div><div class="pi-val mono">' + p.weight + '</div><div style="font-size:10px;color:var(--t3)">kg</div><div style="font-size:10px;color:var(--t3);margin-top:4px;line-height:1.5">Each kg lost improves marathon time by ~2–3 min on average. Not a target — just context for other metrics like power-to-weight.</div></div>' +
         '<div class="profile-item"><div class="pi-label">Height</div><div class="pi-val mono">' + p.height + '</div><div style="font-size:10px;color:var(--t3)">cm</div></div>' +
-        '<div class="profile-item"><div class="pi-label">FTP</div><div class="pi-val mono">' + p.ftp + '</div><div style="font-size:10px;color:var(--t3)">watts</div></div>' +
+        '<div class="profile-item"><div class="pi-label">FTP</div><div class="pi-val mono">' + p.ftp + '</div><div style="font-size:10px;color:var(--t3)">watts</div><div style="font-size:10px;color:var(--t3);margin-top:4px;line-height:1.5">Functional threshold power — max sustainable watts for ~1 hour. Useful for consistent pacing on hilly routes where pace varies but effort doesn\'t.</div></div>' +
       '</div></div>';
   })() +
 
@@ -2606,10 +2678,84 @@ document.getElementById('pg-health').innerHTML =
       '<div style="flex:1;min-width:100px;text-align:center;padding:10px;background:var(--card2);border-radius:8px"><div style="font-size:9px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:1px">After 2 days</div><div class="mono" style="font-size:18px;font-weight:700;margin-top:4px">' + (avgPace(afterRestPaces['2']) ? secsToTimeMS(avgPace(afterRestPaces['2'])) + '/km' : '--') + '</div></div>' +
       '<div style="flex:1;min-width:100px;text-align:center;padding:10px;background:var(--card2);border-radius:8px"><div style="font-size:9px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:1px">After 3+ days</div><div class="mono" style="font-size:18px;font-weight:700;margin-top:4px">' + (avgPace(afterRestPaces['3+']) ? secsToTimeMS(avgPace(afterRestPaces['3+'])) + '/km' : '--') + '</div></div>' +
     '</div>' +
+    '<div style="font-size:10px;color:var(--t3);margin-top:10px;line-height:1.6">Running faster after 2–3 days rest vs 1 day is normal and shows good recovery. If your pace is <em>worse</em> after more rest, it may signal fatigue accumulation or poor sleep quality.</div>' +
   '</div></div>';
 
 // ===== VOLUME PAGE =====
 document.getElementById('pg-volume').innerHTML =
+
+  // THIS WEEK HERO CARD
+  (function() {
+    var thisWeekKey = recentWeeks[recentWeeks.length - 1];
+    var lastWeekKey = recentWeeks.length >= 2 ? recentWeeks[recentWeeks.length - 2] : null;
+    var tw = thisWeekKey ? weeklyMap[thisWeekKey] : null;
+    var lw = lastWeekKey ? weeklyMap[lastWeekKey] : null;
+    if (!tw) return '';
+    var twKm = Math.round(tw.km * 10) / 10;
+    var lwKm = lw ? Math.round(lw.km * 10) / 10 : null;
+    var delta = lwKm != null ? Math.round((twKm - lwKm) * 10) / 10 : null;
+    var deltaStr = delta != null ? (delta >= 0 ? '+' + delta : '' + delta) + 'km vs last week' : '';
+    var deltaColor = delta != null ? (delta >= 0 ? 'var(--grn)' : 'var(--org)') : 'var(--t3)';
+    var mNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var dateRange = '';
+    if (tw.startDate) {
+      var sd = tw.startDate;
+      var ed = new Date(sd); ed.setDate(ed.getDate() + 6);
+      dateRange = mNames[sd.getMonth()] + ' ' + sd.getDate() + ' – ' + mNames[ed.getMonth()] + ' ' + ed.getDate();
+    }
+    // Avg pace this week
+    var twPaces = allRuns.filter(function(r) {
+      var rk = getISOWeek(new Date(r.date));
+      return rk === thisWeekKey && r.pace && r.pace !== '--';
+    }).map(function(r) { return paceToSecs(r.pace); }).filter(Boolean);
+    var avgPaceStr = twPaces.length ? secsToTimeMS(Math.round(twPaces.reduce(function(a,b){return a+b},0)/twPaces.length)) + '/km' : '--';
+    // Elevation this week
+    var twElev = allRuns.filter(function(r) {
+      var rk = getISOWeek(new Date(r.date));
+      return rk === thisWeekKey && r.ascent;
+    }).reduce(function(sum, r) { return sum + (r.ascent || 0); }, 0);
+
+    return '<div style="background:linear-gradient(135deg,#1a6b42,#228B56,#1a8a5a);border-radius:16px;padding:28px 32px;margin-bottom:24px;color:#fff">' +
+      '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;opacity:.7;margin-bottom:12px">This week &bull; ' + dateRange + '</div>' +
+      '<div style="display:flex;align-items:flex-end;gap:8px;margin-bottom:6px">' +
+        '<div style="font-size:72px;font-weight:800;line-height:1;font-family:\'JetBrains Mono\',monospace">' + twKm + '</div>' +
+        '<div style="font-size:24px;font-weight:600;opacity:.8;margin-bottom:10px">km</div>' +
+      '</div>' +
+      (deltaStr ? '<div style="font-size:14px;font-weight:600;color:' + deltaColor + ';margin-bottom:20px;background:rgba(255,255,255,.12);display:inline-block;padding:4px 12px;border-radius:20px">' + (delta >= 0 ? '▲ ' : '▼ ') + deltaStr + '</div>' : '<div style="margin-bottom:20px"></div>') +
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;border-top:1px solid rgba(255,255,255,.2);padding-top:20px">' +
+        '<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.6">Runs</div><div style="font-size:28px;font-weight:700;font-family:\'JetBrains Mono\',monospace;margin-top:4px">' + tw.runs + '</div></div>' +
+        '<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.6">Avg pace</div><div style="font-size:28px;font-weight:700;font-family:\'JetBrains Mono\',monospace;margin-top:4px">' + avgPaceStr + '</div></div>' +
+        (twElev > 0 ? '<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.6">Elevation</div><div style="font-size:28px;font-weight:700;font-family:\'JetBrains Mono\',monospace;margin-top:4px">' + Math.round(twElev) + 'm</div></div>' : '<div></div>') +
+      '</div>' +
+    '</div>';
+  })() +
+
+  '<div class="sec"><div class="sec-h">Last 12 weeks</div><div class="wk-grid">' +
+    recentWeeks.slice(-12).map(function(k, idx, arr) {
+      var w = weeklyMap[k];
+      var km = Math.round(w.km * 10) / 10;
+      var pct = wkMax > 0 ? Math.max(4, (w.km / wkMax) * 100) : 4;
+      var prevKey = idx > 0 ? arr[idx - 1] : null;
+      var prevKm = prevKey ? Math.round(weeklyMap[prevKey].km * 10) / 10 : null;
+      var delta = prevKm != null ? km - prevKm : null;
+      var deltaStr = delta != null ? (delta > 0 ? '+' + delta.toFixed(0) : delta.toFixed(0)) : '';
+      var deltaCls = delta != null ? (delta > 0 ? 'up' : delta < 0 ? 'dn' : '') : '';
+      var isCurrentWeek = k === recentWeeks[recentWeeks.length - 1];
+      var mNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      var dateLabel = '';
+      if (w.startDate) {
+        var sd = w.startDate;
+        dateLabel = mNames[sd.getMonth()] + ' ' + sd.getDate();
+      }
+      return '<div class="wk-col" style="' + (isCurrentWeek ? 'opacity:1' : 'opacity:.85') + '">' +
+        '<div class="wk-val mono" style="' + (isCurrentWeek ? 'color:var(--grn)' : '') + '">' + km + '</div>' +
+        '<div class="wk-bar-wrap"><div class="wk-bar" style="height:' + pct + '%;' + (isCurrentWeek ? 'background:var(--grn)' : '') + '"></div></div>' +
+        '<div class="wk-runs mono">' + w.runs + 'r</div>' +
+        (deltaStr ? '<div class="wk-delta ' + deltaCls + ' mono">' + deltaStr + '</div>' : '<div class="wk-delta mono">&nbsp;</div>') +
+        '<div class="wk-date">' + dateLabel + '</div>' +
+      '</div>';
+    }).join('') +
+  '</div></div>' +
 
   '<div class="sec"><div class="sec-h">Monthly volume</div><div class="bars">' +
     mo.map(function(d) {
@@ -2626,34 +2772,6 @@ document.getElementById('pg-volume').innerHTML =
     '<span><span class="dot" style="background:var(--grn)"></span>Easy ' + easyPct + '%</span>' +
     '<span><span class="dot" style="background:var(--blu)"></span>Moderate ' + modPct + '%</span>' +
     '<span><span class="dot" style="background:var(--org)"></span>Hard ' + hardPct + '%</span>' +
-  '</div></div>' +
-
-  '<div class="sec"><div class="sec-h">Weekly volume — last 16 weeks</div><div class="wk-grid">' +
-    recentWeeks.map(function(k, idx) {
-      var w = weeklyMap[k];
-      var km = Math.round(w.km * 10) / 10;
-      var pct = wkMax > 0 ? Math.max(4, (w.km / wkMax) * 100) : 4;
-      var prevKm = idx > 0 ? weeklyMap[recentWeeks[idx - 1]].km : null;
-      var delta = prevKm != null ? km - Math.round(prevKm * 10) / 10 : null;
-      var deltaStr = delta != null ? (delta > 0 ? '+' + delta.toFixed(0) : delta.toFixed(0)) : '';
-      var deltaCls = delta != null ? (delta > 0 ? 'up' : delta < 0 ? 'dn' : '') : '';
-      var wNum = k.split('-W')[1];
-      var dateLabel = '';
-      if (w.startDate) {
-        var sd = w.startDate;
-        var mon = sd.getDate();
-        var mNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        dateLabel = mNames[sd.getMonth()] + ' ' + mon;
-      }
-      return '<div class="wk-col">' +
-        '<div class="wk-val mono">' + km + '</div>' +
-        '<div class="wk-bar-wrap"><div class="wk-bar" style="height:' + pct + '%"></div></div>' +
-        '<div class="wk-runs mono">' + w.runs + ' run' + (w.runs !== 1 ? 's' : '') + '</div>' +
-        (deltaStr ? '<div class="wk-delta ' + deltaCls + ' mono">' + deltaStr + '</div>' : '<div class="wk-delta mono">&nbsp;</div>') +
-        '<div class="wk-lbl">W' + wNum + '</div>' +
-        '<div class="wk-date">' + dateLabel + '</div>' +
-      '</div>';
-    }).join('') +
   '</div></div>' +
 
   // YEAR-OVER-YEAR COMPARISON
@@ -2952,29 +3070,43 @@ function renderIntPage() {
       var allPaces = rd.reps.map(function(rep) { return rep.paceSecs; });
       var minP = Math.min.apply(null, allPaces);
       var maxP = Math.max.apply(null, allPaces);
-      var repDistLabel = rd.intervalType === 'time' ? secsToTimeMS(i.repInfo.timeSecs) : (rd.repDist >= 1 ? rd.repDist + 'km' : Math.round(rd.repDist * 1000) + 'm');
+      var isDescSource = i.repSource === 'desc';
+      var isStravaSource = i.repSource === 'strava';
+      var sourceBadge = isDescSource
+        ? '<span style="font-weight:400;color:var(--grn);font-size:9px;margin-left:6px;text-transform:none;letter-spacing:0">&#x2713; Strava description</span>'
+        : isStravaSource
+          ? '<span style="font-weight:400;color:var(--grn);font-size:9px;margin-left:6px;text-transform:none;letter-spacing:0">&#x2713; Strava laps</span>'
+          : '<span style="font-weight:400;color:var(--t3);font-size:9px;margin-left:6px;text-transform:none;letter-spacing:0">~ estimated</span>';
+      var repDistLabel = isDescSource ? (rd.reps.length + ' reps')
+        : rd.intervalType === 'time' ? secsToTimeMS(i.repInfo && i.repInfo.timeSecs)
+        : rd.repDist ? (rd.repDist >= 1 ? rd.repDist + 'km' : Math.round(rd.repDist * 1000) + 'm')
+        : rd.reps.length + ' reps';
       repsHtml = '<div style="margin-top:20px">' +
-        '<div class="splits-h">Individual reps \u2014 ' + rd.reps.length + ' \u00D7 ' + repDistLabel + '</div>' +
+        '<div class="splits-h">Individual reps &mdash; ' + rd.reps.length + ' &times; ' + repDistLabel + sourceBadge + '</div>' +
         rd.reps.map(function(rep) {
           var pct = 30 + ((maxP - rep.paceSecs) / (maxP - minP || 1)) * 60;
           var isFastest = rep.paceSecs <= minP + 1;
           var isSlowest = rep.paceSecs >= maxP - 1;
           var cls = isFastest ? 'split-fast' : isSlowest ? 'split-slow' : 'split-avg';
-          // For time-based reps, show distance; for distance-based, show time
-          var repDisplay = rep.isTimeBased ? rep.distanceKm + 'km' : rep.time;
+          // Desc source: show the time directly (e.g. 3:38). Strava laps: show time + pace. Estimated: show time + pace.
+          var repDisplay = isDescSource
+            ? rep.time
+            : rep.isTimeBased ? rep.distanceKm + 'km'
+            : rep.time + (rep.distanceKm ? ' (' + rep.distanceKm + 'km)' : '');
+          var paceStr = isDescSource ? '/km' : ' (' + rep.pace + '/km)';
           return '<div class="split-row">' +
             '<div class="split-km" style="min-width:32px">R' + rep.num + '</div>' +
-            '<div class="split-bar ' + cls + '" style="width:' + pct + '%">' + repDisplay + ' <span style="opacity:.7;font-size:10px">(' + rep.pace + '/km)</span></div>' +
+            '<div class="split-bar ' + cls + '" style="width:' + pct + '%">' + repDisplay + (isDescSource ? '' : ' <span style="opacity:.7;font-size:10px">' + rep.pace + '/km</span>') + '</div>' +
           '</div>';
         }).join('') +
         '<div style="display:flex;gap:16px;margin-top:10px;font-size:11px;font-weight:600;color:var(--t3)">' +
-          (rd.intervalType === 'time' ?
+          (rd.intervalType === 'time' && !isDescSource && !isStravaSource ?
             ('<span>Max: <span class="mono" style="color:var(--grn)">' + Math.max.apply(null, rd.reps.map(function(r){return parseFloat(r.distanceKm)})).toFixed(2) + 'km</span></span>' +
              '<span>Min: <span class="mono" style="color:var(--org)">' + Math.min.apply(null, rd.reps.map(function(r){return parseFloat(r.distanceKm)})).toFixed(2) + 'km</span></span>' +
              '<span>Avg: <span class="mono">' + (rd.reps.reduce(function(sum,r){return sum+parseFloat(r.distanceKm)},0)/rd.reps.length).toFixed(2) + 'km</span></span>')
             :
-            ('<span>Fastest: <span class="mono" style="color:var(--grn)">' + secsToTimeMS(Math.round(minP)) + '/km</span></span>' +
-             '<span>Slowest: <span class="mono" style="color:var(--org)">' + secsToTimeMS(Math.round(maxP)) + '/km</span></span>' +
+            ('<span>Fastest: <span class="mono" style="color:var(--grn)">' + secsToTimeMS(Math.round(minP)) + (isDescSource ? '' : '/km') + '</span></span>' +
+             '<span>Slowest: <span class="mono" style="color:var(--org)">' + secsToTimeMS(Math.round(maxP)) + (isDescSource ? '' : '/km') + '</span></span>' +
              '<span>Spread: <span class="mono">' + Math.round(maxP - minP) + 's</span></span>')
           ) +
         '</div>' +
@@ -3234,20 +3366,7 @@ function renderAllRunsTab() {
     });
     h += '</div>';
 
-    // Parse rep splits from Strava description (e.g. "3:38, 3:40, 3:38, 3:40, 3:48")
-    function parseDescSplits(desc) {
-      if (!desc) return null;
-      // Find lines/groups with 2+ comma/semicolon-separated MM:SS times
-      var groups = desc.match(/\d{1,2}:\d{2}(?:\s*[,;]\s*\d{1,2}:\d{2})+/g);
-      if (!groups) return null;
-      // Pick the group with the most times
-      var best = groups.reduce(function(a, b) {
-        return (a.match(/\d{1,2}:\d{2}/g)||[]).length >= (b.match(/\d{1,2}:\d{2}/g)||[]).length ? a : b;
-      });
-      var times = best.match(/\d{1,2}:\d{2}/g);
-      if (!times || times.length < 2) return null;
-      return times;
-    }
+
 
     // Real Strava laps — look up by date, match by closest distance
     var realLaps = null;
