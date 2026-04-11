@@ -26,23 +26,29 @@
 body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--t1);background:var(--bg);line-height:1.45;-webkit-font-smoothing:antialiased}
 .mono{font-family:'JetBrains Mono',monospace}
 
-/* LAYOUT */
-.wrap{max-width:1200px;margin:0 auto;padding:20px 32px 80px}
+/* LAYOUT — sidebar shell */
+.shell{display:flex;min-height:100vh;background:var(--bg)}
+.main-wrap{flex:1;min-width:0;padding:28px 36px 80px}
 
-/* HERO */
-.hero{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px;padding:32px 40px;border-radius:16px;background:linear-gradient(135deg,#1a6b42,#228B56,#1a8a5a);box-shadow:0 4px 24px rgba(0,0,0,.12)}
-.hero h1{font-size:38px;font-weight:800;letter-spacing:-.5px;line-height:1.1;color:#fff;background:none;-webkit-text-fill-color:#fff}
-.hero .sub{font-size:15px;color:rgba(255,255,255,.75);margin-top:10px;font-weight:500}
-.cd{text-align:right}
-.cd .n{font-family:'JetBrains Mono';font-size:56px;font-weight:700;color:#fff;-webkit-text-fill-color:#fff;background:none;line-height:1}
-.cd .l{font-size:9px;text-transform:uppercase;letter-spacing:3px;color:rgba(255,255,255,.65);font-weight:700;margin-top:4px}
-
-/* NAV */
-.nav{display:flex;gap:4px;margin-bottom:32px;background:rgba(255,255,255,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-radius:14px;padding:5px;border:1px solid var(--bdr);position:sticky;top:12px;z-index:50}
-.nav-btn{font-family:'Inter';font-size:14px;font-weight:700;padding:12px 0;cursor:pointer;border:none;background:transparent;color:var(--t3);border-radius:10px;transition:all .2s;white-space:nowrap;flex:1;text-align:center}
-.nav-btn:hover{color:var(--t2);background:var(--card2)}
-.nav-btn.on{color:var(--t1);background:var(--card2);box-shadow:var(--shadow)}
+/* SIDEBAR */
+.sidebar{width:210px;flex-shrink:0;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;background:var(--card);border-right:1px solid var(--bdr);z-index:50;overflow-y:auto}
+.sidebar-brand{padding:22px 18px 16px;border-bottom:1px solid var(--bdr)}
+.sidebar-title{font-size:14px;font-weight:800;color:var(--t1);letter-spacing:-.3px;line-height:1.2}
+.sidebar-race{font-size:11px;color:var(--t3);font-weight:600;margin-top:3px}
+.sidebar-cd{margin-top:12px;padding:10px 12px;background:var(--grnSoft);border-radius:10px;border:1px solid rgba(13,140,84,.15)}
+.sidebar-cd-n{font-size:30px;font-weight:800;color:var(--grn);font-family:'JetBrains Mono',monospace;line-height:1}
+.sidebar-cd-l{font-size:9px;color:var(--grn);font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:.7;margin-top:2px}
+.sidebar-nav{flex:1;padding:8px 10px;display:flex;flex-direction:column;gap:2px}
+.nav-btn{font-family:'Inter';font-size:13px;font-weight:600;padding:9px 12px;cursor:pointer;border:none;background:transparent;color:var(--t3);border-radius:10px;transition:all .18s;white-space:nowrap;text-align:left;width:100%;position:relative}
+.nav-btn:hover{color:var(--t2);background:var(--bg2)}
+.nav-btn.on{color:var(--grn);background:var(--grnSoft);font-weight:700}
+.nav-btn.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:18px;background:var(--grn);border-radius:0 2px 2px 0}
+.sidebar-foot{padding:14px 18px;border-top:1px solid var(--bdr);font-size:10px;color:var(--t3);font-weight:500;line-height:1.5}
 .page{display:none;opacity:0;transition:opacity .25s ease}.page.show{display:block}.page.show.visible{opacity:1}
+
+/* VOLUME HOVER TOOLTIP */
+.vol-tip{position:fixed;background:var(--t1);color:#fff;font-size:12px;font-weight:600;padding:7px 12px;border-radius:8px;pointer-events:none;z-index:500;opacity:0;transition:opacity .12s;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.25);transform:translateY(-4px)}
+.vol-tip.show{opacity:1;transform:translateY(0)}
 
 /* CARDS & GRIDS */
 .sec{margin-top:32px}
@@ -416,18 +422,15 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--t1);back
 
 /* MOBILE RESPONSIVE */
 @media(max-width:768px){
-  .wrap{padding:16px 16px 80px}
-  /* Hero */
-  .hero{flex-direction:column;align-items:flex-start;gap:16px;padding:20px 20px;margin-bottom:20px}
-  .hero h1{font-size:24px;letter-spacing:-.3px}
-  .hero .sub{font-size:13px}
-  .cd{text-align:left}
-  .cd .n{font-size:36px}
-  .cd .l{font-size:8px;letter-spacing:2px}
-  /* Nav — horizontal scroll on mobile */
-  .nav{overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-bottom:20px;border-radius:10px;padding:4px;gap:2px}
-  .nav::-webkit-scrollbar{display:none}
-  .nav-btn{white-space:nowrap;padding:10px 14px;font-size:12px;flex-shrink:0;flex:none}
+  /* Sidebar → fixed bottom tab bar on mobile */
+  .shell{flex-direction:column}
+  .sidebar{position:fixed;bottom:0;left:0;right:0;top:auto;width:100%;height:auto;flex-direction:row;border-right:none;border-top:1px solid var(--bdr);overflow-x:auto;overflow-y:visible;z-index:100}
+  .sidebar-brand,.sidebar-foot{display:none}
+  .sidebar-nav{flex-direction:row;padding:5px 4px;gap:0;overflow-x:auto;scrollbar-width:none;flex:1;align-items:center}
+  .sidebar-nav::-webkit-scrollbar{display:none}
+  .nav-btn{flex-shrink:0;min-width:52px;padding:7px 10px;font-size:10px;text-align:center;border-radius:8px;white-space:nowrap;width:auto}
+  .nav-btn.on::before{display:none}
+  .main-wrap{padding:16px 16px 90px}
   /* Grids */
   .g5{grid-template-columns:repeat(2,1fr)}
   .g4{grid-template-columns:repeat(2,1fr)}
@@ -663,12 +666,14 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--t1);back
 </style>
 </head>
 <body>
-<div class="wrap">
-<div class="hero">
-<div><h1>Liam's Running Journal</h1><div class="sub">A Race: K&#246;ln Marathon &mdash; Oct 4, 2026 &mdash; Training for 3:25 | Race target sub 3:30</div></div>
-<div class="cd"><div class="n mono" id="cd"></div><div class="l">Days to go</div></div>
+<div class="shell">
+<nav class="sidebar" id="nav">
+<div class="sidebar-brand">
+<div class="sidebar-title">Liam's Running</div>
+<div class="sidebar-race">K&ouml;ln Marathon &bull; Oct 4, 2026</div>
+<div class="sidebar-cd"><div class="sidebar-cd-n" id="cd"></div><div class="sidebar-cd-l">days to go</div></div>
 </div>
-<nav class="nav" id="nav">
+<div class="sidebar-nav">
 <button class="nav-btn on" data-page="dash">Dashboard</button>
 <button class="nav-btn" data-page="performance">Performance</button>
 <button class="nav-btn" data-page="health">Health</button>
@@ -676,8 +681,12 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--t1);back
 <button class="nav-btn" data-page="races">Races</button>
 <button class="nav-btn" data-page="intervals">Intervals</button>
 <button class="nav-btn" data-page="weekly">All Runs</button>
-<button class="nav-btn" data-page="plan">Training plan</button>
+<button class="nav-btn" data-page="plan">Training Plan</button>
+</div>
+<div class="sidebar-foot">Training for 3:25 &rarr; sub-3:30<br>Sub-19 5K by Oct</div>
 </nav>
+<div class="main-wrap">
+<div id="vol-tip" class="vol-tip"></div>
 <div class="page show visible" id="pg-dash"></div>
 <div class="page" id="pg-performance"></div>
 <div class="page" id="pg-health"></div>
@@ -686,6 +695,7 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--t1);back
 <div class="page" id="pg-intervals"></div>
 <div class="page" id="pg-weekly"></div>
 <div class="page" id="pg-plan"></div>
+</div>
 </div>
 <div class="drop-zone" id="drop-zone"><div class="drop-zone-inner">Drop Garmin CSV to update data</div></div>
 
@@ -2827,6 +2837,49 @@ document.getElementById('pg-volume').innerHTML =
     '</div>';
   })() +
 
+  // NEXT WEEK PREVIEW (from plan)
+  (function() {
+    var _pm = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+    function parseWkRange(s) {
+      var m = s.match(/\((\w+)\s+(\d+)\s*[\u2013\-]\s*(?:(\w+)\s+)?(\d+)\)/);
+      if (!m) return null;
+      return { start: new Date(2026, _pm[m[1]], parseInt(m[2])), end: new Date(2026, m[3] ? _pm[m[3]] : _pm[m[1]], parseInt(m[4]), 23, 59, 59) };
+    }
+    // Compute next week Mon-Sun
+    var nwMon = new Date(now); nwMon.setHours(0,0,0,0);
+    var _dow = (nwMon.getDay() + 6) % 7;
+    nwMon.setDate(nwMon.getDate() - _dow + 7);
+    var nwSun = new Date(nwMon); nwSun.setDate(nwMon.getDate() + 6); nwSun.setHours(23,59,59);
+    // Find plan week
+    var nwPlan = null;
+    for (var _pi = 0; _pi < plan.length && !nwPlan; _pi++) {
+      for (var _wi = 0; _wi < plan[_pi].weeks.length && !nwPlan; _wi++) {
+        var _r = parseWkRange(plan[_pi].weeks[_wi].wk);
+        if (_r && nwMon <= _r.end && nwSun >= _r.start) nwPlan = plan[_pi].weeks[_wi];
+      }
+    }
+    if (!nwPlan) return '';
+    var _mn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var _dr = _mn[nwMon.getMonth()] + ' ' + nwMon.getDate() + ' \u2013 ' + _mn[nwSun.getMonth()] + ' ' + nwSun.getDate();
+    var _tc = {te:'var(--grn)',tq:'var(--blu)',tl:'var(--prp)',tr2:'var(--t3)',tx:'var(--red)',ts:'var(--org)'};
+    var _bg = {te:'var(--grnSoft)',tq:'var(--bluGlow)',tl:'rgba(106,78,200,.08)',tr2:'transparent',tx:'var(--redGlow)',ts:'var(--orgGlow)'};
+    var _rows = nwPlan.days.filter(function(d){return d.desc;}).map(function(d){
+      return '<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdr2)">' +
+        '<div style="font-size:11px;font-weight:700;color:var(--t3);width:28px;flex-shrink:0;padding-top:2px">' + d.d + '</div>' +
+        '<div style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:' + (_bg[d.c]||'var(--bg2)') + ';color:' + (_tc[d.c]||'var(--t2)') + ';flex-shrink:0;white-space:nowrap">' + d.t + '</div>' +
+        '<div style="font-size:12px;color:var(--t2);line-height:1.4;flex:1">' + d.desc + '</div>' +
+      '</div>';
+    }).join('');
+    return '<div style="background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:18px 20px;margin-bottom:20px">' +
+      '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px">' +
+        '<div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3)">Next week &bull; ' + _dr + '</div>' +
+        '<div style="font-size:12px;color:var(--t2);margin-top:2px;font-weight:600">' + nwPlan.wk.split('(')[0].trim() + '</div></div>' +
+        '<div class="mono" style="font-size:18px;font-weight:800;color:var(--t1)">' + nwPlan.vol + '</div>' +
+      '</div>' +
+      '<div>' + _rows + '</div>' +
+    '</div>';
+  })() +
+
   (function() {
     var chartWeeks = recentWeeks.slice(-24); // show up to 24 weeks
     var currentWeekKey = recentWeeks[recentWeeks.length - 1];
@@ -2845,6 +2898,14 @@ document.getElementById('pg-volume').innerHTML =
       return '<line x1="' + padL + '" y1="' + gy + '" x2="' + (w - padR) + '" y2="' + gy + '" stroke="var(--bdr)" stroke-width="1"/>' +
         '<text x="' + (padL - 4) + '" y="' + (gy + 3) + '" text-anchor="end" font-size="9" fill="var(--t3)" font-family="JetBrains Mono,monospace">' + g + '</text>';
     }).join('');
+    // Helper: ISO week key → Monday date
+    function isoKeyToMon(key) {
+      var parts = key.split('-W'), yr = parseInt(parts[0]), wn = parseInt(parts[1]);
+      var jan4 = new Date(yr, 0, 4);
+      var d0 = (jan4.getDay() + 6) % 7;
+      var mon = new Date(yr, 0, 4 - d0 + (wn - 1) * 7);
+      return mon;
+    }
     // Bars + labels
     var bars = chartWeeks.map(function(k, i) {
       var wk = weeklyMap[k];
@@ -2854,26 +2915,27 @@ document.getElementById('pg-volume').innerHTML =
       var x = padL + i * (barW + gap);
       var y = padT + (h - padT - padB) - barH;
       var isCurrent = k === currentWeekKey;
-      var fill = isCurrent ? 'var(--grn)' : 'var(--bdr2)';
-      var opacity = isCurrent ? '1' : '0.7';
-      // Date label — show month start or every 4 weeks
+      var fill = isCurrent ? '#0d8c54' : '#dfe2ee';
+      var opacity = isCurrent ? '1' : '0.85';
+      // Mon–Sun date range for tooltip
+      var mon = isoKeyToMon(k);
+      var sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+      var rangeStr = mNames[mon.getMonth()] + ' ' + mon.getDate() + ' \u2013 ' + mNames[sun.getMonth()] + ' ' + sun.getDate();
+      var infoStr = rangeStr + ':  ' + km + ' km \u00B7 ' + wk.runs + ' run' + (wk.runs !== 1 ? 's' : '');
+      // Date label — show month start or first/last
       var label = '';
-      if (wk.startDate) {
-        var sd = wk.startDate;
-        if (i === 0 || sd.getDate() <= 7 || i === n - 1) {
-          label = mNames[sd.getMonth()] + ' ' + sd.getDate();
-        }
+      if (i === 0 || mon.getDate() <= 7 || i === n - 1) {
+        label = mNames[mon.getMonth()] + ' ' + mon.getDate();
       }
-      return '<g>' +
-        '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" rx="2" fill="' + fill + '" opacity="' + opacity + '">' +
-          '<title>' + (wk.startDate ? mNames[wk.startDate.getMonth()] + ' ' + wk.startDate.getDate() + ': ' : '') + km + ' km, ' + wk.runs + ' runs</title>' +
-        '</rect>' +
-        (isCurrent ? '<text x="' + (x + barW / 2) + '" y="' + (y - 5) + '" text-anchor="middle" font-size="9" font-weight="700" fill="var(--grn)" font-family="JetBrains Mono,monospace">' + km + '</text>' : '') +
+      return '<g data-k="' + k + '" data-info="' + infoStr + '" style="cursor:pointer">' +
+        '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" rx="2" fill="' + fill + '" opacity="' + opacity + '"/>' +
+        '<rect x="' + x + '" y="' + padT + '" width="' + barW + '" height="' + (h - padT - padB) + '" fill="transparent"/>' +
+        (isCurrent ? '<text x="' + (x + barW / 2) + '" y="' + (y - 5) + '" text-anchor="middle" font-size="9" font-weight="700" fill="#0d8c54" font-family="JetBrains Mono,monospace">' + km + '</text>' : '') +
         (label ? '<text x="' + (x + barW / 2) + '" y="' + (h - padB + 12) + '" text-anchor="middle" font-size="8" fill="var(--t3)" font-family="Inter,sans-serif">' + label + '</text>' : '') +
       '</g>';
     }).join('');
     return '<div class="sec"><div class="sec-h">Weekly volume</div>' +
-      '<div class="chart-wrap"><svg viewBox="0 0 ' + w + ' ' + h + '" class="chart-svg" preserveAspectRatio="none">' +
+      '<div class="chart-wrap"><svg id="vol-wk-chart" viewBox="0 0 ' + w + ' ' + h + '" class="chart-svg" preserveAspectRatio="none">' +
         gridLines + bars +
       '</svg></div></div>';
   })() +
@@ -4033,6 +4095,45 @@ setTimeout(function() {
 }, 100);
 
 })();
+
+// ===== WEEKLY VOLUME HOVER TOOLTIP =====
+(function() {
+  var tip = document.getElementById('vol-tip');
+  if (!tip) return;
+  var chart = document.getElementById('vol-wk-chart');
+  if (!chart) return;
+  var activeG = null;
+  chart.addEventListener('mouseover', function(e) {
+    var g = e.target.closest('g[data-k]');
+    if (!g || g === activeG) return;
+    activeG = g;
+    tip.textContent = g.dataset.info;
+    tip.classList.add('show');
+  });
+  chart.addEventListener('mousemove', function(e) {
+    if (!activeG) return;
+    tip.style.left = (e.clientX + 14) + 'px';
+    tip.style.top = (e.clientY - 42) + 'px';
+  });
+  chart.addEventListener('mouseout', function(e) {
+    var g = e.target.closest('g[data-k]');
+    if (g && chart.contains(e.relatedTarget) && e.relatedTarget.closest('g[data-k]') === g) return;
+    if (!chart.contains(e.relatedTarget)) {
+      activeG = null;
+      tip.classList.remove('show');
+    } else {
+      var nextG = e.relatedTarget ? e.relatedTarget.closest('g[data-k]') : null;
+      if (nextG && nextG !== activeG) {
+        activeG = nextG;
+        tip.textContent = nextG.dataset.info;
+      } else if (!nextG) {
+        activeG = null;
+        tip.classList.remove('show');
+      }
+    }
+  });
+})();
+
 </script>
 </body>
 </html>
