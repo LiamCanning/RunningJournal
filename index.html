@@ -1182,13 +1182,13 @@ recentWeeks.forEach(function(k) { if (weeklyMap[k].km > wkMax) wkMax = weeklyMap
 // Personal bests (from race-flagged runs at standard distances)
 var pbDists = [
   { label: '1 km', min: 0.95, max: 1.05 },
-  { label: '2 km', min: 1.9, max: 2.1 },
-  { label: '3 km', min: 2.9, max: 3.1 },
-  { label: '5 km', min: 4.8, max: 5.2 },
-  { label: '7.5 km', min: 7.3, max: 8.0 },
-  { label: '10 km', min: 9.5, max: 10.5 },
-  { label: '15 km', min: 14.5, max: 15.5 },
-  { label: 'HM', min: 20.5, max: 23.5 },
+  { label: '2 km', min: 1.95, max: 2.05 },
+  { label: '3 km', min: 2.95, max: 3.05 },
+  { label: '5 km', min: 4.9, max: 5.15 },
+  { label: '7.5 km', min: 7.4, max: 7.7 },
+  { label: '10 km', min: 9.8, max: 10.3 },
+  { label: '15 km', min: 14.8, max: 15.3 },
+  { label: 'HM', min: 20.9, max: 21.5 },
 ];
 var pbs = pbDists.map(function(pd) {
   var best = null;
@@ -1259,7 +1259,7 @@ var formData = formFields.map(function(f) {
 });
 
 // ===== RACES (from "Race –" title prefix) =====
-var raceDistCats = { '4k': [3.5, 4.5], '5k': [4.5, 5.3], '6k': [5.5, 7.0], '7.5k': [7.0, 8.5], '10k': [9.0, 10.5], '15k': [14.0, 16.0], '21k': [20.0, 23.5], '30k': [27.0, 33.0], '42k': [40.0, 44.0] };
+var raceDistCats = { '4k': [3.8, 4.3], '5k': [4.8, 5.3], '6k': [5.8, 6.3], '7.5k': [7.3, 7.8], '10k': [9.8, 10.5], '15k': [14.8, 15.5], '21k': [20.8, 22.0], '30k': [29.5, 31.0], '42k': [41.8, 43.0] };
 var races = [];
 allRuns.forEach(function(r) {
   if (!/^Race\s/i.test(r.title)) return;
