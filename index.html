@@ -2928,9 +2928,9 @@ document.getElementById('pg-volume').innerHTML =
       if (i === 0 || mon.getDate() <= 7 || i === n - 1) {
         label = mNames[mon.getMonth()] + ' ' + mon.getDate();
       }
-      return '<g data-k="' + k + '" data-info="' + infoStr + '" style="cursor:pointer">' +
-        '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" rx="2" fill="' + fill + '" opacity="' + opacity + '"/>' +
-        '<rect x="' + x + '" y="' + padT + '" width="' + barW + '" height="' + (h - padT - padB) + '" fill="transparent"/>' +
+      return '<g data-k="' + k + '" data-info="' + infoStr + '" style="cursor:pointer" pointer-events="all">' +
+        '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" rx="2" fill="' + fill + '" opacity="' + opacity + '" pointer-events="all"/>' +
+        '<rect x="' + x + '" y="' + padT + '" width="' + barW + '" height="' + (h - padT - padB) + '" fill="#000" opacity="0" pointer-events="all"/>' +
         (isCurrent ? '<text x="' + (x + barW / 2) + '" y="' + (y - 5) + '" text-anchor="middle" font-size="9" font-weight="700" fill="#0d8c54" font-family="JetBrains Mono,monospace">' + km + '</text>' : '') +
         (label ? '<text x="' + (x + barW / 2) + '" y="' + (h - padB + 12) + '" text-anchor="middle" font-size="8" fill="var(--t3)" font-family="Inter,sans-serif">' + label + '</text>' : '') +
       '</g>';
@@ -4103,35 +4103,18 @@ setTimeout(function() {
   if (!tip) return;
   var chart = document.getElementById('vol-wk-chart');
   if (!chart) return;
-  var activeG = null;
   chart.addEventListener('mouseover', function(e) {
     var g = e.target.closest('g[data-k]');
-    if (!g || g === activeG) return;
-    activeG = g;
+    if (!g) return;
     tip.textContent = g.dataset.info;
     tip.classList.add('show');
   });
   chart.addEventListener('mousemove', function(e) {
-    if (!activeG) return;
-    tip.style.left = (e.clientX + 14) + 'px';
-    tip.style.top = (e.clientY - 42) + 'px';
+    tip.style.left = (e.clientX + 16) + 'px';
+    tip.style.top  = (e.clientY - 44) + 'px';
   });
-  chart.addEventListener('mouseout', function(e) {
-    var g = e.target.closest('g[data-k]');
-    if (g && chart.contains(e.relatedTarget) && e.relatedTarget.closest('g[data-k]') === g) return;
-    if (!chart.contains(e.relatedTarget)) {
-      activeG = null;
-      tip.classList.remove('show');
-    } else {
-      var nextG = e.relatedTarget ? e.relatedTarget.closest('g[data-k]') : null;
-      if (nextG && nextG !== activeG) {
-        activeG = nextG;
-        tip.textContent = nextG.dataset.info;
-      } else if (!nextG) {
-        activeG = null;
-        tip.classList.remove('show');
-      }
-    }
+  chart.addEventListener('mouseleave', function() {
+    tip.classList.remove('show');
   });
 })();
 
