@@ -731,6 +731,11 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--t1);back
 // Embedded CSV data — paste new Garmin export below this line (everything between backticks)
 var CSV_DATA = `
 Tipo de actividad,Fecha,Favorito,Título,Distancia,Calorías,Tiempo,Frecuencia cardiaca media,FC máxima,TE aeróbico,Cadencia de carrera media,Cadencia de carrera máxima,Ritmo medio,Ritmo óptimo,Ascenso total,Descenso total,Longitud media de zancada,Relación vertical media,Oscilación vertical media,Tiempo medio de contacto con el suelo,GAP medio,Normalized Power® (NP®),Training Stress Score®,Potencia media,Potencia máxima,Pasos,Descarga de Body Battery,Temperatura mínima,Descompresión,Mejor tiempo de vuelta,Número de vueltas,Temperatura máxima,Ritmo respiratorio medio,Ritmo mínimo de respiración,Ritmo máximo de respiración,Tiempo en movimiento,Tiempo transcurrido,Altura mínima,Altura máxima
+Carrera,2026-04-12 09:00:36,false,Steady Run,10.07,767,00:41:27,178,191,5.0,176,188,4:07,3:41,21,20,1.38,6.9,9.5,232,4:07,467,0.0,465,573,"7,256",-22,21.0,No,00:00:15.1,11,25.0,00:41:24,00:41:27,22,33
+Carrera,2026-04-11 14:35:27,false,Intervals,7.32,532,00:38:49,134,156,2.8,162,196,5:18,3:06,19,17,1.15,8.0,9.1,262,5:19,363,0.0,359,646,"6,322",-11,27.0,No,00:00:06.6,17,29.0,00:38:29,00:46:31,20,30
+Carrera,2026-04-10 08:59:07,false,Recovery Run,7.02,571,00:40:13,139,158,3.1,173,182,5:44,4:55,9,11,1.00,8.3,8.4,264,5:45,331,0.0,330,406,"6,946",-12,22.0,No,00:00:07.4,8,26.0,00:40:10,00:40:13,3,11
+Carrera,2026-04-07 19:40:28,false,Easy Run,11.70,953,01:00:00,157,187,4.1,171,181,5:08,4:12,18,12,1.14,7.9,9.0,258,5:07,378,0.0,376,511,"10,294",-14,20.0,No,01:00:00,1,25.0,00:59:58,01:00:50,5,20
+Carrera,2026-04-03 18:19:31,false,Long Run – 15km,15.01,"1,181",01:13:21,160,186,5.0,170,180,4:53,3:54,41,46,1.20,7.7,9.1,253,4:54,402,0.0,399,566,"12,530",-14,23.0,No,00:00:04.2,16,27.0,01:12:55,01:19:15,5,30
 Carrera,2026-03-28 12:05:56,false,Intervals – 6x1km,9.02,710,00:42:25,163,189,4.4,164,188,4:42,3:27,15,17,1.26,7.2,8.8,243,4:43,438,0.0,399,598,"7,046",-14,24.0,No,00:01:30,14,26.0,--,--,--,00:41:42,00:42:25,10,21
 Carrera,2026-03-26 18:40:13,false,Easy Run,10.01,780,00:51:34,148,163,3.7,171,182,5:09,3:59,18,15,1.13,7.9,9.0,259,5:09,380,0.0,377,549,"8,824",-11,18.0,No,00:00:06.6,11,22.0,--,--,--,00:51:30,00:51:34,6,19
 Carrera,2026-03-25 18:33:15,false,Tempo Run,11.19,813,00:53:02,153,187,4.1,169,182,4:44,3:55,30,30,1.23,7.6,9.3,251,4:45,409,0.0,405,571,"9,024",-13,22.0,No,00:00:51.1,12,27.0,--,--,--,00:52:47,00:57:29,5,23
@@ -985,12 +990,6 @@ Carrera,2024-05-26 11:27:37,false,Easy Run,12.38,"1,076",01:03:50,175,189,5.0,16
 Carrera,2024-05-25 09:03:58,false,ParkRun – Bucks,5.01,375,00:21:27,163,199,3.9,174,188,4:17,3:41,17,17,1.34,7.1,9.5,238,4:17,460,0.0,456,603,"3,720",-10,--,No,00:00:01.3,6,--,--,--,--,00:21:24,00:21:27,77,85
 Carrera,2024-05-25 08:38:52,false,Warm-Up,1.06,83,00:06:30.0,122,137,1.5,164,182,6:07,5:09,8,10,1.00,8.5,8.4,268,6:00,342,0.0,322,491,"1,070",-2,--,No,00:00:23.6,2,--,--,--,--,00:06:19,00:06:49.6,79,86
 Carrera,2024-05-23 17:58:19,false,Moderate Run,1.96,144,00:09:13.8,158,180,2.6,169,188,4:43,3:55,1,3,1.25,7.4,9.2,245,4:40,428,0.0,408,499,"1,570",-3,--,No,00:00:13.8,5,--,27,14,36,00:09:09.6,00:09:13.8,34,37
-Carrera,2026-04-03 18:19:31,false,Tempo Run,15.01,,01:19:14,160,186,,,,4:53,,,,,,,,,,,,,,,,,,,,,,,,,,
-Carrera,2026-04-04 11:41:23,false,Intervals – 5x1km,7.84,,00:52:08,159,196,,,,4:53,,,,,,,,,,,,,,,,,,,,,,,,,,
-Carrera,2026-04-07 19:40:28,false,Easy Run – Rodaje 60’,11.70,,01:00:49,156,187,,,,5:07,,,,,,,,,,,,,,,,,,,,,,,,,,
-Carrera,2026-04-10 08:59:07,false,Easy Run – Con Nico Tranquilo,7.01,,00:40:12,139,158,,,,5:43,,,,,,,,,,,,,,,,,,,,,,,,,,
-Carrera,2026-04-11 14:35:27,false,Easy Run – Relaxed Run,7.32,,00:46:30,134,156,,,,5:17,,,,,,,,,,,,,,,,,,,,,,,,,,
-Carrera,2026-04-12 09:00:36,false,Race – 10K Marca Personal  | Carrera de Empresas,10.06,,00:41:26,178,191,,,,4:07,,,,,,,,,,,,,,,,,,,,,,,,,,
 `;
 
 // ===== GARMIN METRICS =====
