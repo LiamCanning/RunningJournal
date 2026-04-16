@@ -159,6 +159,66 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--t1);back
 .prog-lbl{font-size:9px;color:var(--t3);margin-top:8px;text-align:center;line-height:1.2;font-weight:500}
 .empty{padding:60px;text-align:center;color:var(--t3);font-size:15px;background:var(--card);border:1px solid var(--bdr);border-radius:14px;font-weight:500}
 
+/* RACE CALENDAR */
+.cal-hero{background:linear-gradient(135deg,var(--grn) 0%,#0a6b40 100%);color:#fff;border-radius:18px;padding:26px 30px;margin-bottom:22px;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;position:relative;overflow:hidden}
+.cal-hero::before{content:'';position:absolute;top:-50%;right:-20%;width:400px;height:400px;background:radial-gradient(circle,rgba(255,255,255,.08) 0%,transparent 70%);pointer-events:none}
+.cal-hero-l{flex:1;min-width:220px;position:relative;z-index:1}
+.cal-hero-lbl{font-size:10px;text-transform:uppercase;letter-spacing:2.5px;opacity:.75;font-weight:700;margin-bottom:6px}
+.cal-hero-name{font-size:24px;font-weight:800;margin-bottom:6px;letter-spacing:-.3px}
+.cal-hero-meta{font-size:13px;opacity:.85;font-weight:500}
+.cal-hero-r{text-align:right;position:relative;z-index:1}
+.cal-hero-cd{font-family:'JetBrains Mono';font-size:52px;font-weight:800;line-height:1;letter-spacing:-2px}
+.cal-hero-cdlbl{font-size:11px;text-transform:uppercase;letter-spacing:2px;opacity:.8;margin-top:4px;font-weight:700}
+.cal-filter{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;align-items:center}
+.cal-filter-group{display:flex;gap:4px;background:var(--card);border:1px solid var(--bdr);border-radius:10px;padding:4px}
+.cal-filter-lbl{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);font-weight:700;margin-right:6px}
+.cal-chip{font-family:'Inter';font-size:12px;font-weight:700;padding:7px 14px;cursor:pointer;border:none;background:transparent;color:var(--t3);border-radius:6px;transition:all .15s;white-space:nowrap}
+.cal-chip:hover{color:var(--t1)}
+.cal-chip.on{background:var(--card2);color:var(--t1);box-shadow:var(--shadow)}
+.cal-section-h{font-size:11px;text-transform:uppercase;letter-spacing:2.5px;color:var(--t3);font-weight:700;margin:28px 0 12px;display:flex;align-items:center;gap:10px}
+.cal-section-h .cal-count{background:var(--card2);color:var(--t2);font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;letter-spacing:.5px}
+.cal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+.cal-card{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:18px 20px;transition:all .18s;position:relative;display:flex;flex-direction:column;gap:12px}
+.cal-card:hover{border-color:var(--bdr2);transform:translateY(-1px);box-shadow:var(--shadowL)}
+.cal-card.confirmed{border-left:4px solid var(--grn)}
+.cal-card.possibility{border-left:4px solid var(--org)}
+.cal-card.bucket{border-left:4px solid var(--blu)}
+.cal-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.cal-card-dateline{display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono';font-size:12px;font-weight:700;color:var(--t2)}
+.cal-card-date{color:var(--t1)}
+.cal-card-cd{background:var(--grnSoft);color:var(--grn);font-size:10px;font-weight:800;padding:3px 9px;border-radius:10px;letter-spacing:.3px;white-space:nowrap}
+.cal-card-cd.soon{background:#fff3e5;color:var(--org)}
+.cal-card-cd.imminent{background:#ffe5e5;color:var(--red);animation:pulse 1.6s ease-in-out infinite}
+.cal-card-cd.past{background:var(--card2);color:var(--t3)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.cal-card-dist{font-size:10px;font-weight:800;background:var(--card2);color:var(--t1);padding:4px 10px;border-radius:6px;letter-spacing:1px;white-space:nowrap}
+.cal-card-dist.marathon{background:linear-gradient(135deg,var(--red),#c43030);color:#fff}
+.cal-card-dist.half{background:linear-gradient(135deg,var(--blu),#1a5cad);color:#fff}
+.cal-card-dist.tenK{background:linear-gradient(135deg,var(--org),#c27020);color:#fff}
+.cal-card-dist.fiveK{background:linear-gradient(135deg,var(--grn),#0a6b40);color:#fff}
+.cal-card-dist.fifteenK{background:linear-gradient(135deg,#6b3fa0,#4a2a75);color:#fff}
+.cal-card-name{font-size:15px;font-weight:700;color:var(--t1);line-height:1.3}
+.cal-card-loc{font-size:12px;color:var(--t3);font-weight:500;display:flex;align-items:center;gap:6px}
+.cal-card-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:auto;padding-top:10px;border-top:1px solid var(--bdr)}
+.cal-card-tag{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;letter-spacing:.5px;text-transform:uppercase}
+.cal-card-tag.registered{background:var(--grnSoft);color:var(--grn)}
+.cal-card-tag.possibility{background:#fff3e5;color:var(--org)}
+.cal-card-tag.reg-open{background:var(--bluGlow);color:var(--blu)}
+.cal-card-tag.reg-closed{background:var(--card2);color:var(--t3)}
+.cal-card-tag.reg-ballot{background:#f4e9ff;color:#6b3fa0}
+.cal-card-tag.reg-upcoming{background:var(--card2);color:var(--t2)}
+.cal-card-reg{font-size:11px;color:var(--t3);font-weight:500}
+.cal-card-link{font-size:11px;color:var(--grn);font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.cal-card-link:hover{text-decoration:underline}
+.cal-card-notes{font-size:12px;color:var(--t2);line-height:1.4;font-style:italic;padding:8px 12px;background:var(--bg2);border-radius:8px}
+@media (max-width:640px){
+  .cal-hero{padding:18px 20px}
+  .cal-hero-cd{font-size:40px}
+  .cal-hero-name{font-size:19px}
+  .cal-grid{grid-template-columns:1fr;gap:10px}
+  .cal-card{padding:14px 16px}
+}
+
 /* INTERVAL CARDS — Expandable style like races */
 .int-toolbar{display:flex;gap:8px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
 .int-toolbar .cmp-toggle{font-family:'Inter';font-size:12px;font-weight:700;padding:10px 20px;border:2px solid var(--bdr);border-radius:10px;background:var(--card);color:var(--t2);cursor:pointer;transition:all .2s;margin-left:auto}
@@ -679,6 +739,7 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--t1);back
 <button class="nav-btn" data-page="health">Health</button>
 <button class="nav-btn" data-page="volume">Volume</button>
 <button class="nav-btn" data-page="races">Races</button>
+<button class="nav-btn" data-page="calendar">Calendar</button>
 <button class="nav-btn" data-page="intervals">Intervals</button>
 <button class="nav-btn" data-page="weekly">All Runs</button>
 <button class="nav-btn" data-page="plan">Training Plan</button>
@@ -692,6 +753,7 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--t1);back
 <div class="page" id="pg-health"></div>
 <div class="page" id="pg-volume"></div>
 <div class="page" id="pg-races"></div>
+<div class="page" id="pg-calendar"></div>
 <div class="page" id="pg-intervals"></div>
 <div class="page" id="pg-weekly"></div>
 <div class="page" id="pg-plan"></div>
@@ -3194,6 +3256,206 @@ document.getElementById('pg-races').addEventListener('click', function(e) {
   }
   var head = e.target.closest('.rc-head');
   if (head) { head.parentElement.classList.toggle('open'); }
+});
+
+// ===== RACE CALENDAR PAGE =====
+// Data model per race:
+//   { date:'YYYY-MM-DD' | 'TBA-YYYY-MM', dist:'5K'|'10K'|'Half'|'Marathon'|'Other',
+//     distKm: number, name, location, cat:'near'|'spain'|'international',
+//     status:'confirmed'|'possibility'|'bucket',
+//     registrationStatus:'open'|'closed'|'ballot'|'upcoming'|'unknown',
+//     registrationOpens: string, url, notes }
+var raceCalendar = [
+  // ── Confirmed (Liam is signed up) ──
+  { date:'2026-04-25', dist:'5K',      distKm:5,    name:'Volta a Peu',                     location:'Valencia, Spain', cat:'near', status:'confirmed', registrationStatus:'closed', registrationOpens:'Registered', url:'https://sportmaniacs.com/', notes:'Classic Valencia popular 5K.' },
+  { date:'2026-05-10', dist:'5K',      distKm:5,    name:'José Antonio Redolat',            location:'Valencia, Spain', cat:'near', status:'confirmed', registrationStatus:'closed', registrationOpens:'Registered', url:'https://sportmaniacs.com/', notes:'Fast flat course.' },
+  { date:'2026-05-24', dist:'5K',      distKm:5,    name:'VII Marta Fernández',             location:'Valencia, Spain', cat:'near', status:'confirmed', registrationStatus:'closed', registrationOpens:'Registered', url:'https://sportmaniacs.com/', notes:'Charity 5K.' },
+  { date:'2026-06-14', dist:'5K',      distKm:5,    name:'Runners Ciutat',                  location:'Valencia, Spain', cat:'near', status:'confirmed', registrationStatus:'closed', registrationOpens:'Registered', url:'https://sportmaniacs.com/', notes:'Club home race.' },
+  { date:'2026-06-21', dist:'10K',     distKm:10,   name:'Ponle Freno 10K',                 location:'Valencia, Spain', cat:'near', status:'possibility', registrationStatus:'open', registrationOpens:'Not yet confirmed',  url:'https://ponleFreno.atresmedia.com/carreras/', notes:'Road-safety charity race — possibility.' },
+  { date:'2026-09-20', dist:'5K',      distKm:5,    name:'Barris de Sant Marcel·lí',        location:'Valencia, Spain', cat:'near', status:'confirmed', registrationStatus:'closed', registrationOpens:'Registered', url:'https://sportmaniacs.com/', notes:'Neighbourhood 5K.' },
+  { date:'2026-09-26', dist:'15K',     distKm:15,   name:'15K Nocturna Valencia',           location:'Valencia, Spain', cat:'near', status:'confirmed', registrationStatus:'closed', registrationOpens:'Registered', url:'https://15knocturna.es/', notes:'Iconic night race — last hard effort before Köln.' },
+  { date:'2026-10-04', dist:'Marathon',distKm:42.2, name:'Köln Marathon',                   location:'Köln, Germany',   cat:'international', status:'confirmed', registrationStatus:'closed', registrationOpens:'Registered', url:'https://www.koeln-marathon.de/', notes:'A-race — target 3:25, stretch sub-3:30.' },
+
+  // ── User-added possibility ──
+  { date:'2026-11-08', dist:'Half',    distKm:21.1, name:'Mitja Marató de Gandia',          location:'Gandia, Spain',   cat:'near', status:'possibility', registrationStatus:'upcoming', registrationOpens:'Typically opens ~Jul–Aug', url:'https://mitjagandia.com/', notes:'First half-marathon option post-Köln — 70km south.' },
+
+  // ── Bucket-list races (populated from research) ──
+  /*__RACE_CALENDAR_EXTRA__*/
+];
+
+function renderCalendar() {
+  var today = new Date(); today.setHours(0,0,0,0);
+
+  // Filter state
+  var distFilter = window.__calDist || 'all';
+  var travelFilter = window.__calTravel || 'all';
+
+  function matchesDist(r) {
+    if (distFilter === 'all') return true;
+    return r.dist === distFilter;
+  }
+  function matchesTravel(r) {
+    if (travelFilter === 'all') return true;
+    return r.cat === travelFilter;
+  }
+
+  function distClass(d) {
+    if (d === 'Marathon') return 'marathon';
+    if (d === 'Half') return 'half';
+    if (d === '10K') return 'tenK';
+    if (d === '5K') return 'fiveK';
+    if (d === '15K') return 'fifteenK';
+    return '';
+  }
+
+  function parseRaceDate(ds) {
+    if (ds && ds.indexOf('TBA') === 0) return null;
+    return new Date(ds);
+  }
+
+  function daysTo(ds) {
+    var d = parseRaceDate(ds); if (!d) return null;
+    return Math.ceil((d - today) / (1000 * 60 * 60 * 24));
+  }
+
+  function fmtDate(ds) {
+    if (ds && ds.indexOf('TBA') === 0) {
+      var parts = ds.replace('TBA-','').split('-');
+      var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return 'TBA — ' + (months[parseInt(parts[1],10)-1] || '?') + ' ' + parts[0];
+    }
+    var d = new Date(ds);
+    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var dow = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()];
+    return dow + ' ' + d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+  }
+
+  function cdChip(ds) {
+    var d = daysTo(ds);
+    if (d == null) return '';
+    if (d < 0) return '<span class="cal-card-cd past">' + Math.abs(d) + 'd ago</span>';
+    if (d === 0) return '<span class="cal-card-cd imminent">TODAY</span>';
+    if (d <= 7) return '<span class="cal-card-cd imminent">' + d + 'd</span>';
+    if (d <= 30) return '<span class="cal-card-cd soon">' + d + 'd</span>';
+    return '<span class="cal-card-cd">' + d + 'd</span>';
+  }
+
+  function regTag(r) {
+    var rs = r.registrationStatus || 'unknown';
+    var label = { open:'Open', closed:r.status==='confirmed'?'Registered':'Closed', ballot:'Ballot', upcoming:'Soon', unknown:'' }[rs] || '';
+    var cls = { open:'reg-open', closed:r.status==='confirmed'?'registered':'reg-closed', ballot:'reg-ballot', upcoming:'reg-upcoming', unknown:'' }[rs] || '';
+    if (!label) return '';
+    return '<span class="cal-card-tag ' + cls + '">' + label + '</span>';
+  }
+
+  function cardHtml(r) {
+    var cls = 'cal-card ' + r.status;
+    var link = r.url ? '<a class="cal-card-link" href="' + r.url + '" target="_blank" rel="noopener">Info \u2192</a>' : '';
+    return '<div class="' + cls + '">' +
+      '<div class="cal-card-top">' +
+        '<div class="cal-card-dateline">' +
+          '<span class="cal-card-date">' + fmtDate(r.date) + '</span>' +
+          cdChip(r.date) +
+        '</div>' +
+        '<span class="cal-card-dist ' + distClass(r.dist) + '">' + r.dist + '</span>' +
+      '</div>' +
+      '<div>' +
+        '<div class="cal-card-name">' + r.name + '</div>' +
+        '<div class="cal-card-loc">\uD83D\uDCCD ' + r.location + '</div>' +
+      '</div>' +
+      (r.notes ? '<div class="cal-card-notes">' + r.notes + '</div>' : '') +
+      '<div class="cal-card-foot">' +
+        '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">' +
+          regTag(r) +
+          (r.registrationOpens && r.registrationStatus !== 'closed' ? '<span class="cal-card-reg">' + r.registrationOpens + '</span>' : '') +
+        '</div>' +
+        link +
+      '</div>' +
+    '</div>';
+  }
+
+  // Partition
+  var all = raceCalendar.filter(function(r) { return matchesDist(r) && matchesTravel(r); });
+  // Sort by date (TBA last)
+  all.sort(function(a, b) {
+    var aTba = (a.date || '').indexOf('TBA') === 0;
+    var bTba = (b.date || '').indexOf('TBA') === 0;
+    if (aTba && !bTba) return 1;
+    if (!aTba && bTba) return -1;
+    return a.date < b.date ? -1 : 1;
+  });
+
+  // Find hero: next confirmed future race
+  var hero = raceCalendar.filter(function(r) {
+    var d = daysTo(r.date); return d != null && d >= 0 && r.status === 'confirmed';
+  }).sort(function(a, b) { return daysTo(a.date) - daysTo(b.date); })[0];
+
+  var heroHtml = '';
+  if (hero) {
+    heroHtml = '<div class="cal-hero">' +
+      '<div class="cal-hero-l">' +
+        '<div class="cal-hero-lbl">Next up</div>' +
+        '<div class="cal-hero-name">' + hero.name + ' \u00B7 ' + hero.dist + '</div>' +
+        '<div class="cal-hero-meta">' + fmtDate(hero.date) + ' \u00B7 ' + hero.location + '</div>' +
+      '</div>' +
+      '<div class="cal-hero-r">' +
+        '<div class="cal-hero-cd">' + daysTo(hero.date) + '</div>' +
+        '<div class="cal-hero-cdlbl">days to go</div>' +
+      '</div>' +
+    '</div>';
+  }
+
+  // Filter chips
+  var distOpts = ['all','5K','10K','15K','Half','Marathon'];
+  var travelOpts = [['all','All'],['near','Near Valencia'],['spain','Spain'],['international','International']];
+
+  var filterHtml = '<div class="cal-filter">' +
+    '<span class="cal-filter-lbl">Distance</span>' +
+    '<div class="cal-filter-group">' +
+      distOpts.map(function(d) {
+        return '<button class="cal-chip' + (d === distFilter ? ' on' : '') + '" data-caldist="' + d + '">' + (d === 'all' ? 'All' : d) + '</button>';
+      }).join('') +
+    '</div>' +
+    '<span class="cal-filter-lbl" style="margin-left:12px">Region</span>' +
+    '<div class="cal-filter-group">' +
+      travelOpts.map(function(o) {
+        return '<button class="cal-chip' + (o[0] === travelFilter ? ' on' : '') + '" data-caltravel="' + o[0] + '">' + o[1] + '</button>';
+      }).join('') +
+    '</div>' +
+  '</div>';
+
+  // Group into sections by status/cat
+  var confirmed = all.filter(function(r) { return r.status === 'confirmed'; });
+  var possibilities = all.filter(function(r) { return r.status === 'possibility'; });
+  var bucketNear = all.filter(function(r) { return r.status === 'bucket' && r.cat === 'near'; });
+  var bucketSpain = all.filter(function(r) { return r.status === 'bucket' && r.cat === 'spain'; });
+  var bucketIntl = all.filter(function(r) { return r.status === 'bucket' && r.cat === 'international'; });
+
+  function section(title, list, emptyMsg) {
+    if (!list.length) return emptyMsg ? '<div class="cal-section-h">' + title + '</div><div class="empty" style="padding:30px;font-size:13px">' + emptyMsg + '</div>' : '';
+    return '<div class="cal-section-h">' + title + '<span class="cal-count">' + list.length + '</span></div>' +
+      '<div class="cal-grid">' + list.map(cardHtml).join('') + '</div>';
+  }
+
+  var body = filterHtml +
+    heroHtml +
+    section('Confirmed \u2014 I\u2019m running these', confirmed) +
+    section('Possibilities', possibilities) +
+    section('Near Valencia \u2014 bucket list', bucketNear) +
+    section('Spain \u2014 bucket list', bucketSpain) +
+    section('International \u2014 bucket list', bucketIntl);
+
+  if (!all.length) body += '<div class="empty">No races match the current filters.</div>';
+
+  document.getElementById('pg-calendar').innerHTML = body;
+}
+renderCalendar();
+
+document.getElementById('pg-calendar').addEventListener('click', function(e) {
+  var dc = e.target.closest('[data-caldist]');
+  if (dc) { window.__calDist = dc.dataset.caldist; renderCalendar(); return; }
+  var tc = e.target.closest('[data-caltravel]');
+  if (tc) { window.__calTravel = tc.dataset.caltravel; renderCalendar(); return; }
 });
 
 // Dashboard tab — click recent runs to see details, or navigate via "View all runs"
