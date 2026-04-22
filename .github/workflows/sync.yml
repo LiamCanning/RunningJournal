@@ -1,0 +1,41 @@
+name: Strava Sync
+
+on:
+  schedule:
+    - cron: '15 * * * *'   # every hour at :15 past
+  workflow_dispatch:         # allow manual trigger from GitHub UI
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write        # to commit dashboard back to repo
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run sync
+        env:
+          STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
+          STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
+          STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+          GH_REPO: ${{ github.repository }}
+        run: python3 automation/ci_sync.py
+
+      - name: Commit & push
+        run: |
+          git config user.name  "strava-sync[bot]"
+          git config user.email "strava-sync[bot]@users.noreply.github.com"
+          git add index.html classified_runs.csv strava_activity_cache.json
+          git diff --cached --quiet && echo "Nothing new." || \
+            (git commit -m "Auto-sync $(date -u '+%Y-%m-%d %H:%M') UTC" && git push)
