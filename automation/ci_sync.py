@@ -204,6 +204,20 @@ KNOWN_RACES = [
     r'MediaCity\s*10k', r'Barris\s*de\s*Sant', r'Nocturna\s*Val',
     r'Mitja\s*Marat', r'K.ln\s*Marathon', r'Koeln\s*Marathon', r'Cologne\s*Marathon',
 ]
+
+# Confirmed race calendar: date → (display name, expected distance in km).
+# Used to classify generic-named activities (e.g. "Evening Run") that fall on a race day.
+RACE_CALENDAR = {
+    '2026-04-25': ('Volta a Peu',          5),
+    '2026-05-10': ('Redolat 5K',           5),
+    '2026-05-24': ('VII Marta Fernandez',  5),
+    '2026-06-14': ('Runners Ciutat 5K',    5),
+    '2026-06-21': ('Ponle Freno 10K',     10),
+    '2026-09-20': ('Barris de Sant Marti', 5),
+    '2026-09-26': ('Nocturna Valencia',   15),
+    '2026-10-04': ('Köln Marathon',       42),
+    '2026-11-08': ('Mitja Marató Gandia', 21),
+}
 PARKRUN_RE = re.compile(r'[Pp]ark\s*[Rr]un')
 
 INTERVAL_RE = re.compile(
@@ -445,7 +459,17 @@ def main():
         name = act.get('name', '')
         desc = act.get('description', '')
         dist_full = act.get('distance_km', 0)
-        title = classify_strava_run(name, desc, dist_full)
+
+        # Race-calendar override: if this date is a confirmed race AND distance
+        # roughly matches (±3km), use the race name regardless of Strava title.
+        calendar_title = None
+        if date_str in RACE_CALENDAR:
+            race_name, race_dist = RACE_CALENDAR[date_str]
+            if abs(dist_full - race_dist) <= 3:
+                calendar_title = f"Race – {race_name}"
+                print(f"  [calendar] {date_str}: matched race day → {calendar_title}")
+
+        title = calendar_title or classify_strava_run(name, desc, dist_full)
 
         new_row = [''] * len(headers)
         new_row[col_map.get('Tipo de actividad', 0)] = 'Carrera'
