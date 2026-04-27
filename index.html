@@ -1334,7 +1334,10 @@ var formData = formFields.map(function(f) {
 });
 
 // ===== RACES (from "Race –" title prefix) =====
-var raceDistCats = { '4k': [3.8, 4.3], '5k': [4.8, 5.3], '6k': [5.8, 6.3], '7.5k': [7.3, 7.8], '10k': [9.8, 10.5], '15k': [14.8, 15.5], '21k': [20.8, 22.0], '30k': [29.5, 31.0], '42k': [41.8, 43.0] };
+// Broad buckets for display grouping — wider ranges absorb short-course variations
+var raceDistCats = { '5k': [4.5, 5.4], '10k': [9.0, 10.6], '15k': [14.5, 15.5], '21k': [20.5, 22.0], '30k': [29.5, 31.0], '42k': [41.5, 43.0] };
+// Narrow "clean" ranges — only truly standard distances count as record candidates
+var raceCleanRanges = { '5k': [4.8, 5.3], '10k': [9.8, 10.5], '15k': [14.8, 15.2], '21k': [20.8, 21.5], '30k': [29.8, 30.3], '42k': [41.8, 42.5] };
 var races = [];
 allRuns.forEach(function(r) {
   if (!/^Race\s/i.test(r.title)) return;
@@ -1342,7 +1345,7 @@ allRuns.forEach(function(r) {
   for (var c in raceDistCats) {
     if (r.dist >= raceDistCats[c][0] && r.dist <= raceDistCats[c][1]) { cat = c; break; }
   }
-  if (!cat) cat = r.dist.toFixed(1) + 'k';
+  if (!cat) return; // not a standard distance — skip entirely
   // Generate estimated splits
   var fullKm = Math.floor(r.dist);
   var avgPaceSecs = r.timeSecs / r.dist;
@@ -1362,7 +1365,13 @@ allRuns.forEach(function(r) {
   });
 });
 var bestByDist = {};
-races.forEach(function(r) { if (!bestByDist[r.cat] || r.timeSecs < bestByDist[r.cat]) bestByDist[r.cat] = r.timeSecs; });
+races.forEach(function(r) {
+  // Only races within the clean (standard) distance range can be the "best" for that category
+  var clean = raceCleanRanges[r.cat];
+  if (clean && r.dist >= clean[0] && r.dist <= clean[1]) {
+    if (!bestByDist[r.cat] || r.timeSecs < bestByDist[r.cat]) bestByDist[r.cat] = r.timeSecs;
+  }
+});
 
 // ===== INTERVALS =====
 var intPatterns = /x1km|x400|x800|x1'|x1\s*min|x\s*60s|track|pista|intervals?|benchmark|mile|20-15-5-10|10x|12x|6x|5x|4x|3x|\d+km\s*@/i;
@@ -3151,10 +3160,8 @@ function renderRaces() {
   // Build tabs dynamically from actual race categories
   var raceCats = {};
   races.forEach(function(r) { raceCats[r.cat] = true; });
-  var distOrder = ['4k','5k','6k','7.5k','10k','15k','21k','30k','42k'];
+  var distOrder = ['5k','10k','15k','21k','30k','42k'];
   var activeTabs = ['all'].concat(distOrder.filter(function(c) { return raceCats[c]; }));
-  // Add any extra categories not in the predefined order
-  Object.keys(raceCats).forEach(function(c) { if (activeTabs.indexOf(c) === -1) activeTabs.push(c); });
   var tabsHtml = '<div class="dtabs">' + activeTabs.map(function(c) {
     var label = c === 'all' ? 'All' : c === '21k' ? 'Half' : c.toUpperCase();
     return '<div class="dtab' + (c === curDist ? ' on' : '') + '" data-dist="' + c + '">' + label + '</div>';
