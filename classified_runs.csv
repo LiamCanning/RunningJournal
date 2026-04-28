@@ -1,4 +1,13 @@
 Tipo de actividad,Fecha,Favorito,Título,Distancia,Calorías,Tiempo,Frecuencia cardiaca media,FC máxima,TE aeróbico,Cadencia de carrera media,Cadencia de carrera máxima,Ritmo medio,Ritmo óptimo,Ascenso total,Descenso total,Longitud media de zancada,Relación vertical media,Oscilación vertical media,Tiempo medio de contacto con el suelo,GAP medio,Normalized Power® (NP®),Training Stress Score®,Potencia media,Potencia máxima,Pasos,Descarga de Body Battery,Temperatura mínima,Descompresión,Mejor tiempo de vuelta,Número de vueltas,Temperatura máxima,Ritmo respiratorio medio,Ritmo mínimo de respiración,Ritmo máximo de respiración,Tiempo en movimiento,Tiempo transcurrido,Altura mínima,Altura máxima
+Carrera,2026-04-25 18:00:30,false,Race – Volta a Peu,5.03,,00:19:43,186,205,,,,3:55,,,,,,,,,,,,,,,,,,,,,,,,,,
+Carrera,2026-04-23 12:48:10,false,Easy Run – Calma,10.01,,00:59:51,154,189,,,,5:37,,,,,,,,,,,,,,,,,,,,,,,,,,
+Carrera,2026-04-22 09:23:53,false,Intervals – 5x1km,8.32,,00:55:23,154,188,,,,4:56,,,,,,,,,,,,,,,,,,,,,,,,,,
+Carrera,2026-04-21 09:06:49,false,Easy Run – Relajadooo,7.62,,00:45:51,132,150,,,,6:01,,,,,,,,,,,,,,,,,,,,,,,,,,
+Carrera,2026-04-20 19:54:03,false,Easy Run – Z2 60’,10.63,,01:03:16,134,153,,,,5:48,,,,,,,,,,,,,,,,,,,,,,,,,,
+Carrera,2026-04-18 09:02:23,false,Easy Run – Parkrun en Buckingham,5.01,,00:21:15,179,189,,,,4:14,,,,,,,,,,,,,,,,,,,,,,,,,,
+Carrera,2026-04-18 08:34:15,false,Easy Run – Morning Run,2.37,,00:13:16,138,150,,,,5:35,,,,,,,,,,,,,,,,,,,,,,,,,,
+Carrera,2026-04-16 16:50:17,false,Easy Run – En Casa En Buckingham,9.21,,00:45:12,164,184,,,,4:53,,,,,,,,,,,,,,,,,,,,,,,,,,
+Carrera,2026-04-14 18:05:04,false,Easy Run – Una Hora Tranquila,11.39,,01:00:55,154,175,,,,5:17,,,,,,,,,,,,,,,,,,,,,,,,,,
 Carrera,2026-04-12 09:00:36,false,Race – 10K Marca Personal | Carrera de Empresas,10.07,767,00:41:27,178,191,5.0,176,188,4:07,3:41,21,20,1.38,6.9,9.5,232,4:07,467,0.0,465,573,"7,256",-22,21.0,No,00:00:15.1,11,25.0,00:41:24,00:41:27,22,33
 Carrera,2026-04-11 14:35:27,false,Easy Run,7.32,532,00:38:49,134,156,2.8,162,196,5:18,3:06,19,17,1.15,8.0,9.1,262,5:19,363,0.0,359,646,"6,322",-11,27.0,No,00:00:06.6,17,29.0,00:38:29,00:46:31,20,30
 Carrera,2026-04-10 08:59:07,false,Recovery Run,7.02,571,00:40:13,139,158,3.1,173,182,5:44,4:55,9,11,1.00,8.3,8.4,264,5:45,331,0.0,330,406,"6,946",-12,22.0,No,00:00:07.4,8,26.0,00:40:10,00:40:13,3,11
@@ -258,10 +267,3 @@ Carrera,2024-05-26 11:27:37,false,Easy Run,12.38,"1,076",01:03:50,175,189,5.0,16
 Carrera,2024-05-25 09:03:58,false,ParkRun – Bucks,5.01,375,00:21:27,163,199,3.9,174,188,4:17,3:41,17,17,1.34,7.1,9.5,238,4:17,460,0.0,456,603,"3,720",-10,--,No,00:00:01.3,6,--,--,--,--,00:21:24,00:21:27,77,85
 Carrera,2024-05-25 08:38:52,false,Warm-Up,1.06,83,00:06:30.0,122,137,1.5,164,182,6:07,5:09,8,10,1.00,8.5,8.4,268,6:00,342,0.0,322,491,"1,070",-2,--,No,00:00:23.6,2,--,--,--,--,00:06:19,00:06:49.6,79,86
 Carrera,2024-05-23 17:58:19,false,Moderate Run,1.96,144,00:09:13.8,158,180,2.6,169,188,4:43,3:55,1,3,1.25,7.4,9.2,245,4:40,428,0.0,408,499,"1,570",-3,--,No,00:00:13.8,5,--,27,14,36,00:09:09.6,00:09:13.8,34,37
-Carrera,2026-04-14 18:05:04,false,Easy Run – Una Hora Tranquila,11.39,,01:00:55,154,175,,,,5:17,,,,,,,,,,,,,,,,,,,,,,,,,,
-Carrera,2026-04-16 16:50:17,false,Easy Run – En Casa En Buckingham,9.21,,00:45:12,164,184,,,,4:53,,,,,,,,,,,,,,,,,,,,,,,,,,
-Carrera,2026-04-18 08:34:15,false,Easy Run – Morning Run,2.37,,00:13:16,138,150,,,,5:35,,,,,,,,,,,,,,,,,,,,,,,,,,
-Carrera,2026-04-18 09:02:23,false,Easy Run – Parkrun en Buckingham,5.01,,00:21:15,179,189,,,,4:14,,,,,,,,,,,,,,,,,,,,,,,,,,
-Carrera,2026-04-20 19:54:03,false,Easy Run – Z2 60’,10.63,,01:03:16,134,153,,,,5:48,,,,,,,,,,,,,,,,,,,,,,,,,,
-Carrera,2026-04-21 09:06:49,false,Easy Run – Relajadooo,7.62,,00:45:51,132,150,,,,6:01,,,,,,,,,,,,,,,,,,,,,,,,,,
-Carrera,2026-04-22 09:23:53,false,Intervals – 5x1km,8.32,,00:55:23,154,188,,,,4:56,,,,,,,,,,,,,,,,,,,,,,,,,,
