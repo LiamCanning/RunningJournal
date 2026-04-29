@@ -227,6 +227,40 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--t1);back
 .cal-card-link{font-size:13px;color:var(--grn);font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
 .cal-card-link:hover{text-decoration:underline}
 .cal-card-notes{font-size:12px;color:var(--t2);line-height:1.4;font-style:italic;padding:8px 12px;background:var(--bg2);border-radius:8px}
+.cal-card.has-strat{cursor:pointer}
+.cal-card.has-strat .cal-card-strat-hint{font-size:11px;color:var(--grn);font-weight:700;display:flex;align-items:center;gap:5px;margin-top:4px}
+/* Race strategy modal */
+.strat-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.strat-modal{background:var(--bg);border-radius:18px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.25);position:relative}
+.strat-modal-head{background:linear-gradient(135deg,var(--grn) 0%,#0a6b40 100%);color:#fff;padding:24px 28px;border-radius:18px 18px 0 0;position:sticky;top:0;z-index:1}
+.strat-modal-head h2{font-size:20px;font-weight:800;margin:0 0 4px;letter-spacing:-.3px}
+.strat-modal-head .strat-meta{font-size:13px;opacity:.85}
+.strat-modal-close{position:absolute;top:16px;right:20px;background:rgba(255,255,255,.2);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.strat-modal-close:hover{background:rgba(255,255,255,.35)}
+.strat-body{padding:24px 28px}
+.strat-goals{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px}
+.strat-goal{border-radius:12px;padding:16px 18px;border:2px solid var(--bdr)}
+.strat-goal.goal-a{border-color:var(--grn);background:var(--grnSoft)}
+.strat-goal.goal-b{border-color:var(--blu);background:var(--bluGlow)}
+.strat-goal-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px}
+.strat-goal.goal-a .strat-goal-label{color:var(--grn)}
+.strat-goal.goal-b .strat-goal-label{color:var(--blu)}
+.strat-goal-time{font-family:'JetBrains Mono';font-size:28px;font-weight:800;color:var(--t1);line-height:1}
+.strat-goal-pace{font-family:'JetBrains Mono';font-size:14px;color:var(--t2);margin-top:4px}
+.strat-goal-desc{font-size:12px;color:var(--t3);margin-top:8px;line-height:1.4}
+.strat-section-h{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--t3);font-weight:700;margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.strat-section-h::after{content:'';flex:1;height:1px;background:var(--bdr)}
+.strat-splits{width:100%;border-collapse:collapse;font-size:13px}
+.strat-splits th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);text-align:left;padding:8px 10px;border-bottom:2px solid var(--bdr)}
+.strat-splits td{padding:8px 10px;border-bottom:1px solid var(--bdr);font-family:'JetBrains Mono'}
+.strat-splits tr:last-child td{border-bottom:none;font-weight:700}
+.strat-splits .col-a{color:var(--grn);font-weight:600}
+.strat-splits .col-b{color:var(--blu);font-weight:600}
+.strat-splits .km-label{color:var(--t2);font-weight:600}
+.strat-splits .split-note{font-family:'Inter';font-size:11px;color:var(--t3);font-style:italic}
+.strat-tip{background:var(--bg2);border-left:3px solid var(--grn);padding:12px 16px;border-radius:0 10px 10px 0;margin-top:16px;font-size:13px;line-height:1.5;color:var(--t2)}
+.strat-tip strong{color:var(--t1)}
+@media(max-width:600px){.strat-goals{grid-template-columns:1fr}.strat-modal{max-width:100%;border-radius:14px}.strat-modal-head{border-radius:14px 14px 0 0;padding:18px 20px}.strat-body{padding:18px 20px}}
 @media (max-width:640px){
   .cal-hero{padding:18px 20px}
   .cal-hero-cd{font-size:40px}
@@ -3687,6 +3721,136 @@ document.getElementById('pg-races').addEventListener('click', function(e) {
 //   { date:'YYYY-MM-DD' | 'TBA-YYYY-MM', dist:'5K'|'10K'|'Half'|'Marathon'|'Other',
 //     distKm: number, name, location, cat:'near'|'spain'|'international',
 //     status:'confirmed'|'possibility'|'bucket',
+// ===== RACE STRATEGIES (A + B goals with per-km pacing) =====
+// Based on: 5K PR 19:25 (3:53/km), 10K PR 41:27 (4:09/km), Garmin pred 5K 19:16 / 10K 40:37 / HM 1:32:01 / Mar 3:24:59
+// VO2max 55, marathon block starts Jun 8, A-race Oct 4
+var raceStrategies = {
+  '2026-05-10': {
+    race: 'Jose Antonio Redolat 5K', dist: '5K', distKm: 5,
+    goalA: { label: 'A Goal - PR hunt', time: '19:10', totalSecs: 1150, pace: '3:50/km',
+      desc: 'Beat current PR (19:25) and Garmin prediction. Requires fast start, hold on.' },
+    goalB: { label: 'B Goal - Solid race', time: '19:30', totalSecs: 1170, pace: '3:54/km',
+      desc: 'Match or beat PR pace. Controlled effort, finish strong.' },
+    splits: [
+      { km: 1, a: '3:48', b: '3:52', note: 'Settle into rhythm. Adrenaline will push you fast - don\'t fight it but don\'t sprint.' },
+      { km: 2, a: '3:50', b: '3:54', note: 'Lock in. This is your race pace. Relax shoulders, steady breathing.' },
+      { km: 3, a: '3:52', b: '3:56', note: 'Midpoint grind. Stay mentally present. Focus on form and cadence.' },
+      { km: 4, a: '3:50', b: '3:54', note: 'This is where the race starts. Maintain or pick up slightly.' },
+      { km: 5, a: '3:46', b: '3:50', note: 'Empty the tank. Kick with 400m to go. Everything you have left.' }
+    ],
+    strategy: 'Even to negative split. Go out controlled at PR pace, hold through km 3-4 where it hurts, then kick the last km. Flat course so no excuses. Warm up 2km + 4 strides beforehand.'
+  },
+  '2026-05-24': {
+    race: 'VII Marta Fernandez 5K', dist: '5K', distKm: 5,
+    goalA: { label: 'A Goal - Sub-19', time: '18:55', totalSecs: 1135, pace: '3:47/km',
+      desc: 'Break the 19-minute barrier. Two weeks of interval sharpening after Redolat race.' },
+    goalB: { label: 'B Goal - New PR', time: '19:15', totalSecs: 1155, pace: '3:51/km',
+      desc: 'Consolidate any PR set at Redolat. Build confidence for the block.' },
+    splits: [
+      { km: 1, a: '3:46', b: '3:50', note: 'Aggressive but controlled start. Settle fast, find a group to sit in.' },
+      { km: 2, a: '3:48', b: '3:52', note: 'Cruise. This should feel hard but sustainable. Check form.' },
+      { km: 3, a: '3:48', b: '3:52', note: 'Halfway - don\'t slow here. Mental focus. "Relax and drive."' },
+      { km: 4, a: '3:48', b: '3:52', note: 'Dig in. Arms forward, quick feet. Hold the pace.' },
+      { km: 5, a: '3:41', b: '3:45', note: 'All-out finish. Sprint from 300m. Make this one count.' }
+    ],
+    strategy: 'Two weeks after Redolat - you\'ll know your shape. If sub-19 is there, commit from the start. Even pace through km 2-4, fast finish. If legs feel heavy, settle into B-goal pace and still PR.'
+  },
+  '2026-06-14': {
+    race: 'Runners Ciutat 5K', dist: '5K', distKm: 5,
+    goalA: { label: 'A Goal - Home race PB', time: '18:45', totalSecs: 1125, pace: '3:45/km',
+      desc: 'Club race - familiar course. Peak 5K speed before marathon block absorbs all energy.' },
+    goalB: { label: 'B Goal - Sub-19 confirm', time: '19:00', totalSecs: 1140, pace: '3:48/km',
+      desc: 'Confirm sub-19 fitness. Last speed race before marathon training takes over.' },
+    splits: [
+      { km: 1, a: '3:44', b: '3:47', note: 'Home crowd energy. Use it but stay controlled. Quick start, settle by 400m.' },
+      { km: 2, a: '3:46', b: '3:49', note: 'Rhythm. You know this course. Find the racing line.' },
+      { km: 3, a: '3:46', b: '3:49', note: 'Midpoint push. Don\'t let it drift. This is the make-or-break km.' },
+      { km: 4, a: '3:44', b: '3:48', note: 'Start winding up. Slight pickup. Chase someone ahead.' },
+      { km: 5, a: '3:41', b: '3:43', note: 'Home straight. Full send. Leave nothing behind.' }
+    ],
+    strategy: 'Last pure 5K before marathon block takes over Jun 8. Chase a PB on home turf. By now you\'ve raced twice in 5 weeks so you know your speed. Marathon block starts 6 days later - this is your send-off.'
+  },
+  '2026-06-21': {
+    race: 'Ponle Freno 10K', dist: '10K', distKm: 10,
+    goalA: { label: 'A Goal - Sub-40', time: '39:50', totalSecs: 2390, pace: '3:59/km',
+      desc: 'Break 40 minutes. Garmin says 40:37 - this is aggressive but achievable if 5K speed has improved.' },
+    goalB: { label: 'B Goal - PR', time: '41:00', totalSecs: 2460, pace: '4:06/km',
+      desc: 'Beat current 10K PR (41:27). Safe target based on current fitness with no risk.' },
+    splits: [
+      { km: 1, a: '3:58', b: '4:06', note: 'Easy start. Let the field go. You need km 1 to be slower than race pace.' },
+      { km: 2, a: '3:58', b: '4:06', note: 'Settle in. Breathing should be rhythmic. Lock into a group.' },
+      { km: 3, a: '3:59', b: '4:06', note: 'Cruise control. Arms relaxed, jaw unclenched. Efficient.' },
+      { km: 4, a: '3:59', b: '4:06', note: 'First quarter done. Check in - can you hold this for 6 more? If yes, stay.' },
+      { km: 5, a: '4:00', b: '4:06', note: 'Halfway. If comfortable, you\'re on track. If suffering, ease to B-goal pace.' },
+      { km: 6, a: '4:00', b: '4:06', note: 'Grind zone begins. Stay present. One km at a time now.' },
+      { km: 7, a: '3:59', b: '4:06', note: '3km to go. Start racing. Pick off runners ahead. Shorten stride, increase turnover.' },
+      { km: 8, a: '3:58', b: '4:05', note: '2km to go. This is where the race is won. Push through the pain.' },
+      { km: 9, a: '3:56', b: '4:04', note: 'Penultimate km. Wind it up. You can suffer for 6 more minutes.' },
+      { km: 10, a: '3:53', b: '4:02', note: 'Empty everything. Kick from 500m. Sprint last 200m.' }
+    ],
+    strategy: 'Negative split this race. Deliberate restraint km 1-5, then build km 6-10. Week 2 of marathon block so legs should still be fresh. Sub-40 is a stretch goal - only chase it if km 1-3 feel comfortable at 3:58. If not, lock into B-goal 4:06 pace and PR safely.'
+  },
+  '2026-09-20': {
+    race: 'Barris de Sant Marcel-li 5K', dist: '5K', distKm: 5,
+    goalA: { label: 'A Goal - Sharpness test', time: '18:30', totalSecs: 1110, pace: '3:42/km',
+      desc: 'Peak marathon fitness = best speed too. 14 weeks of training should show here.' },
+    goalB: { label: 'B Goal - Sub-19 on tired legs', time: '18:50', totalSecs: 1130, pace: '3:46/km',
+      desc: 'Realistic on marathon-block fatigue. Don\'t sacrifice Koln prep for this.' },
+    splits: [
+      { km: 1, a: '3:41', b: '3:45', note: 'Fast start. Marathon fitness means your aerobic base is huge now.' },
+      { km: 2, a: '3:42', b: '3:46', note: 'Hold. This is harder than it used to be - marathon legs are heavier.' },
+      { km: 3, a: '3:43', b: '3:47', note: 'Grit km. If legs feel dead from the week\'s training, accept B-goal.' },
+      { km: 4, a: '3:42', b: '3:46', note: 'Nearly there. Pick it up if you have anything left.' },
+      { km: 5, a: '3:38', b: '3:42', note: 'All out. This is the last speed race before Koln.' }
+    ],
+    strategy: 'MB W15 (consolidation). Your aerobic engine is at its peak but legs carry cumulative fatigue. Use this as a sharpener, not a peak race. If training week was heavy, target B. The real goal is Koln in 14 days - do NOT get injured.'
+  },
+  '2026-09-26': {
+    race: '15K Nocturna Valencia', dist: '15K', distKm: 15,
+    goalA: { label: 'A Goal - Marathon pace dress rehearsal', time: '1:01:00', totalSecs: 3660, pace: '4:04/km',
+      desc: 'Run this at slightly faster than marathon pace. Prove you can hold 4:04 for 15km comfortably.' },
+    goalB: { label: 'B Goal - Controlled effort', time: '1:03:30', totalSecs: 3810, pace: '4:14/km',
+      desc: 'Comfortable marathon-effort run. Use as a confidence-building dress rehearsal, not a race.' },
+    splits: [
+      { km: 1,  a: '4:10', b: '4:20', note: 'Slow start. Night race energy is high - hold back. First km always fast.' },
+      { km: 2,  a: '4:06', b: '4:16', note: 'Settle into race pace. Find a group running your target.' },
+      { km: 3,  a: '4:04', b: '4:14', note: 'Locked in. This is your Koln marathon pace. Memorise how it feels.' },
+      { km: 4,  a: '4:04', b: '4:14', note: 'Cruise. Practise your nutrition - take a gel at km 4.' },
+      { km: 5,  a: '4:04', b: '4:14', note: 'One-third done. Check in with body. Breathing? Shoulders relaxed?' },
+      { km: 6,  a: '4:04', b: '4:14', note: 'Practise drinking from cups on course. Exactly like race day.' },
+      { km: 7,  a: '4:03', b: '4:14', note: 'Midpoint. You should feel comfortable. If not, this is valuable data.' },
+      { km: 8,  a: '4:03', b: '4:13', note: 'Slight pickup. Test whether marathon pace can be sustained when fatigued.' },
+      { km: 9,  a: '4:03', b: '4:13', note: 'Second gel here if using 2-gel strategy for Koln.' },
+      { km: 10, a: '4:02', b: '4:12', note: '5km to go. Start thinking like it\'s km 32 of the marathon.' },
+      { km: 11, a: '4:02', b: '4:12', note: 'Building. If the pace feels easy, your Koln target is on.' },
+      { km: 12, a: '4:01', b: '4:11', note: 'This is the test. Can you push when tired? Koln depends on this.' },
+      { km: 13, a: '4:00', b: '4:10', note: 'Winding up. Slight acceleration. Practise your late-race form.' },
+      { km: 14, a: '3:58', b: '4:08', note: 'Penultimate km. Faster now. Feel the speed.' },
+      { km: 15, a: '3:52', b: '4:02', note: 'Fast finish. Prove you have gears left. Koln is 8 days away.' }
+    ],
+    strategy: 'THE dress rehearsal. 8 days before Koln. Run this at marathon pace (A) or slightly easier (B). Primary purpose: test pacing, nutrition (gels at km 4 + 9), hydration, race-day routine. Negative split is essential - prove you can close. Do NOT race all out. Keep HR under LTHR (175). Save the legs.'
+  },
+  '2026-10-04': {
+    race: 'Koln Marathon', dist: 'Marathon', distKm: 42.2,
+    goalA: { label: 'A Goal - Training target', time: '3:25:00', totalSecs: 12300, pace: '4:52/km',
+      desc: 'Full training target. Requires disciplined pacing, good conditions, and the fitness from 17-week block.' },
+    goalB: { label: 'B Goal - Race goal', time: '3:30:00', totalSecs: 12600, pace: '4:58/km',
+      desc: 'Conservative target. Sub-3:30 is a great first marathon. Gives room for a bad patch.' },
+    splits: [
+      { km: '1-5',   a: '4:55', b: '5:01', note: 'PATIENCE. Start slower than goal pace. First 5km bank nothing. Settle.' },
+      { km: '6-10',  a: '4:52', b: '4:58', note: 'Ease into race pace. Find a group. Stay relaxed. Gel at km 8.' },
+      { km: '11-15', a: '4:51', b: '4:57', note: 'Rhythm. This should feel easy. If it doesn\'t, you went out too fast.' },
+      { km: '16-20', a: '4:51', b: '4:57', note: 'Still comfortable? Good. Halfway in ~1:42/1:45. Gel at km 16.' },
+      { km: '21-25', a: '4:51', b: '4:57', note: 'Half marathon to go. The real race starts now. Stay focused.' },
+      { km: '26-30', a: '4:51', b: '4:57', note: 'The grind. Gel at km 24. Shorten stride if needed. Arms drive legs.' },
+      { km: '31-35', a: '4:50', b: '4:57', note: 'The wall zone. Break it into 1km chunks. "Just this km." Gel at km 32.' },
+      { km: '36-40', a: '4:49', b: '4:56', note: 'If you have anything left, use it now. Crowd energy in Koln is huge.' },
+      { km: '40-42.2', a: '4:45', b: '4:50', note: 'Last 2.2km. Everything. Sprint the final straight. You\'re a marathoner.' }
+    ],
+    strategy: 'Negative split or die trying. The first half should feel boring - that\'s the goal. Pass people after km 30, not before. Nutrition: gel every 8km (km 8, 16, 24, 32) + water at every station. Pace band on wrist. If A-goal pace feels hard before halfway, immediately switch to B-goal - a 3:28 is better than a 3:45 blow-up. Trust the training.'
+  }
+};
+
 //     registrationStatus:'open'|'closed'|'ballot'|'upcoming'|'unknown',
 //     registrationOpens: string, url, notes }
 var raceCalendar = [
@@ -3810,9 +3974,16 @@ function renderCalendar() {
   }
 
   function cardHtml(r) {
-    var cls = 'cal-card ' + r.status;
+    var hasStrat = raceStrategies[r.date] && daysTo(r.date) >= 0;
+    var cls = 'cal-card ' + r.status + (hasStrat ? ' has-strat' : '');
     var link = r.url ? '<a class="cal-card-link" href="' + r.url + '" target="_blank" rel="noopener">Info \u2192</a>' : '';
-    return '<div class="' + cls + '">' +
+    var stratHint = '';
+    if (hasStrat) {
+      var s = raceStrategies[r.date];
+      stratHint = '<div class="cal-card-strat-hint" data-strat-date="' + r.date + '">' +
+        '\u{1F3AF} Race strategy: ' + s.goalA.time + ' (A) / ' + s.goalB.time + ' (B) - tap to view</div>';
+    }
+    return '<div class="' + cls + '"' + (hasStrat ? ' data-strat-date="' + r.date + '"' : '') + '>' +
       '<div class="cal-card-top">' +
         '<div class="cal-card-dateline">' +
           '<span class="cal-card-date">' + fmtDate(r.date) + '</span>' +
@@ -3824,6 +3995,7 @@ function renderCalendar() {
         '<div class="cal-card-name">' + r.name + '</div>' +
         '<div class="cal-card-loc">\uD83D\uDCCD ' + r.location + '</div>' +
       '</div>' +
+      stratHint +
       (r.notes ? '<div class="cal-card-notes">' + r.notes + '</div>' : '') +
       '<div class="cal-card-foot">' +
         '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">' +
@@ -3937,7 +4109,88 @@ function renderCalendar() {
 }
 renderCalendar();
 
+// Race strategy modal renderer
+function showRaceStrategy(dateKey) {
+  var s = raceStrategies[dateKey];
+  if (!s) return;
+  var rc = raceCalendar.filter(function(r) { return r.date === dateKey; })[0];
+  var raceName = rc ? rc.name : s.race;
+  // Inline date formatting (fmtDate is scoped inside renderCalendar)
+  var raceDate = dateKey;
+  if (rc && rc.date && rc.date.indexOf('TBA') !== 0) {
+    var _d = new Date(rc.date);
+    var _months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var _dow = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][_d.getDay()];
+    raceDate = _dow + ' ' + _d.getDate() + ' ' + _months[_d.getMonth()] + ' ' + _d.getFullYear();
+  }
+  var raceLoc = rc ? rc.location : '';
+
+  // Build splits table
+  var splitsRows = s.splits.map(function(sp, i) {
+    var isLast = i === s.splits.length - 1;
+    return '<tr>' +
+      '<td class="km-label">' + (typeof sp.km === 'number' ? 'km ' + sp.km : 'km ' + sp.km) + '</td>' +
+      '<td class="col-a">' + sp.a + '</td>' +
+      '<td class="col-b">' + sp.b + '</td>' +
+      '<td class="split-note">' + sp.note + '</td>' +
+    '</tr>';
+  }).join('');
+
+  var html = '<div class="strat-overlay" id="strat-overlay">' +
+    '<div class="strat-modal">' +
+      '<div class="strat-modal-head">' +
+        '<h2>' + raceName + ' - ' + s.dist + '</h2>' +
+        '<div class="strat-meta">' + raceDate + (raceLoc ? ' - ' + raceLoc : '') + '</div>' +
+        '<button class="strat-modal-close" id="strat-close">×</button>' +
+      '</div>' +
+      '<div class="strat-body">' +
+        '<div class="strat-goals">' +
+          '<div class="strat-goal goal-a">' +
+            '<div class="strat-goal-label">' + s.goalA.label + '</div>' +
+            '<div class="strat-goal-time">' + s.goalA.time + '</div>' +
+            '<div class="strat-goal-pace">' + s.goalA.pace + '</div>' +
+            '<div class="strat-goal-desc">' + s.goalA.desc + '</div>' +
+          '</div>' +
+          '<div class="strat-goal goal-b">' +
+            '<div class="strat-goal-label">' + s.goalB.label + '</div>' +
+            '<div class="strat-goal-time">' + s.goalB.time + '</div>' +
+            '<div class="strat-goal-pace">' + s.goalB.pace + '</div>' +
+            '<div class="strat-goal-desc">' + s.goalB.desc + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="strat-section-h">Per-km race plan</div>' +
+        '<table class="strat-splits">' +
+          '<thead><tr><th>Split</th><th>A Goal</th><th>B Goal</th><th>Notes</th></tr></thead>' +
+          '<tbody>' + splitsRows + '</tbody>' +
+        '</table>' +
+        '<div class="strat-section-h">Race strategy</div>' +
+        '<div class="strat-tip">' + s.strategy + '</div>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+
+  // Remove existing overlay if any
+  var existing = document.getElementById('strat-overlay');
+  if (existing) existing.remove();
+  document.body.insertAdjacentHTML('beforeend', html);
+
+  // Close handlers
+  document.getElementById('strat-close').addEventListener('click', function() {
+    document.getElementById('strat-overlay').remove();
+  });
+  document.getElementById('strat-overlay').addEventListener('click', function(ev) {
+    if (ev.target === this) this.remove();
+  });
+}
+window.showRaceStrategy = showRaceStrategy;
+
 document.getElementById('pg-calendar').addEventListener('click', function(e) {
+  // Race strategy click
+  var stratCard = e.target.closest('[data-strat-date]');
+  if (stratCard && !e.target.closest('a')) {
+    showRaceStrategy(stratCard.dataset.stratDate);
+    return;
+  }
   var dc = e.target.closest('[data-caldist]');
   if (dc) { window.__calDist = dc.dataset.caldist; renderCalendar(); return; }
   var tc = e.target.closest('[data-caltravel]');
