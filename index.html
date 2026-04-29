@@ -1171,6 +1171,7 @@ function parseCSV(raw) {
   for (var i = 1; i < lines.length; i++) {
     if (!lines[i].trim()) continue;
     var vals = parseCSVLine(lines[i]);
+    if (vals.length === 36) vals.splice(32, 0, '', '', '');
     var obj = {};
     for (var j = 0; j < headers.length; j++) obj[headers[j]] = (vals[j] || '').trim();
     rows.push(obj);
@@ -1332,10 +1333,19 @@ allRuns.forEach(function(r) {
   var d = new Date(r.date);
   var iw = getISOWeek(d);
   var key = iw.y + '-W' + pad(iw.w);
-  if (!weeklyMap[key]) weeklyMap[key] = { km: 0, runs: 0, startDate: null };
+  if (!weeklyMap[key]) weeklyMap[key] = { km: 0, runs: 0, startDate: null, intensity: { Easy:0, Intervals:0, Tempo:0, Long:0, Race:0, Recovery:0 } };
   weeklyMap[key].km += r.dist;
   weeklyMap[key].runs++;
   if (!weeklyMap[key].startDate || d < weeklyMap[key].startDate) weeklyMap[key].startDate = d;
+  // Classify run type for intensity stacking
+  var t = r.title.toLowerCase();
+  var cat = 'Easy';
+  if (/^race\s/i.test(r.title) || r.type === 'Race') cat = 'Race';
+  else if (/interval|x\d|hill rep|fartlek|track/i.test(t) || r.type === 'Entrenamiento en pista') cat = 'Intervals';
+  else if (/tempo|threshold|progres/i.test(t)) cat = 'Tempo';
+  else if (/long\s*run|long$/i.test(t)) cat = 'Long';
+  else if (/recovery|recup/i.test(t)) cat = 'Recovery';
+  weeklyMap[key].intensity[cat] = (weeklyMap[key].intensity[cat] || 0) + r.dist;
 });
 var weekKeys = Object.keys(weeklyMap).sort();
 var recentWeeks = weekKeys.slice(-16);
@@ -2334,31 +2344,64 @@ document.getElementById('pg-dash').innerHTML =
       '</div>' +
     '</div>' +
 
-    // Right: Weekly mileage mini chart
+    // Right: Weekly intensity stacked chart
     '<div>' +
-      '<div class="sec-h" style="margin-bottom:8px">Weekly mileage</div>' +
+      '<div class="sec-h" style="margin-bottom:8px">Weekly volume + intensity</div>' +
       (function() {
         var chartWks = recentWeeks.slice(-12);
         var curWkKey = recentWeeks[recentWeeks.length - 1];
-        var kms = chartWks.map(function(k) { return weeklyMap[k] ? weeklyMap[k].km : 0; });
-        var maxKm = Math.max.apply(null, kms) || 1;
-        var svgW = 200, svgH = 80, gap = 2;
-        var bw = (svgW - gap * (chartWks.length + 1)) / chartWks.length;
+        var maxKm = 0;
+        chartWks.forEach(function(k) { var km = weeklyMap[k] ? weeklyMap[k].km : 0; if (km > maxKm) maxKm = km; });
+        maxKm = maxKm || 1;
+        var intColors = { Easy:'#3b82f6', Intervals:'#ef4444', Tempo:'#f59e0b', Long:'#8b5cf6', Race:'#0d8c54', Recovery:'#94a3b8' };
+        var intOrder = ['Recovery','Easy','Long','Tempo','Intervals','Race'];
+        var svgW = 260, svgH = 110, padL = 28, padB = 18, gap = 3;
+        var chartH = svgH - padB - 8;
+        var n = chartWks.length;
+        var bw = Math.max(8, Math.floor((svgW - padL - n * gap) / n));
+        // Grid lines
+        var gridStep = maxKm > 60 ? 20 : maxKm > 30 ? 10 : 5;
+        var grid = '';
+        for (var g = 0; g <= maxKm * 1.1; g += gridStep) {
+          var gy = svgH - padB - (g / (maxKm * 1.1)) * chartH;
+          grid += '<line x1="' + padL + '" y1="' + gy.toFixed(1) + '" x2="' + svgW + '" y2="' + gy.toFixed(1) + '" stroke="var(--bdr)" stroke-width="0.5" opacity=".5"/>';
+          grid += '<text x="' + (padL - 3) + '" y="' + (gy + 3).toFixed(1) + '" fill="var(--t3)" font-size="7" text-anchor="end" font-family="JetBrains Mono">' + g + '</text>';
+        }
         var bars = chartWks.map(function(k, i) {
-          var km = weeklyMap[k] ? weeklyMap[k].km : 0;
-          var h = Math.max(4, (km / maxKm) * 64);
+          var wk = weeklyMap[k] || { km:0, intensity:{} };
+          var x = padL + i * (bw + gap);
+          var totalH = Math.max(3, (wk.km / (maxKm * 1.1)) * chartH);
           var isCur = k === curWkKey;
-          var x = gap + i * (bw + gap);
-          var y = svgH - h;
-          return '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) + '" rx="2" fill="' + (isCur ? '#0d8c54' : '#dfe2ee') + '"/>' +
-            (isCur && km > 0 ? '<text x="' + (x + bw / 2).toFixed(1) + '" y="' + Math.max(8, y - 3).toFixed(1) + '" fill="#0d8c54" font-size="8" text-anchor="middle" font-family="JetBrains Mono" font-weight="700">' + Math.round(km) + '</text>' : '');
+          // Stack segments bottom to top
+          var segs = '', yOff = svgH - padB;
+          intOrder.forEach(function(cat) {
+            var km = wk.intensity ? (wk.intensity[cat] || 0) : 0;
+            if (km <= 0) return;
+            var segH = (km / (maxKm * 1.1)) * chartH;
+            yOff -= segH;
+            segs += '<rect x="' + x.toFixed(1) + '" y="' + yOff.toFixed(1) + '" width="' + bw + '" height="' + segH.toFixed(1) + '" fill="' + intColors[cat] + '" opacity="' + (isCur ? '1' : '.55') + '" rx="0"/>';
+          });
+          // Top round corners on topmost rect
+          var topY = svgH - padB - totalH;
+          segs += '<rect x="' + x.toFixed(1) + '" y="' + topY.toFixed(1) + '" width="' + bw + '" height="3" fill="transparent" rx="3"/>';
+          // Total km label above bar
+          var label = wk.km >= 1 ? '<text x="' + (x + bw/2).toFixed(1) + '" y="' + (topY - 3).toFixed(1) + '" fill="' + (isCur ? 'var(--grn)' : 'var(--t3)') + '" font-size="' + (isCur ? '8' : '7') + '" text-anchor="middle" font-family="JetBrains Mono" font-weight="' + (isCur ? '700' : '500') + '">' + Math.round(wk.km) + '</text>' : '';
+          return '<g>' + segs + label + '</g>';
         }).join('');
+        // Legend
+        var legend = '<div style="display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:8px">';
+        ['Easy','Intervals','Tempo','Long','Race','Recovery'].forEach(function(cat) {
+          legend += '<span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t3);font-weight:600"><span style="width:8px;height:8px;border-radius:2px;background:' + intColors[cat] + ';display:inline-block"></span>' + cat + '</span>';
+        });
+        legend += '</div>';
         return '<div class="dash-card tight">' +
-          '<svg viewBox="0 0 ' + svgW + ' ' + svgH + '" style="width:100%;height:80px;display:block">' +
-            '<line x1="0" y1="' + (svgH - 0.5) + '" x2="' + svgW + '" y2="' + (svgH - 0.5) + '" stroke="#dfe2ee" stroke-width="1"/>' +
+          '<svg viewBox="0 0 ' + svgW + ' ' + svgH + '" style="width:100%;height:110px;display:block" preserveAspectRatio="xMidYMid meet">' +
+            grid +
+            '<line x1="' + padL + '" y1="' + (svgH - padB) + '" x2="' + svgW + '" y2="' + (svgH - padB) + '" stroke="var(--bdr)" stroke-width="1"/>' +
             bars +
           '</svg>' +
-          '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:8px">' +
+          legend +
+          '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:6px;border-top:1px solid var(--bdr);margin-top:8px">' +
             '<span style="font-size:11px;color:var(--t3)">Last 12 weeks</span>' +
             '<span style="font-size:12px;color:var(--grn);font-weight:700;font-family:JetBrains Mono">' + Math.round(curWeekKm) + '\u202f/\u202f' + weeklyTarget + '\u202fkm</span>' +
           '</div>' +
@@ -3406,6 +3449,58 @@ function renderRaces() {
   var filtered = curDist === 'all' ? races : races.filter(function(r) { return r.cat === curDist; });
   var sorted = filtered.slice().sort(function(a, b) { return b.ds > a.ds ? 1 : -1; });
 
+  // === HERO SECTION ===
+  var pbCount = 0;
+  var distCounts = {};
+  races.forEach(function(r) {
+    distCounts[r.cat] = (distCounts[r.cat] || 0) + 1;
+    if (bestByDist[r.cat] && Math.abs(r.timeSecs - bestByDist[r.cat]) < 1) pbCount++;
+  });
+  var distColors = { '5k':'#0d8c54', '10k':'#1e6cc0', '15k':'#6a4ec8', '21k':'#c06c1c', '42k':'#d32828' };
+  var distChips = '';
+  ['5k','10k','15k','21k','42k'].forEach(function(d) {
+    if (distCounts[d]) distChips += '<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:8px;font-size:12px;font-weight:700;background:' + distColors[d] + '15;color:' + distColors[d] + '">' + (d === '21k' ? 'Half' : d.toUpperCase()) + ' <span class="mono" style="opacity:.7">' + distCounts[d] + '</span></span>';
+  });
+
+  // Pace timeline chart (all races chronologically)
+  var chronoAll = races.slice().sort(function(a, b) { return a.ds > b.ds ? 1 : -1; });
+  var paceTimelineHtml = '';
+  if (chronoAll.length >= 3) {
+    var ptW = 680, ptH = 100, ptPadL = 36, ptPadB = 22, ptPadT = 14;
+    var ptPaces = chronoAll.map(function(r) { return paceToSecs(r.pace) || 0; });
+    var ptMin = Math.min.apply(null, ptPaces) - 10;
+    var ptMax = Math.max.apply(null, ptPaces) + 10;
+    var ptRange = ptMax - ptMin || 1;
+    function ptX(i) { return ptPadL + (i / Math.max(chronoAll.length - 1, 1)) * (ptW - ptPadL - 10); }
+    function ptY(v) { return ptPadT + ((v - ptMin) / ptRange) * (ptH - ptPadT - ptPadB); }
+    var ptLine = chronoAll.map(function(r, i) { return ptX(i) + ',' + ptY(paceToSecs(r.pace)); }).join(' ');
+    var ptDots = chronoAll.map(function(r, i) {
+      var ps = paceToSecs(r.pace);
+      var isBest = bestByDist[r.cat] && Math.abs(r.timeSecs - bestByDist[r.cat]) < 1;
+      var col = distColors[r.cat] || 'var(--t3)';
+      return '<circle cx="' + ptX(i) + '" cy="' + ptY(ps) + '" r="' + (isBest ? '5' : '3.5') + '" fill="' + col + '"' + (isBest ? ' stroke="#fff" stroke-width="1.5"' : '') + '>' +
+        '<title>' + r.name + ' (' + r.date + ') - ' + r.pace + '/km</title></circle>';
+    }).join('');
+    paceTimelineHtml = '<div style="background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px 16px;margin-bottom:16px">' +
+      '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);margin-bottom:8px">Race pace timeline</div>' +
+      '<svg viewBox="0 0 ' + ptW + ' ' + ptH + '" style="width:100%;display:block" preserveAspectRatio="xMidYMid meet">' +
+        '<polyline points="' + ptLine + '" fill="none" stroke="var(--grn)" stroke-width="1.5" opacity=".4"/>' +
+        ptDots +
+        '<text x="' + ptPadL + '" y="' + (ptH - 2) + '" fill="var(--t3)" font-size="8" font-family="JetBrains Mono">' + chronoAll[0].date + '</text>' +
+        '<text x="' + (ptW - 10) + '" y="' + (ptH - 2) + '" fill="var(--t3)" font-size="8" font-family="JetBrains Mono" text-anchor="end">' + chronoAll[chronoAll.length-1].date + '</text>' +
+        '<text x="' + (ptPadL - 3) + '" y="' + (ptY(ptMin) + 3) + '" fill="var(--t3)" font-size="7" font-family="JetBrains Mono" text-anchor="end">' + secsToTimeMS(Math.round(ptMin)) + '</text>' +
+        '<text x="' + (ptPadL - 3) + '" y="' + (ptY(ptMax) + 3) + '" fill="var(--t3)" font-size="7" font-family="JetBrains Mono" text-anchor="end">' + secsToTimeMS(Math.round(ptMax)) + '</text>' +
+      '</svg>' +
+      '<div style="font-size:11px;color:var(--t3);margin-top:4px">Lower = faster. Dot size = PB. Color = distance category.</div>' +
+    '</div>';
+  }
+
+  var heroHtml = '<div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">' +
+    '<div class="st a"><div class="sl">Total races</div><div class="sv mono" style="font-size:24px">' + races.length + '</div></div>' +
+    '<div class="st" style="border-color:var(--grn);background:linear-gradient(135deg,rgba(13,140,84,.04),var(--card))"><div class="sl">PBs set</div><div class="sv mono" style="font-size:24px;color:var(--grn)">' + pbCount + '</div></div>' +
+    '<div class="st"><div class="sl">Distances</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">' + distChips + '</div></div>' +
+  '</div>' + paceTimelineHtml;
+
   // Build tabs dynamically from actual race categories
   var raceCats = {};
   races.forEach(function(r) { raceCats[r.cat] = true; });
@@ -3533,7 +3628,7 @@ function renderRaces() {
     '</div></div>';
   }
 
-  document.getElementById('pg-races').innerHTML = compareBar + tabsHtml + listHtml + progHtml + (raceCompareMode ? renderRaceCompare() : '');
+  document.getElementById('pg-races').innerHTML = heroHtml + compareBar + tabsHtml + listHtml + progHtml + (raceCompareMode ? renderRaceCompare() : '');
 }
 renderRaces();
 
@@ -3874,6 +3969,54 @@ var compareMode = false;
 var openInts = {};
 
 function renderIntPage() {
+  // === HERO SECTION: best-rep progression chart ===
+  var intHeroHtml = '';
+  var chronoInts = ints.slice().sort(function(a, b) { return a.ds > b.ds ? 1 : -1; });
+  var bestPaces = chronoInts.filter(function(i) { return i.best; }).map(function(i) { return { ds: i.ds, date: i.date, title: i.title, pace: paceToSecs(i.best) }; });
+
+  if (bestPaces.length >= 3) {
+    // Stats
+    var fastestEver = Math.min.apply(null, bestPaces.map(function(b) { return b.pace; }));
+    var recentBest = bestPaces.slice(-3);
+    var avgRecent = Math.round(recentBest.reduce(function(s,b) { return s + b.pace; }, 0) / recentBest.length);
+    // Chart
+    var ipW = 680, ipH = 100, ipPadL = 36, ipPadB = 20, ipPadT = 12;
+    var ipPaces = bestPaces.map(function(b) { return b.pace; });
+    var ipMin = Math.min.apply(null, ipPaces) - 5;
+    var ipMax = Math.max.apply(null, ipPaces) + 5;
+    var ipRange = ipMax - ipMin || 1;
+    function ipX(i) { return ipPadL + (i / Math.max(bestPaces.length - 1, 1)) * (ipW - ipPadL - 10); }
+    function ipY(v) { return ipPadT + ((v - ipMin) / ipRange) * (ipH - ipPadT - ipPadB); }
+    var ipLinePts = bestPaces.map(function(b, i) { return ipX(i) + ',' + ipY(b.pace); }).join(' ');
+    var ipArea = 'M' + ipX(0) + ',' + ipY(bestPaces[0].pace);
+    bestPaces.forEach(function(b, i) { ipArea += ' L' + ipX(i) + ',' + ipY(b.pace); });
+    ipArea += ' L' + ipX(bestPaces.length-1) + ',' + (ipH - ipPadB) + ' L' + ipX(0) + ',' + (ipH - ipPadB) + ' Z';
+    var ipDots = bestPaces.map(function(b, i) {
+      var isFastest = b.pace <= fastestEver + 1;
+      return '<circle cx="' + ipX(i) + '" cy="' + ipY(b.pace) + '" r="' + (isFastest ? '5' : '3') + '" fill="' + (isFastest ? 'var(--grn)' : 'var(--red)') + '"' + (isFastest ? ' stroke="#fff" stroke-width="1.5"' : ' opacity=".7"') + '>' +
+        '<title>' + b.date + ': ' + secsToTimeMS(Math.round(b.pace)) + '/km</title></circle>';
+    }).join('');
+
+    intHeroHtml = '<div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">' +
+      '<div class="st a"><div class="sl">Sessions</div><div class="sv mono" style="font-size:24px">' + ints.length + '</div></div>' +
+      '<div class="st" style="border-color:var(--grn);background:linear-gradient(135deg,rgba(13,140,84,.04),var(--card))"><div class="sl">Fastest rep ever</div><div class="sv mono" style="font-size:24px;color:var(--grn)">' + secsToTimeMS(Math.round(fastestEver)) + '<span style="font-size:12px;color:var(--t3)">/km</span></div></div>' +
+      '<div class="st"><div class="sl">Last 3 avg</div><div class="sv mono" style="font-size:24px">' + secsToTimeMS(avgRecent) + '<span style="font-size:12px;color:var(--t3)">/km</span></div></div>' +
+    '</div>' +
+    '<div style="background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px 16px;margin-bottom:16px">' +
+      '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);margin-bottom:8px">Best rep pace progression</div>' +
+      '<svg viewBox="0 0 ' + ipW + ' ' + ipH + '" style="width:100%;display:block" preserveAspectRatio="xMidYMid meet">' +
+        '<path d="' + ipArea + '" fill="var(--red)" opacity=".06"/>' +
+        '<polyline points="' + ipLinePts + '" fill="none" stroke="var(--red)" stroke-width="2" opacity=".6"/>' +
+        ipDots +
+        '<text x="' + ipPadL + '" y="' + (ipH - 2) + '" fill="var(--t3)" font-size="8" font-family="JetBrains Mono">' + bestPaces[0].date + '</text>' +
+        '<text x="' + (ipW - 10) + '" y="' + (ipH - 2) + '" fill="var(--t3)" font-size="8" font-family="JetBrains Mono" text-anchor="end">' + bestPaces[bestPaces.length-1].date + '</text>' +
+        '<text x="' + (ipPadL - 3) + '" y="' + (ipY(ipMin) + 3) + '" fill="var(--t3)" font-size="7" font-family="JetBrains Mono" text-anchor="end">' + secsToTimeMS(Math.round(ipMin)) + '</text>' +
+        '<text x="' + (ipPadL - 3) + '" y="' + (ipY(ipMax) + 3) + '" fill="var(--t3)" font-size="7" font-family="JetBrains Mono" text-anchor="end">' + secsToTimeMS(Math.round(ipMax)) + '</text>' +
+      '</svg>' +
+      '<div style="font-size:11px;color:var(--t3);margin-top:4px">Lower = faster. Green dots = all-time best reps.</div>' +
+    '</div>';
+  }
+
   // Toolbar with count + compare toggle
   var toolbarHtml = '<div class="int-toolbar">' +
     '<div class="int-count">' + ints.length + ' interval session' + (ints.length !== 1 ? 's' : '') + '</div>' +
@@ -4043,7 +4186,7 @@ function renderIntPage() {
       }).join('') + '</table></div></div>';
   }
 
-  document.getElementById('pg-intervals').innerHTML = toolbarHtml + hintHtml + listHtml + cmpHtml;
+  document.getElementById('pg-intervals').innerHTML = intHeroHtml + toolbarHtml + hintHtml + listHtml + cmpHtml;
 }
 renderIntPage();
 
