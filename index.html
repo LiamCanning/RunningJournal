@@ -2322,93 +2322,88 @@ document.getElementById('pg-dash').innerHTML =
     '<div class="st"><div class="sl">4-week avg</div><div class="sv mono">' + weeklyAvg + '</div><div class="sd">km / week</div></div>' +
   '</div>' +
 
-  // 3. TWO-COL: RECENT ACTIVITIES (left 3fr) + WEEKLY MILEAGE (right 2fr)
-  '<div class="dash-row dash-row-3-2">' +
-
-    // Left: Recent activities
-    '<div>' +
-      '<div class="sec-h" style="margin-bottom:8px">Recent activities</div>' +
-      '<div class="act-feed">' +
-        recentRuns.slice(0, 7).map(function(r) {
-          var ps = paceToSecs(r.pace);
-          var dotColor = r.type === 'Race' ? '#d32828' : ps != null && ps < 270 ? '#c06c1c' : ps != null && ps < 315 ? '#1e6cc0' : '#0d8c54';
-          return '<div class="act-row" data-run-id="' + r.id + '">' +
-            '<div class="act-dot" style="background:' + dotColor + '"></div>' +
-            '<div class="act-title">' + r.title + '</div>' +
-            '<div class="act-date">' + relDate(r.ds) + '</div>' +
-            '<div class="act-dist">' + r.dist.toFixed(1) + 'km</div>' +
-            '<div class="act-pace">' + (r.pace || '--') + '</div>' +
-          '</div>';
-        }).join('') +
-        '<div class="act-view-all" data-navto="weekly">View all runs \u2192</div>' +
-      '</div>' +
-    '</div>' +
-
-    // Right: Weekly intensity stacked chart
-    '<div>' +
-      '<div class="sec-h" style="margin-bottom:8px">Weekly volume + intensity</div>' +
-      (function() {
-        var chartWks = recentWeeks.slice(-12);
-        var curWkKey = recentWeeks[recentWeeks.length - 1];
-        var maxKm = 0;
-        chartWks.forEach(function(k) { var km = weeklyMap[k] ? weeklyMap[k].km : 0; if (km > maxKm) maxKm = km; });
-        maxKm = maxKm || 1;
-        var intColors = { Easy:'#3b82f6', Intervals:'#ef4444', Tempo:'#f59e0b', Long:'#8b5cf6', Race:'#0d8c54', Recovery:'#94a3b8' };
-        var intOrder = ['Recovery','Easy','Long','Tempo','Intervals','Race'];
-        var svgW = 260, svgH = 110, padL = 28, padB = 18, gap = 3;
-        var chartH = svgH - padB - 8;
-        var n = chartWks.length;
-        var bw = Math.max(8, Math.floor((svgW - padL - n * gap) / n));
-        // Grid lines
-        var gridStep = maxKm > 60 ? 20 : maxKm > 30 ? 10 : 5;
-        var grid = '';
-        for (var g = 0; g <= maxKm * 1.1; g += gridStep) {
-          var gy = svgH - padB - (g / (maxKm * 1.1)) * chartH;
-          grid += '<line x1="' + padL + '" y1="' + gy.toFixed(1) + '" x2="' + svgW + '" y2="' + gy.toFixed(1) + '" stroke="var(--bdr)" stroke-width="0.5" opacity=".5"/>';
-          grid += '<text x="' + (padL - 3) + '" y="' + (gy + 3).toFixed(1) + '" fill="var(--t3)" font-size="7" text-anchor="end" font-family="JetBrains Mono">' + g + '</text>';
-        }
-        var bars = chartWks.map(function(k, i) {
-          var wk = weeklyMap[k] || { km:0, intensity:{} };
-          var x = padL + i * (bw + gap);
-          var totalH = Math.max(3, (wk.km / (maxKm * 1.1)) * chartH);
-          var isCur = k === curWkKey;
-          // Stack segments bottom to top
-          var segs = '', yOff = svgH - padB;
-          intOrder.forEach(function(cat) {
-            var km = wk.intensity ? (wk.intensity[cat] || 0) : 0;
-            if (km <= 0) return;
-            var segH = (km / (maxKm * 1.1)) * chartH;
-            yOff -= segH;
-            segs += '<rect x="' + x.toFixed(1) + '" y="' + yOff.toFixed(1) + '" width="' + bw + '" height="' + segH.toFixed(1) + '" fill="' + intColors[cat] + '" opacity="' + (isCur ? '1' : '.55') + '" rx="0"/>';
-          });
-          // Top round corners on topmost rect
-          var topY = svgH - padB - totalH;
-          segs += '<rect x="' + x.toFixed(1) + '" y="' + topY.toFixed(1) + '" width="' + bw + '" height="3" fill="transparent" rx="3"/>';
-          // Total km label above bar
-          var label = wk.km >= 1 ? '<text x="' + (x + bw/2).toFixed(1) + '" y="' + (topY - 3).toFixed(1) + '" fill="' + (isCur ? 'var(--grn)' : 'var(--t3)') + '" font-size="' + (isCur ? '8' : '7') + '" text-anchor="middle" font-family="JetBrains Mono" font-weight="' + (isCur ? '700' : '500') + '">' + Math.round(wk.km) + '</text>' : '';
-          return '<g>' + segs + label + '</g>';
-        }).join('');
-        // Legend
-        var legend = '<div style="display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:8px">';
-        ['Easy','Intervals','Tempo','Long','Race','Recovery'].forEach(function(cat) {
-          legend += '<span style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t3);font-weight:600"><span style="width:8px;height:8px;border-radius:2px;background:' + intColors[cat] + ';display:inline-block"></span>' + cat + '</span>';
-        });
-        legend += '</div>';
-        return '<div class="dash-card tight">' +
-          '<svg viewBox="0 0 ' + svgW + ' ' + svgH + '" style="width:100%;height:110px;display:block" preserveAspectRatio="xMidYMid meet">' +
-            grid +
-            '<line x1="' + padL + '" y1="' + (svgH - padB) + '" x2="' + svgW + '" y2="' + (svgH - padB) + '" stroke="var(--bdr)" stroke-width="1"/>' +
-            bars +
-          '</svg>' +
-          legend +
-          '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:6px;border-top:1px solid var(--bdr);margin-top:8px">' +
-            '<span style="font-size:11px;color:var(--t3)">Last 12 weeks</span>' +
-            '<span style="font-size:12px;color:var(--grn);font-weight:700;font-family:JetBrains Mono">' + Math.round(curWeekKm) + '\u202f/\u202f' + weeklyTarget + '\u202fkm</span>' +
-          '</div>' +
+  // 3. RECENT ACTIVITIES (full width)
+  '<div style="margin-bottom:16px">' +
+    '<div class="sec-h" style="margin-bottom:8px">Recent activities</div>' +
+    '<div class="act-feed">' +
+      recentRuns.slice(0, 7).map(function(r) {
+        var ps = paceToSecs(r.pace);
+        var dotColor = r.type === 'Race' ? '#d32828' : ps != null && ps < 270 ? '#c06c1c' : ps != null && ps < 315 ? '#1e6cc0' : '#0d8c54';
+        return '<div class="act-row" data-run-id="' + r.id + '">' +
+          '<div class="act-dot" style="background:' + dotColor + '"></div>' +
+          '<div class="act-title">' + r.title + '</div>' +
+          '<div class="act-date">' + relDate(r.ds) + '</div>' +
+          '<div class="act-dist">' + r.dist.toFixed(1) + 'km</div>' +
+          '<div class="act-pace">' + (r.pace || '--') + '</div>' +
         '</div>';
-      })() +
+      }).join('') +
+      '<div class="act-view-all" data-navto="weekly">View all runs \u2192</div>' +
     '</div>' +
+  '</div>' +
 
+  // 3b. WEEKLY VOLUME + INTENSITY (full width, large chart)
+  '<div style="margin-bottom:16px">' +
+    '<div class="sec-h" style="margin-bottom:8px">Weekly volume + intensity</div>' +
+    (function() {
+      var chartWks = recentWeeks.slice(-12);
+      var curWkKey = recentWeeks[recentWeeks.length - 1];
+      var maxKm = 0;
+      chartWks.forEach(function(k) { var km = weeklyMap[k] ? weeklyMap[k].km : 0; if (km > maxKm) maxKm = km; });
+      maxKm = maxKm || 1;
+      var intColors = { Easy:'#3b82f6', Intervals:'#ef4444', Tempo:'#f59e0b', Long:'#8b5cf6', Race:'#0d8c54', Recovery:'#94a3b8' };
+      var intOrder = ['Recovery','Easy','Long','Tempo','Intervals','Race'];
+      var svgW = 700, svgH = 240, padL = 38, padB = 28, padT = 16, gap = 6;
+      var chartH = svgH - padB - padT;
+      var n = chartWks.length;
+      var bw = Math.max(20, Math.floor((svgW - padL - n * gap) / n));
+      // Grid lines
+      var gridStep = maxKm > 60 ? 20 : maxKm > 30 ? 10 : 5;
+      var grid = '';
+      for (var g = 0; g <= maxKm * 1.1; g += gridStep) {
+        var gy = svgH - padB - (g / (maxKm * 1.1)) * chartH;
+        grid += '<line x1="' + padL + '" y1="' + gy.toFixed(1) + '" x2="' + svgW + '" y2="' + gy.toFixed(1) + '" stroke="var(--bdr)" stroke-width="0.5" opacity=".5"/>';
+        grid += '<text x="' + (padL - 6) + '" y="' + (gy + 4).toFixed(1) + '" fill="var(--t3)" font-size="11" text-anchor="end" font-family="JetBrains Mono">' + g + '</text>';
+      }
+      var bars = chartWks.map(function(k, i) {
+        var wk = weeklyMap[k] || { km:0, intensity:{} };
+        var x = padL + i * (bw + gap);
+        var totalH = Math.max(3, (wk.km / (maxKm * 1.1)) * chartH);
+        var isCur = k === curWkKey;
+        // Stack segments bottom to top
+        var segs = '', yOff = svgH - padB;
+        intOrder.forEach(function(cat) {
+          var km = wk.intensity ? (wk.intensity[cat] || 0) : 0;
+          if (km <= 0) return;
+          var segH = (km / (maxKm * 1.1)) * chartH;
+          yOff -= segH;
+          segs += '<rect x="' + x.toFixed(1) + '" y="' + yOff.toFixed(1) + '" width="' + bw + '" height="' + segH.toFixed(1) + '" fill="' + intColors[cat] + '" opacity="' + (isCur ? '1' : '.6') + '" rx="2"/>';
+        });
+        var topY = svgH - padB - totalH;
+        // Total km label above bar
+        var label = wk.km >= 1 ? '<text x="' + (x + bw/2).toFixed(1) + '" y="' + (topY - 6).toFixed(1) + '" fill="' + (isCur ? 'var(--grn)' : 'var(--t2)') + '" font-size="' + (isCur ? '13' : '11') + '" text-anchor="middle" font-family="JetBrains Mono" font-weight="' + (isCur ? '700' : '600') + '">' + Math.round(wk.km) + '</text>' : '';
+        // Week label below bar
+        var wkLabel = '<text x="' + (x + bw/2).toFixed(1) + '" y="' + (svgH - 6) + '" fill="' + (isCur ? 'var(--grn)' : 'var(--t3)') + '" font-size="9" text-anchor="middle" font-family="JetBrains Mono" font-weight="' + (isCur ? '700' : '500') + '">W' + k.split('W')[1] + '</text>';
+        return '<g>' + segs + label + wkLabel + '</g>';
+      }).join('');
+      // Legend
+      var legend = '<div style="display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px">';
+      ['Easy','Intervals','Tempo','Long','Race','Recovery'].forEach(function(cat) {
+        legend += '<span style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--t2);font-weight:600"><span style="width:10px;height:10px;border-radius:3px;background:' + intColors[cat] + ';display:inline-block"></span>' + cat + '</span>';
+      });
+      legend += '</div>';
+      return '<div class="dash-card" style="padding:20px 24px">' +
+        '<svg viewBox="0 0 ' + svgW + ' ' + svgH + '" style="width:100%;height:auto;display:block" preserveAspectRatio="xMidYMid meet">' +
+          grid +
+          '<line x1="' + padL + '" y1="' + (svgH - padB) + '" x2="' + svgW + '" y2="' + (svgH - padB) + '" stroke="var(--bdr)" stroke-width="1"/>' +
+          bars +
+        '</svg>' +
+        legend +
+        '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--bdr);margin-top:12px">' +
+          '<span style="font-size:12px;color:var(--t3)">Last 12 weeks</span>' +
+          '<span style="font-size:14px;color:var(--grn);font-weight:700;font-family:JetBrains Mono">' + Math.round(curWeekKm) + '\u202f/\u202f' + weeklyTarget + '\u202fkm</span>' +
+        '</div>' +
+      '</div>';
+    })() +
   '</div>' +
 
   // 4. GARMIN 2-COL: readiness + ACWR
