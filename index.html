@@ -2324,16 +2324,34 @@ var planPhases = [
 document.getElementById('cd').textContent = Math.ceil((new Date('2026-10-04') - new Date()) / 864e5);
 
 // ===== NAV =====
+function navTo(pageId, pushState) {
+  if (!pageId) pageId = 'dash';
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('show','visible'); });
+  document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('on'); });
+  var btn = document.querySelector('.nav-btn[data-page="' + pageId + '"]');
+  if (btn) btn.classList.add('on');
+  var pg = document.getElementById('pg-' + pageId);
+  if (!pg) return;
+  pg.classList.add('show');
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ pg.classList.add('visible'); }); });
+  if (pushState !== false) location.hash = pageId;
+  try { localStorage.setItem('cm_page', pageId); } catch(e) {}
+}
 document.getElementById('nav').addEventListener('click', function(e) {
   var btn = e.target.closest('.nav-btn');
   if (!btn) return;
-  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('show','visible'); });
-  document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('on'); });
-  btn.classList.add('on');
-  var pg = document.getElementById('pg-' + btn.dataset.page);
-  pg.classList.add('show');
-  requestAnimationFrame(function(){ requestAnimationFrame(function(){ pg.classList.add('visible'); }); });
+  navTo(btn.dataset.page);
 });
+// Restore page on load (hash → localStorage → default)
+(function() {
+  var hash = location.hash.replace('#','');
+  var saved = '';
+  try { saved = localStorage.getItem('cm_page') || ''; } catch(e) {}
+  var target = hash || saved || 'dash';
+  var valid = ['dash','performance','health','volume','races','calendar','intervals','weekly','plan','coach'];
+  if (valid.indexOf(target) < 0) target = 'dash';
+  if (target !== 'dash') navTo(target, false);
+})();
 
 // ===== STREAK & CONSISTENCY =====
 var streakData = (function() {
