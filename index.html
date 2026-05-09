@@ -980,6 +980,27 @@ body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;color:va
 .route-lb img{max-width:100%;max-height:90vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.5);cursor:default;object-fit:contain}
 .route-lb-close{position:fixed;top:18px;right:22px;color:#fff;font-size:28px;cursor:pointer;opacity:.7;line-height:1;background:none;border:none;font-weight:300}
 .route-lb-close:hover{opacity:1}
+.cal-add-btn{background:var(--grn);color:#fff;border:none;border-radius:8px;padding:5px 13px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:5px;letter-spacing:.5px}
+.cal-add-btn:hover{opacity:.85}
+.cal-card{position:relative}
+.cal-card-del{position:absolute;top:8px;right:8px;background:none;border:none;color:var(--t3);font-size:16px;line-height:1;cursor:pointer;padding:3px 7px;border-radius:5px;opacity:0;transition:opacity .15s;z-index:2}
+.cal-card:hover .cal-card-del{opacity:1}
+.cal-card-del:hover{background:var(--red);color:#fff;opacity:1!important}
+.race-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:8000;display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);overflow-y:auto}
+.race-modal{background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:28px;width:100%;max-width:500px}
+.race-modal h3{margin:0 0 20px;font-size:15px;font-weight:800;color:var(--t1)}
+.race-modal-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.race-modal-field{margin-top:14px}
+.race-modal-field:first-child{margin-top:0}
+.race-modal-lbl{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--t3);margin-bottom:5px}
+.race-modal-inp{width:100%;background:var(--card2);border:1px solid var(--bdr);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--t1);font-family:inherit;box-sizing:border-box}
+.race-modal-inp:focus{outline:none;border-color:var(--grn)}
+textarea.race-modal-inp{resize:vertical;min-height:56px}
+.race-modal-foot{display:flex;gap:10px;margin-top:22px;justify-content:flex-end}
+.race-modal-foot button{border:none;border-radius:8px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer}
+.race-modal-cancel{background:var(--card2);color:var(--t2)}
+.race-modal-save{background:var(--grn);color:#fff}
+.race-modal-cancel:hover,.race-modal-save:hover{opacity:.85}
 
 </style>
 </head>
@@ -4405,6 +4426,22 @@ var raceCalendar = [
   { date:'TBA-2027-05', dist:'Marathon', distKm:42.2, name:'Copenhagen Marathon',                           location:'Copenhagen, Denmark',        cat:'international', status:'bucket', registrationStatus:'upcoming', registrationOpens:'Opens ~May 2026', url:'https://copenhagenmarathon.dk/en/', notes:'Flat scenic mid-May marathon - sells out fast (2026 went in 12 weeks).', routeUrl:'https://copenhagenmarathon.dk/en/' },
 ];
 
+// ── User race management ──────────────────────────────────────────────────────
+var LS_RACES   = 'runDash_userRaces';
+var LS_DELETED = 'runDash_deletedIds';
+function _lsGet(k){ try{ return JSON.parse(localStorage.getItem(k)||'[]'); }catch(e){ return []; } }
+function _lsSet(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+function getUserRaces(){ return _lsGet(LS_RACES); }
+function getDeletedIds(){ return _lsGet(LS_DELETED); }
+function saveUserRaces(a){ _lsSet(LS_RACES,a); }
+function saveDeletedIds(a){ _lsSet(LS_DELETED,a); }
+function raceId(r){ return (r.date||'')+'|'+(r.name||''); }
+function getAllRaces(){
+  var del=getDeletedIds();
+  function notDel(r){ return del.indexOf(raceId(r))<0; }
+  return raceCalendar.filter(notDel).concat(getUserRaces().filter(notDel));
+}
+// ─────────────────────────────────────────────────────────────────────────────
 function renderCalendar() {
   var today = new Date(); today.setHours(0,0,0,0);
 
@@ -4495,7 +4532,9 @@ function renderCalendar() {
           (r.routeUrl ? '<a class="cal-route-link" href="' + r.routeUrl + '" target="_blank" rel="noopener">\uD83D\uDDFA\uFE0F View official route \u2197</a>' : '') +
         '</div>';
     }
+    var delId = raceId(r);
     return '<div class="' + cls + '"' + (hasStrat ? ' data-strat-date="' + r.date + '"' : '') + '>' +
+      '<button class="cal-card-del" data-del-id="' + delId + '" title="Remove race">&times;</button>' +
       '<div class="cal-card-top">' +
         '<div class="cal-card-dateline">' +
           '<span class="cal-card-date">' + fmtDate(r.date) + '</span>' +
@@ -4521,7 +4560,8 @@ function renderCalendar() {
   }
 
   // Partition
-  var all = raceCalendar.filter(function(r) { return matchesDist(r) && matchesTravel(r); });
+  var races = getAllRaces();
+  var all = races.filter(function(r) { return matchesDist(r) && matchesTravel(r); });
   // Sort by date (TBA last)
   all.sort(function(a, b) {
     var aTba = (a.date || '').indexOf('TBA') === 0;
@@ -4532,7 +4572,7 @@ function renderCalendar() {
   });
 
   // Find hero: next confirmed future race
-  var hero = raceCalendar.filter(function(r) {
+  var hero = races.filter(function(r) {
     var d = daysTo(r.date); return d != null && d >= 0 && r.status === 'confirmed';
   }).sort(function(a, b) { return daysTo(a.date) - daysTo(b.date); })[0];
 
@@ -4568,6 +4608,7 @@ function renderCalendar() {
         return '<button class="cal-chip' + (o[0] === travelFilter ? ' on' : '') + '" data-caltravel="' + o[0] + '">' + o[1] + '</button>';
       }).join('') +
     '</div>' +
+  '<button class="cal-add-btn" id="cal-add-race-btn">+ Add Race</button>' +
   '</div>';
 
   // Group into sections by status/cat
@@ -4594,7 +4635,7 @@ function renderCalendar() {
   if (!all.length) body += '<div class="empty">No races match the current filters.</div>';
 
   // Next confirmed race strip
-  var upcoming = raceCalendar.filter(function(r) {
+  var upcoming = races.filter(function(r) {
     if (r.status !== 'confirmed') return false;
     var d = parseRaceDate(r.date);
     return d && d >= today;
@@ -4699,9 +4740,21 @@ function showRaceStrategy(dateKey) {
 window.showRaceStrategy = showRaceStrategy;
 
 document.getElementById('pg-calendar').addEventListener('click', function(e) {
+  // Delete race
+  var delBtn = e.target.closest('.cal-card-del');
+  if (delBtn) {
+    e.stopPropagation();
+    var id = delBtn.dataset.delId;
+    if (!confirm('Remove this race from the calendar?')) return;
+    var del = getDeletedIds(); if (del.indexOf(id) < 0) del.push(id); saveDeletedIds(del);
+    var ur = getUserRaces().filter(function(r){ return raceId(r) !== id; }); saveUserRaces(ur);
+    renderCalendar(); return;
+  }
+  // Add race
+  if (e.target.id === 'cal-add-race-btn') { showAddRaceModal(); return; }
   // Race strategy click
   var stratCard = e.target.closest('[data-strat-date]');
-  if (stratCard && !e.target.closest('a') && !e.target.closest('.cal-route-body')) {
+  if (stratCard && !e.target.closest('a') && !e.target.closest('.cal-route-body') && !e.target.closest('.cal-card-del')) {
     showRaceStrategy(stratCard.dataset.stratDate);
     return;
   }
@@ -4710,6 +4763,81 @@ document.getElementById('pg-calendar').addEventListener('click', function(e) {
   var tc = e.target.closest('[data-caltravel]');
   if (tc) { window.__calTravel = tc.dataset.caltravel; renderCalendar(); return; }
 });
+
+// ── Add Race Modal ─────────────────────────────────────────────────────────
+function showAddRaceModal() {
+  var bg = document.createElement('div');
+  bg.className = 'race-modal-bg';
+  bg.innerHTML = '<div class="race-modal">' +
+    '<h3>Add Race</h3>' +
+    '<div class="race-modal-field"><label class="race-modal-lbl">Race name *</label>' +
+      '<input class="race-modal-inp" id="rm-name" placeholder="e.g. Valencia 10K" required></div>' +
+    '<div class="race-modal-row">' +
+      '<div class="race-modal-field"><label class="race-modal-lbl">Date *</label>' +
+        '<input class="race-modal-inp" id="rm-date" type="date" required></div>' +
+      '<div class="race-modal-field"><label class="race-modal-lbl">Distance</label>' +
+        '<select class="race-modal-inp" id="rm-dist"><option>5K</option><option>10K</option><option>15K</option><option selected>Half</option><option>Marathon</option><option>Other</option></select></div>' +
+    '</div>' +
+    '<div class="race-modal-row">' +
+      '<div class="race-modal-field"><label class="race-modal-lbl">Distance (km)</label>' +
+        '<input class="race-modal-inp" id="rm-distKm" type="number" step="0.1" value="21.1"></div>' +
+      '<div class="race-modal-field"><label class="race-modal-lbl">Region</label>' +
+        '<select class="race-modal-inp" id="rm-cat"><option value="near">Near Valencia</option><option value="spain">Spain</option><option value="international">International</option></select></div>' +
+    '</div>' +
+    '<div class="race-modal-field"><label class="race-modal-lbl">Location</label>' +
+      '<input class="race-modal-inp" id="rm-location" placeholder="e.g. Valencia, Spain"></div>' +
+    '<div class="race-modal-row">' +
+      '<div class="race-modal-field"><label class="race-modal-lbl">Status</label>' +
+        '<select class="race-modal-inp" id="rm-status"><option value="confirmed">Confirmed</option><option value="possibility">Possibility</option><option value="bucket">Bucket list</option><option value="done">Done</option></select></div>' +
+      '<div class="race-modal-field"><label class="race-modal-lbl">Registration</label>' +
+        '<select class="race-modal-inp" id="rm-reg"><option value="open">Open</option><option value="closed">Closed/Registered</option><option value="ballot">Ballot</option><option value="upcoming">Upcoming</option></select></div>' +
+    '</div>' +
+    '<div class="race-modal-field"><label class="race-modal-lbl">Registration info</label>' +
+      '<input class="race-modal-inp" id="rm-regOpens" placeholder="e.g. Opens Sep 2026"></div>' +
+    '<div class="race-modal-field"><label class="race-modal-lbl">Race website</label>' +
+      '<input class="race-modal-inp" id="rm-url" type="url" placeholder="https://..."></div>' +
+    '<div class="race-modal-field"><label class="race-modal-lbl">Route URL</label>' +
+      '<input class="race-modal-inp" id="rm-routeUrl" type="url" placeholder="https://..."></div>' +
+    '<div class="race-modal-field"><label class="race-modal-lbl">Notes</label>' +
+      '<textarea class="race-modal-inp" id="rm-notes" placeholder="Optional notes..."></textarea></div>' +
+    '<div class="race-modal-foot">' +
+      '<button class="race-modal-cancel" id="rm-cancel">Cancel</button>' +
+      '<button class="race-modal-save" id="rm-save">Add Race</button>' +
+    '</div>' +
+  '</div>';
+  document.body.appendChild(bg);
+
+  var distKmMap = {'5K':5,'10K':10,'15K':15,'Half':21.1,'Marathon':42.2,'Other':0};
+  document.getElementById('rm-dist').addEventListener('change', function() {
+    var v = distKmMap[this.value]; if (v) document.getElementById('rm-distKm').value = v;
+  });
+
+  document.getElementById('rm-cancel').addEventListener('click', function() { bg.remove(); });
+  bg.addEventListener('click', function(e) { if (e.target === bg) bg.remove(); });
+
+  document.getElementById('rm-save').addEventListener('click', function() {
+    var name = document.getElementById('rm-name').value.trim();
+    var date = document.getElementById('rm-date').value;
+    if (!name || !date) { alert('Name and date are required.'); return; }
+    var race = {
+      date: date,
+      name: name,
+      dist: document.getElementById('rm-dist').value,
+      distKm: parseFloat(document.getElementById('rm-distKm').value) || 0,
+      location: document.getElementById('rm-location').value.trim() || 'Unknown',
+      cat: document.getElementById('rm-cat').value,
+      status: document.getElementById('rm-status').value,
+      registrationStatus: document.getElementById('rm-reg').value,
+      registrationOpens: document.getElementById('rm-regOpens').value.trim(),
+      url: document.getElementById('rm-url').value.trim(),
+      routeUrl: document.getElementById('rm-routeUrl').value.trim(),
+      notes: document.getElementById('rm-notes').value.trim(),
+    };
+    var ur = getUserRaces(); ur.push(race); saveUserRaces(ur);
+    bg.remove();
+    renderCalendar();
+  });
+}
 
 // Route image lightbox
 document.addEventListener('click', function(e) {
