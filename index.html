@@ -968,6 +968,70 @@ body{font-family:'Plus Jakarta Sans',system-ui,-apple-system,sans-serif;color:va
 .monthly-msg.alert{border-color:var(--red)}
 @media(max-width:768px){.monthly-grid{grid-template-columns:1fr}.traj-row{flex-direction:column;gap:10px}}
 
+/* ===== MONTHLY SNAPSHOT v2 (interactive) ===== */
+.ms-pills{display:flex;gap:8px;overflow-x:auto;padding:4px 0 12px;margin-bottom:18px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+.ms-pills::-webkit-scrollbar{height:4px}
+.ms-pills::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:2px}
+.ms-pill{flex:0 0 auto;background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:10px 16px;cursor:pointer;text-align:center;min-width:90px;transition:all .18s ease;-webkit-user-select:none;user-select:none}
+.ms-pill:hover{border-color:rgba(96,165,250,.45);transform:translateY(-1px)}
+.ms-pill.active{background:linear-gradient(135deg,#1e3a8a 0%,#1e40af 100%);border-color:#3b82f6;box-shadow:0 4px 16px rgba(59,130,246,.25)}
+.ms-pill-month{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-bottom:4px}
+.ms-pill.active .ms-pill-month{color:#bfdbfe}
+.ms-pill-km{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800;color:var(--t1);line-height:1}
+.ms-pill.active .ms-pill-km{color:#fff}
+.ms-pill-runs{font-size:10px;color:var(--t3);margin-top:3px;font-weight:600}
+.ms-pill.active .ms-pill-runs{color:rgba(255,255,255,.6)}
+
+.ms-hero{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.ms-stat{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden}
+.ms-stat::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blu),transparent);opacity:.4}
+.ms-stat-h{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-bottom:8px}
+.ms-stat-val{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:800;color:var(--t1);margin-bottom:6px;line-height:1}
+.ms-stat-unit{font-size:13px;font-weight:600;color:var(--t3);margin-left:4px}
+.ms-stat-delta{font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:3px}
+.ms-stat-delta.up{color:var(--grn)}
+.ms-stat-delta.down{color:var(--red)}
+.ms-stat-delta.flat{color:var(--t3)}
+.ms-stat-delta-sub{font-size:11px;color:var(--t3);margin-left:6px;font-weight:500}
+
+.ms-section{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:18px 20px;margin-bottom:14px}
+.ms-section-h{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.ms-section-h-meta{font-size:11px;color:var(--t3);font-weight:600;letter-spacing:0;text-transform:none}
+
+.ms-bars{display:flex;align-items:flex-end;gap:8px;height:140px;padding:0 4px}
+.ms-bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0}
+.ms-bar-track{width:100%;height:100%;background:rgba(96,165,250,.08);border-radius:6px 6px 2px 2px;position:relative;display:flex;align-items:flex-end;overflow:hidden}
+.ms-bar-fill{width:100%;background:linear-gradient(180deg,#3b82f6,#1e3a8a);border-radius:6px 6px 2px 2px;transition:height .4s cubic-bezier(.4,0,.2,1);position:relative}
+.ms-bar-fill:hover{background:linear-gradient(180deg,#60a5fa,#2563eb)}
+.ms-bar-val{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--t2);font-weight:700;white-space:nowrap}
+.ms-bar-label{font-size:10px;color:var(--t3);font-weight:600;text-align:center;white-space:nowrap}
+
+.ms-pace-chart{height:120px;position:relative;padding:8px 4px}
+.ms-pace-svg{width:100%;height:100%;overflow:visible}
+
+.ms-best{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.ms-best-card{background:linear-gradient(135deg,rgba(13,140,84,.1),rgba(13,140,84,.02));border:1px solid rgba(13,140,84,.25);border-radius:12px;padding:14px}
+.ms-best-card.empty{background:var(--card);border:1px dashed var(--bdr);opacity:.5}
+.ms-best-h{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--grn);margin-bottom:6px}
+.ms-best-card.empty .ms-best-h{color:var(--t3)}
+.ms-best-time{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:800;color:var(--t1);line-height:1;margin-bottom:4px}
+.ms-best-src{font-size:11px;color:var(--t3);font-weight:500}
+
+.ms-analysis{background:linear-gradient(135deg,rgba(96,165,250,.08),rgba(96,165,250,.02));border-left:3px solid var(--blu);border-radius:0 12px 12px 0;padding:16px 18px;font-size:13px;color:var(--t2);line-height:1.65}
+.ms-analysis strong{color:var(--t1)}
+
+.ms-compare{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ms-compare-label{font-size:11px;font-weight:700;color:var(--t3);letter-spacing:1px;text-transform:uppercase}
+.ms-compare-select{background:var(--card);border:1px solid var(--bdr);color:var(--t1);padding:7px 12px;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit}
+.ms-compare-out{font-size:13px;color:var(--t2);flex:1;min-width:200px}
+.ms-compare-out strong{color:var(--t1)}
+
+@media(max-width:768px){
+  .ms-hero{grid-template-columns:1fr 1fr}
+  .ms-best{grid-template-columns:1fr}
+  .ms-bars{height:110px}
+}
+
 /* RACE ROUTE */
 .cal-route-section{border-top:1px solid var(--bdr);padding-top:10px;margin-top:2px}
 .cal-route-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);margin-bottom:8px}
@@ -5329,27 +5393,33 @@ document.getElementById('pg-plan').innerHTML = plan.map(function(p) {
   el.innerHTML = html;
 })();
 
-// ===== MONTHLY SNAPSHOT PAGE =====
+// ===== MONTHLY SNAPSHOT PAGE (interactive) =====
 (function() {
   var pg = document.getElementById('pg-monthly');
   if (!pg || !allRuns || !allRuns.length) return;
 
-  function fmtPace(secsPerKm) {
-    if (!secsPerKm) return '--';
-    var m = Math.floor(secsPerKm/60), s = Math.round(secsPerKm - m*60);
-    if (s === 60) { m++; s = 0; }
-    return m + ':' + (s < 10 ? '0' : '') + s + '/km';
+  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var monthAbbr  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  function fmtPace(s) {
+    if (!s) return '--';
+    var m = Math.floor(s/60), sec = Math.round(s - m*60);
+    if (sec === 60) { m++; sec = 0; }
+    return m + ':' + (sec<10?'0':'') + sec;
   }
   function fmtTime(s) {
     if (!s) return '--';
     var h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = Math.round(s%60);
     return h ? h+':'+(m<10?'0':'')+m+':'+(sec<10?'0':'')+sec : m+':'+(sec<10?'0':'')+sec;
   }
+  function escapeHtml(s) {
+    return String(s||'').replace(/[&<>"']/g, function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});
+  }
 
   function statsFor(runs) {
     var totalKm=0, totalSecs=0, hrs=[], longest=0, races=0, intervals=0, tempo=0, longRuns=0;
-    var best5k=null, best10k=null, bestHM=null;
-    var totalAscent=0, totalCals=0;
+    var best={k5:null,k10:null,hm:null};
+    var totalAscent=0;
     runs.forEach(function(r) {
       totalKm += r.dist || 0;
       totalSecs += r.timeSecs || 0;
@@ -5357,26 +5427,32 @@ document.getElementById('pg-plan').innerHTML = plan.map(function(p) {
       if (r.dist > longest) longest = r.dist;
       if (r.dist >= 15) longRuns++;
       if (r.ascent) totalAscent += r.ascent;
-      if (r.cals) totalCals += r.cals;
       var t = (r.title || '').toLowerCase();
       if (/race|parkrun|carrera de empresas/.test(t)) races++;
       if (/interval|fartlek|series|tirada/.test(t)) intervals++;
       if (/tempo|threshold|umbral|progres/.test(t)) tempo++;
-      if (r.timeSecs && r.dist >= 4.9 && r.dist <= 5.2 && (best5k===null || r.timeSecs < best5k)) best5k = r.timeSecs;
-      if (r.timeSecs && r.dist >= 9.8 && r.dist <= 10.3 && (best10k===null || r.timeSecs < best10k)) best10k = r.timeSecs;
-      if (r.timeSecs && r.dist >= 20.5 && r.dist <= 21.5 && (bestHM===null || r.timeSecs < bestHM)) bestHM = r.timeSecs;
+      function tryBest(slot, lo, hi) {
+        if (r.timeSecs && r.dist >= lo && r.dist <= hi) {
+          var norm = r.timeSecs * ((slot==='k5'?5:slot==='k10'?10:21.0975) / r.dist);
+          if (best[slot]===null || norm < best[slot].t) best[slot] = {t:norm, src:r.title||'', date:r.ds};
+        }
+      }
+      tryBest('k5', 4.9, 5.2);
+      tryBest('k10', 9.7, 10.4);
+      tryBest('hm', 20.5, 21.5);
     });
-    var avgPace = totalKm > 0 ? (totalSecs/totalKm) : 0;
-    var avgHR = hrs.length ? Math.round(hrs.reduce(function(a,b){return a+b;}, 0) / hrs.length) : 0;
     return {
-      runs: runs.length, km: totalKm, totalSecs: totalSecs, avgPace: avgPace, avgHR: avgHR,
-      longest: longest, races: races, intervals: intervals, tempo: tempo, longRuns: longRuns,
-      ascent: totalAscent, cals: totalCals,
-      best5k: best5k, best10k: best10k, bestHM: bestHM
+      runs: runs.length, km: totalKm, totalSecs: totalSecs,
+      avgPace: totalKm>0 ? totalSecs/totalKm : 0,
+      avgHR: hrs.length ? Math.round(hrs.reduce(function(a,b){return a+b;},0)/hrs.length) : 0,
+      longest: longest, longRuns: longRuns,
+      races: races, intervals: intervals, tempo: tempo,
+      ascent: totalAscent,
+      best: best
     };
   }
 
-  // Group all runs from Jan 2026 onwards by year-month
+  // Group runs by year-month, from Jan 2026 onwards
   var byMonth = {};
   allRuns.forEach(function(r) {
     if (!r.ds || r.ds < '2026-01') return;
@@ -5385,88 +5461,231 @@ document.getElementById('pg-plan').innerHTML = plan.map(function(p) {
     byMonth[ym].push(r);
   });
   var keys = Object.keys(byMonth).sort();
-  var monthly = keys.map(function(k) { return { key: k, stats: statsFor(byMonth[k]) }; });
+  if (!keys.length) {
+    pg.innerHTML = '<div class="monthly-header"><div class="monthly-name">Monthly Snapshot</div><div class="monthly-tagline">No 2026 runs yet</div></div>';
+    return;
+  }
+  var monthly = keys.map(function(k) {
+    return { key: k, runs: byMonth[k], stats: statsFor(byMonth[k]) };
+  });
+  var indexByKey = {};
+  monthly.forEach(function(m, i){ indexByKey[m.key] = i; });
 
-  var monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-
-  function buildAnalysis(s, prev) {
-    if (!prev) return 'Baseline month - no prior data to compare against. Subsequent months track changes from here.';
-    var bits = [];
-    var dKm = s.km - prev.km;
-    var dPace = s.avgPace - prev.avgPace;
-    var dHR = s.avgHR - prev.avgHR;
-
-    if (dKm >= 15) bits.push('volume jumped <strong>+' + Math.round(dKm) + 'km</strong> (' + Math.round(dKm/prev.km*100) + '% build)');
-    else if (dKm <= -15) bits.push('volume dropped <strong>-' + Math.round(Math.abs(dKm)) + 'km</strong> (recovery, travel or down week)');
-    else if (Math.abs(dKm) <= 6) bits.push('volume held steady (' + s.km.toFixed(0) + 'km vs ' + prev.km.toFixed(0) + 'km)');
-    else bits.push('volume ' + (dKm>0?'up':'down') + ' ' + Math.abs(Math.round(dKm)) + 'km');
-
-    if (dPace <= -10) bits.push('avg pace <strong>' + Math.round(Math.abs(dPace)) + 's/km faster</strong> - either fitness gain or fewer easy/long miles in the mix');
-    else if (dPace >= 10) bits.push('avg pace <strong>' + Math.round(dPace) + 's/km slower</strong> - more easy/long-run mileage shifting the average');
-
-    if (dHR <= -3) bits.push('avg HR down ' + Math.abs(dHR) + ' bpm at similar effort - aerobic efficiency improving');
-    else if (dHR >= 3) bits.push('avg HR up ' + dHR + ' bpm');
-
-    if (s.intervals > prev.intervals + 1) bits.push('quality work increased (' + prev.intervals + ' to ' + s.intervals + ' interval sessions)');
-    if (s.tempo > prev.tempo + 1) bits.push('tempo/threshold work increased (' + prev.tempo + ' to ' + s.tempo + ')');
-    if (s.longest > prev.longest + 2) bits.push('long-run ceiling lifted <strong>+' + (s.longest - prev.longest).toFixed(1) + 'km</strong> to ' + s.longest.toFixed(1) + 'km');
-    else if (s.longest < prev.longest - 2) bits.push('long-run ceiling pulled back to ' + s.longest.toFixed(1) + 'km');
-
-    if (s.races > prev.races) bits.push((s.races - prev.races) + ' race effort' + (s.races-prev.races===1?'':'s') + ' this month');
-
-    if (!bits.length) return 'Month-on-month metrics broadly unchanged.';
-    var sentence = bits.join('. ');
-    return sentence.charAt(0).toUpperCase() + sentence.slice(1) + '.';
+  function deltaBlock(curr, prev, fmt, betterIsLower) {
+    if (prev === null || prev === undefined) {
+      return '<div class="ms-stat-delta flat">- no prior month</div>';
+    }
+    var d = curr - prev;
+    if (Math.abs(d) < 0.01) return '<div class="ms-stat-delta flat">= no change</div>';
+    var arrow = d > 0 ? '▲' : '▼';
+    var sign = d > 0 ? '+' : '';
+    var classed;
+    if (betterIsLower) classed = d < 0 ? 'up' : 'down';
+    else classed = d > 0 ? 'up' : 'down';
+    return '<div class="ms-stat-delta ' + classed + '">' + arrow + ' ' + sign + (fmt ? fmt(d) : Math.round(d)) + '<span class="ms-stat-delta-sub">vs prev</span></div>';
   }
 
-  var headerHtml = '<div class="monthly-header">' +
-    '<div class="monthly-name">📅 Monthly Snapshot</div>' +
-    '<div class="monthly-tagline">Month-by-month performance review</div>' +
-    '<div class="monthly-sub">Volume, pace, HR, sessions and best efforts. Auto-updates from each Garmin and Strava sync.</div>' +
-  '</div>';
+  function buildAnalysis(curr, prev, prevLabel) {
+    if (!prev) return '<strong>Baseline month.</strong> Subsequent months are compared from here.';
+    var bits = [];
+    var dKm = curr.km - prev.km, dPace = curr.avgPace - prev.avgPace, dHR = curr.avgHR - prev.avgHR;
+    if (dKm >= 15) bits.push('Volume jumped <strong>+' + Math.round(dKm) + 'km</strong> (' + Math.round(dKm/prev.km*100) + '% build) - clear ramp-up');
+    else if (dKm <= -15) bits.push('Volume dropped <strong>' + Math.round(dKm) + 'km</strong> - recovery, travel or down-cycle');
+    else if (Math.abs(dKm) <= 6) bits.push('Volume held steady (' + curr.km.toFixed(0) + 'km vs ' + prev.km.toFixed(0) + 'km)');
+    else bits.push('Volume ' + (dKm>0?'up':'down') + ' ' + Math.abs(Math.round(dKm)) + 'km');
+    if (dPace <= -10) bits.push('avg pace <strong>' + Math.round(Math.abs(dPace)) + 's/km faster</strong> - fitness gain or fewer easy miles diluting the average');
+    else if (dPace >= 10) bits.push('avg pace <strong>' + Math.round(dPace) + 's/km slower</strong> - more easy/long-run mileage shifting the average');
+    if (dHR <= -3) bits.push('avg HR down ' + Math.abs(dHR) + ' bpm - aerobic efficiency improving');
+    else if (dHR >= 3) bits.push('avg HR up ' + dHR + ' bpm');
+    if (curr.intervals > prev.intervals + 1) bits.push('quality work increased (' + prev.intervals + ' to ' + curr.intervals + ' interval sessions)');
+    if (curr.tempo > prev.tempo + 1) bits.push('tempo work up (' + prev.tempo + ' to ' + curr.tempo + ')');
+    if (curr.longest > prev.longest + 2) bits.push('long-run ceiling lifted <strong>+' + (curr.longest - prev.longest).toFixed(1) + 'km</strong> to ' + curr.longest.toFixed(1) + 'km');
+    else if (curr.longest < prev.longest - 2) bits.push('long-run ceiling pulled back to ' + curr.longest.toFixed(1) + 'km');
+    if (curr.races > prev.races) bits.push((curr.races - prev.races) + ' race effort' + (curr.races-prev.races===1?'':'s') + ' this month');
+    if (!bits.length) return '<strong>Steady month vs ' + prevLabel + '.</strong> Metrics broadly unchanged.';
+    return bits.join('. ') + '.';
+  }
 
-  var cards = monthly.map(function(m, i) {
-    var prev = i > 0 ? monthly[i-1].stats : null;
+  function buildWeeklyBars(monthRuns, monthKey) {
+    var parts = monthKey.split('-');
+    var year = parseInt(parts[0], 10), monthIdx = parseInt(parts[1], 10) - 1;
+    var firstDay = new Date(year, monthIdx, 1);
+    var lastDay = new Date(year, monthIdx + 1, 0);
+    var buckets = [];
+    var d = new Date(firstDay);
+    while (d <= lastDay) {
+      var weekEnd = new Date(d);
+      weekEnd.setDate(weekEnd.getDate() + 6);
+      if (weekEnd > lastDay) weekEnd = new Date(lastDay);
+      buckets.push({ start: new Date(d), end: new Date(weekEnd), km: 0, runs: 0 });
+      d.setDate(d.getDate() + 7);
+    }
+    monthRuns.forEach(function(r) {
+      var rd = new Date(r.ds + 'T00:00:00');
+      buckets.forEach(function(b) {
+        if (rd >= b.start && rd <= b.end) { b.km += r.dist || 0; b.runs += 1; }
+      });
+    });
+    var maxKm = Math.max.apply(null, buckets.map(function(b){return b.km;}).concat([1]));
+    var bars = buckets.map(function(b) {
+      var h = b.km > 0 ? Math.max(8, Math.round(b.km / maxKm * 100)) : 2;
+      var label = b.start.getDate() + '-' + b.end.getDate();
+      return '<div class="ms-bar"><div class="ms-bar-track">' +
+        '<div class="ms-bar-fill" style="height:' + h + '%">' +
+          (b.km > 0 ? '<div class="ms-bar-val">' + b.km.toFixed(1) + 'km</div>' : '') +
+        '</div></div><div class="ms-bar-label">' + label + '</div></div>';
+    }).join('');
+    return '<div class="ms-bars">' + bars + '</div>';
+  }
+
+  function buildPaceChart(monthRuns, monthKey) {
+    var runs = monthRuns.filter(function(r){return r.timeSecs && r.dist >= 1;}).slice().sort(function(a,b){return a.ds<b.ds?-1:1;});
+    if (!runs.length) return '<div style="text-align:center;color:var(--t3);padding:24px;font-size:12px">No runs this month</div>';
+    var paces = runs.map(function(r){return r.timeSecs/r.dist;});
+    var minP = Math.min.apply(null, paces) - 10;
+    var maxP = Math.max.apply(null, paces) + 10;
+    var parts = monthKey.split('-');
+    var year = parseInt(parts[0], 10), monthIdx = parseInt(parts[1], 10) - 1;
+    var lastDay = new Date(year, monthIdx + 1, 0).getDate();
+    var W = 100, H = 100;
+    var pts = runs.map(function(r) {
+      var day = parseInt(r.ds.substring(8,10), 10);
+      var x = (day - 1) / Math.max(1, lastDay - 1) * W;
+      var y = H - ((r.timeSecs/r.dist) - minP) / (maxP - minP) * H;
+      var t = (r.title || '').toLowerCase();
+      var color = '#3b82f6';
+      if (/race|parkrun|carrera de empresas/.test(t)) color = '#f59e0b';
+      else if (/interval|fartlek|series/.test(t)) color = '#ef4444';
+      else if (/tempo|threshold|progres/.test(t)) color = '#a855f7';
+      else if (r.dist >= 15) color = '#10b981';
+      var size = Math.max(2, Math.min(7, Math.sqrt(r.dist)));
+      return {x:x, y:y, c:color, s:size, r:r};
+    });
+    var dots = pts.map(function(p) {
+      var label = p.r.dist.toFixed(1) + 'km · ' + fmtPace(p.r.timeSecs/p.r.dist) + '/km · ' + escapeHtml(p.r.title || p.r.ds);
+      return '<circle cx="' + p.x.toFixed(2) + '" cy="' + p.y.toFixed(2) + '" r="' + p.s + '" fill="' + p.c + '" opacity="0.85"><title>' + label + '</title></circle>';
+    }).join('');
+    var avgY = H - (runs.reduce(function(a,r){return a+r.timeSecs/r.dist;},0)/runs.length - minP)/(maxP-minP)*H;
+    var meanLine = '<line x1="0" x2="' + W + '" y1="' + avgY.toFixed(2) + '" y2="' + avgY.toFixed(2) + '" stroke="rgba(148,163,184,0.35)" stroke-dasharray="2,2" stroke-width="0.5"/>';
+    var legend = '<div style="display:flex;gap:14px;font-size:10px;color:var(--t3);margin-top:8px;flex-wrap:wrap">' +
+      '<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#3b82f6;margin-right:4px"></span>Easy</span>' +
+      '<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;margin-right:4px"></span>Long ≥15km</span>' +
+      '<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#a855f7;margin-right:4px"></span>Tempo</span>' +
+      '<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;margin-right:4px"></span>Intervals</span>' +
+      '<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#f59e0b;margin-right:4px"></span>Race</span>' +
+      '<span style="margin-left:auto">faster ↑ · ↓ slower</span></div>';
+    return '<div class="ms-pace-chart"><svg class="ms-pace-svg" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none">' + meanLine + dots + '</svg></div>' + legend;
+  }
+
+  function buildPills(activeKey) {
+    return '<div class="ms-pills">' + monthly.map(function(m) {
+      var p = m.key.split('-');
+      var ab = monthAbbr[parseInt(p[1],10)-1];
+      return '<div class="ms-pill ' + (m.key===activeKey?'active':'') + '" data-msk="' + m.key + '">' +
+        '<div class="ms-pill-month">' + ab + '</div>' +
+        '<div class="ms-pill-km">' + Math.round(m.stats.km) + '<span style="font-size:10px;color:var(--t3);margin-left:2px">km</span></div>' +
+        '<div class="ms-pill-runs">' + m.stats.runs + ' run' + (m.stats.runs===1?'':'s') + '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+  }
+
+  function renderFor(activeKey, compareKey) {
+    var i = indexByKey[activeKey];
+    var m = monthly[i];
     var s = m.stats;
-    var parts = m.key.split('-');
-    var label = monthNames[parseInt(parts[1], 10) - 1] + ' ' + parts[0];
+    var prevIdx = i - 1;
+    var prev = prevIdx >= 0 ? monthly[prevIdx].stats : null;
+    var prevLabel = prevIdx >= 0 ? monthNames[parseInt(monthly[prevIdx].key.split('-')[1],10)-1] : null;
+    var p = m.key.split('-');
+    var monthLabel = monthNames[parseInt(p[1],10)-1] + ' ' + p[0];
 
-    var statsRow = '<div class="monthly-grid">' +
-      '<div class="monthly-insight">' +
-        '<div class="monthly-insight-h">📊 Volume</div>' +
-        '<div class="monthly-insight-val">' + s.km.toFixed(1) + ' km</div>' +
-        '<div class="monthly-insight-body">' + s.runs + ' runs' + (prev ? ' · ' + (s.km-prev.km>=0?'+':'') + (s.km-prev.km).toFixed(1) + ' km vs prev' : '') + '</div>' +
+    var hero = '<div class="ms-hero">' +
+      '<div class="ms-stat">' +
+        '<div class="ms-stat-h">Volume</div>' +
+        '<div class="ms-stat-val">' + s.km.toFixed(1) + '<span class="ms-stat-unit">km</span></div>' +
+        deltaBlock(s.km, prev ? prev.km : null, function(d){return Math.abs(d).toFixed(1)+'km';}, false) +
       '</div>' +
-      '<div class="monthly-insight">' +
-        '<div class="monthly-insight-h">⏱ Avg pace</div>' +
-        '<div class="monthly-insight-val">' + fmtPace(s.avgPace) + '</div>' +
-        '<div class="monthly-insight-body">avg HR ' + (s.avgHR || '--') + ' bpm' + (s.ascent ? ' · ' + Math.round(s.ascent) + 'm climb' : '') + '</div>' +
+      '<div class="ms-stat">' +
+        '<div class="ms-stat-h">Avg pace</div>' +
+        '<div class="ms-stat-val">' + fmtPace(s.avgPace) + '<span class="ms-stat-unit">/km</span></div>' +
+        deltaBlock(s.avgPace, prev ? prev.avgPace : null, function(d){return Math.abs(Math.round(d))+'s';}, true) +
       '</div>' +
-      '<div class="monthly-insight">' +
-        '<div class="monthly-insight-h">🏔 Longest run</div>' +
-        '<div class="monthly-insight-val">' + s.longest.toFixed(1) + ' km</div>' +
-        '<div class="monthly-insight-body">' + s.longRuns + ' run' + (s.longRuns===1?'':'s') + ' ≥15km</div>' +
+      '<div class="ms-stat">' +
+        '<div class="ms-stat-h">Longest run</div>' +
+        '<div class="ms-stat-val">' + s.longest.toFixed(1) + '<span class="ms-stat-unit">km</span></div>' +
+        deltaBlock(s.longest, prev ? prev.longest : null, function(d){return Math.abs(d).toFixed(1)+'km';}, false) +
       '</div>' +
-      '<div class="monthly-insight">' +
-        '<div class="monthly-insight-h">🎯 Sessions</div>' +
-        '<div class="monthly-insight-val">' + (s.tempo + s.intervals + s.races) + '</div>' +
-        '<div class="monthly-insight-body">' + s.intervals + ' intervals · ' + s.tempo + ' tempo · ' + s.races + ' race</div>' +
+      '<div class="ms-stat">' +
+        '<div class="ms-stat-h">Avg HR</div>' +
+        '<div class="ms-stat-val">' + (s.avgHR || '--') + '<span class="ms-stat-unit">bpm</span></div>' +
+        deltaBlock(s.avgHR, prev ? prev.avgHR : null, function(d){return Math.abs(Math.round(d))+'bpm';}, true) +
       '</div>' +
     '</div>';
 
-    var pbBits = [];
-    if (s.best5k) pbBits.push('5K ' + fmtTime(s.best5k));
-    if (s.best10k) pbBits.push('10K ' + fmtTime(s.best10k));
-    if (s.bestHM) pbBits.push('HM ' + fmtTime(s.bestHM));
-    var pbRow = pbBits.length ? '<div class="monthly-msg good"><strong>Best efforts this month:</strong> ' + pbBits.join(' · ') + '</div>' : '';
+    var sessionRow = '<div class="ms-section"><div class="ms-section-h">Session breakdown <span class="ms-section-h-meta">' + s.runs + ' runs · ' + Math.round(s.ascent) + 'm climb · ' + s.longRuns + ' run' + (s.longRuns===1?'':'s') + ' ≥15km</span></div>' +
+      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;font-size:13px">' +
+        '<div><strong style="color:var(--t1);font-size:18px">' + s.intervals + '</strong> <span style="color:var(--t3)">intervals</span></div>' +
+        '<div><strong style="color:var(--t1);font-size:18px">' + s.tempo + '</strong> <span style="color:var(--t3)">tempo</span></div>' +
+        '<div><strong style="color:var(--t1);font-size:18px">' + s.races + '</strong> <span style="color:var(--t3)">race</span></div>' +
+        '<div><strong style="color:var(--t1);font-size:18px">' + Math.max(0, s.runs - s.intervals - s.tempo - s.races) + '</strong> <span style="color:var(--t3)">easy/long</span></div>' +
+      '</div></div>';
 
-    var analysis = '<div class="monthly-msg">' + buildAnalysis(s, prev) + '</div>';
+    var weeklyChart = '<div class="ms-section"><div class="ms-section-h">Weekly volume <span class="ms-section-h-meta">7-day buckets within ' + monthNames[parseInt(p[1],10)-1] + '</span></div>' + buildWeeklyBars(m.runs, m.key) + '</div>';
+    var paceChart = '<div class="ms-section"><div class="ms-section-h">Pace by run <span class="ms-section-h-meta">hover for details · dot size = distance</span></div>' + buildPaceChart(m.runs, m.key) + '</div>';
 
-    return '<div class="sec-h" style="margin:24px 0 12px">' + label + '</div>' +
-      statsRow + pbRow + analysis;
-  }).join('');
+    function bestCard(label, slot) {
+      var b = s.best[slot];
+      if (!b) return '<div class="ms-best-card empty"><div class="ms-best-h">' + label + '</div><div class="ms-best-time">-</div><div class="ms-best-src">no effort this month</div></div>';
+      return '<div class="ms-best-card"><div class="ms-best-h">' + label + ' best</div><div class="ms-best-time">' + fmtTime(Math.round(b.t)) + '</div><div class="ms-best-src">' + escapeHtml(b.src || b.date) + '</div></div>';
+    }
+    var bestRow = '<div class="ms-section"><div class="ms-section-h">Best efforts (normalised to exact distance)</div>' +
+      '<div class="ms-best">' + bestCard('5K','k5') + bestCard('10K','k10') + bestCard('Half','hm') + '</div></div>';
 
-  pg.innerHTML = headerHtml + cards;
+    var analysis = '<div class="ms-section"><div class="ms-section-h">Month-on-month analysis</div>' +
+      '<div class="ms-analysis">' + buildAnalysis(s, prev, prevLabel) + '</div></div>';
+
+    var cmpKey = compareKey || (i > 0 ? monthly[0].key : m.key);
+    var cmpStats = monthly[indexByKey[cmpKey]].stats;
+    var cmpOptions = monthly.filter(function(x){return x.key !== m.key;}).map(function(x) {
+      var pp = x.key.split('-');
+      var lbl = monthNames[parseInt(pp[1],10)-1] + ' ' + pp[0];
+      return '<option value="' + x.key + '"' + (x.key === cmpKey ? ' selected' : '') + '>' + lbl + '</option>';
+    }).join('');
+    function cmpBit(curr, base, label, fmt, betterLow, unit) {
+      var d = curr - base;
+      if (Math.abs(d) < 0.01) return '<strong>' + label + ':</strong> identical';
+      var arrow = d > 0 ? '▲' : '▼';
+      var color = (betterLow ? d < 0 : d > 0) ? 'var(--grn)' : 'var(--red)';
+      return '<strong>' + label + ':</strong> <span style="color:' + color + '">' + arrow + ' ' + (fmt ? fmt(d) : Math.round(d)) + (unit||'') + '</span>';
+    }
+    var cmpOut = monthly.length < 2 ? 'Need at least two months to compare.' :
+      cmpBit(s.km, cmpStats.km, 'volume', function(d){return Math.abs(d).toFixed(0);}, false, 'km') + ' · ' +
+      cmpBit(s.avgPace, cmpStats.avgPace, 'pace', function(d){return Math.abs(Math.round(d));}, true, 's/km') + ' · ' +
+      cmpBit(s.longest, cmpStats.longest, 'longest', function(d){return Math.abs(d).toFixed(1);}, false, 'km') + ' · ' +
+      cmpBit(s.avgHR, cmpStats.avgHR, 'HR', function(d){return Math.abs(Math.round(d));}, true, 'bpm');
+    var compare = '<div class="ms-section"><div class="ms-section-h">Compare ' + monthNames[parseInt(p[1],10)-1] + ' to another month</div>' +
+      '<div class="ms-compare">' +
+        '<span class="ms-compare-label">vs</span>' +
+        '<select class="ms-compare-select" id="ms-cmp-sel">' + cmpOptions + '</select>' +
+        '<div class="ms-compare-out">' + cmpOut + '</div>' +
+      '</div></div>';
+
+    var headerHtml = '<div class="monthly-header">' +
+      '<div class="monthly-name">Monthly Snapshot</div>' +
+      '<div class="monthly-tagline">' + monthLabel + '</div>' +
+      '<div class="monthly-sub">Click a month above to switch · auto-updates from each Garmin and Strava sync</div>' +
+    '</div>';
+
+    pg.innerHTML = headerHtml + buildPills(m.key) + hero + sessionRow + bestRow + weeklyChart + paceChart + analysis + compare;
+
+    pg.querySelectorAll('.ms-pill').forEach(function(el) {
+      el.addEventListener('click', function() { renderFor(el.dataset.msk, null); });
+    });
+    var sel = document.getElementById('ms-cmp-sel');
+    if (sel) sel.addEventListener('change', function() { renderFor(m.key, sel.value); });
+  }
+
+  renderFor(monthly[monthly.length - 1].key, null);
 })();
 
 document.getElementById('pg-plan').addEventListener('click', function(e) {
