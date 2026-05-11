@@ -5759,282 +5759,381 @@ document.getElementById('pg-plan').innerHTML = plan.map(function(p) {
   renderFor(monthly[monthly.length - 1].key, null);
 })();
 
-// ===== FORECAST PAGE (Claude analytical prediction) =====
+// ===== FORECAST PAGE (Claude analytical prediction - multi-distance) =====
 (function() {
   var pg = document.getElementById('pg-forecast');
   if (!pg) return;
 
-  var TARGET_SECS = 12300;       // 3:25:00
-  var SUB_3_30 = 12600;
-  var SUB_3_20 = 12000;
-  var MARATHON_KM = 42.195;
-  var RACE_DATE = new Date(2026, 9, 4); // 4 Oct 2026
+  var HISTORIC_LONGEST_KM = 30; // Sep/Oct 2025 long run, pre-data-window
+  var RACE_DATE = new Date(2026, 9, 4);
 
-  // ── Known long-run ceiling: dashboard data starts Jan 2026, but Liam ran a
-  //    30km long run in Sep/Oct 2025 (pre-data-window). Use the larger of the
-  //    historical value or anything visible in current data.
-  var HISTORIC_LONGEST_KM = 30;
+  var TARGETS = {
+    k5:  { dist:5,        label:'5K',       garminField:'t5k',  goal:1140, stretch:1110, soft:1170, raceLabel:'TBC' },
+    k10: { dist:10,       label:'10K',      garminField:'t10k', goal:2400, stretch:2340, soft:2460, raceLabel:'Various 10Ks' },
+    hm:  { dist:21.0975,  label:'Half',     garminField:'thm',  goal:5400, stretch:5280, soft:5520, raceLabel:'TBC' },
+    mar: { dist:42.195,   label:'Marathon', garminField:'tmar', goal:12300, stretch:12000, soft:12600, raceLabel:'Cologne · 4 Oct 2026' }
+  };
+  var ORDER = ['k5','k10','hm','mar'];
 
   function fmtTime(s) {
     if (s == null || !isFinite(s)) return '--';
     s = Math.round(s);
     var h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
-    return h + ':' + (m<10?'0':'') + m + ':' + (sec<10?'0':'') + sec;
+    if (h) return h + ':' + (m<10?'0':'') + m + ':' + (sec<10?'0':'') + sec;
+    return m + ':' + (sec<10?'0':'') + sec;
   }
   function fmtMin(s) { var m = Math.floor(s/60), sec = Math.round(s%60); if (sec===60){m++;sec=0;} return m + ':' + (sec<10?'0':'') + sec; }
-  function diffStr(s) {
-    if (s >= 0) return '+' + Math.floor(s/60) + ':' + (Math.round(s%60)<10?'0':'') + Math.round(s%60);
-    s = -s; return '-' + Math.floor(s/60) + ':' + (Math.round(s%60)<10?'0':'') + Math.round(s%60);
+  function diffStr(s, withColon) {
+    var sign = s < 0 ? '-' : '+';
+    s = Math.abs(s);
+    var m = Math.floor(s/60), sec = Math.round(s%60);
+    if (sec === 60) { m++; sec = 0; }
+    if (withColon || m >= 1) return sign + m + ':' + (sec<10?'0':'') + sec;
+    return sign + sec + 's';
   }
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
-  // ── Pull race-verified efforts from allRuns (Riegel uses ACTUAL race times
-  //    where available, not training-segment fastest splits) ────────────────
-  var bestActual = { k5:null, k10:null, hm:null };
+  // ── Race-verified PBs at each canonical distance ─────────────────────────
+  var bestActual = { k5:null, k10:null, hm:null, mar:null };
   (allRuns || []).forEach(function(r) {
     if (!r.timeSecs) return;
     var titleLow = (r.title || '').toLowerCase();
     var isRace = /race|parkrun|carrera de empresas/.test(titleLow);
-    function tryFor(slot, lo, hi, exact) {
+    function tryFor(slot, lo, hi, exact, raceOnly) {
       if (r.dist < lo || r.dist > hi) return;
+      if (raceOnly && !isRace) return;
       var norm = r.timeSecs * (exact / r.dist);
-      if (!isRace && slot !== 'k5') return; // only race efforts for 10K/HM
       if (bestActual[slot] === null || norm < bestActual[slot].t) {
         bestActual[slot] = { t: norm, src: r.title || r.ds, date: r.ds, isRace: isRace, dist: r.dist };
       }
     }
-    tryFor('k5', 4.85, 5.15, 5);
-    tryFor('k10', 9.7, 10.3, 10);
-    tryFor('hm', 20.5, 21.5, 21.0975);
+    tryFor('k5',  4.85, 5.15, 5, false);
+    tryFor('k10', 9.7, 10.3, 10, true);
+    tryFor('hm',  20.5, 21.5, 21.0975, true);
+    tryFor('mar', 41.5, 43.0, 42.195, true);
   });
 
-  // ── Longest run actually performed (dashboard window) ─────────────────────
   var visibleLongest = 0;
   (allRuns || []).forEach(function(r) { if (r.dist > visibleLongest) visibleLongest = r.dist; });
   var trueLongest = Math.max(visibleLongest, HISTORIC_LONGEST_KM);
 
-  // ── Volume signal: 4-week rolling avg km ──────────────────────────────────
   var fourWkAvg = (function() {
     if (typeof weeklyMap !== 'undefined' && typeof recentWeeks !== 'undefined') {
-      var last = recentWeeks.slice(-4);
-      var sum = 0; last.forEach(function(k){ sum += (weeklyMap[k] && weeklyMap[k].km) || 0; });
+      var last = recentWeeks.slice(-4), sum = 0;
+      last.forEach(function(k){ sum += (weeklyMap[k] && weeklyMap[k].km) || 0; });
       return last.length ? sum / last.length : 0;
     }
     return 0;
   })();
 
-  // ── Days to race ──────────────────────────────────────────────────────────
   var now = new Date();
   var daysToRace = Math.max(0, Math.ceil((RACE_DATE - now) / 86400000));
 
-  // ── Method 1: Pure Riegel from 10K (race-verified) ────────────────────────
-  var m_riegel10 = bestActual.k10 ? bestActual.k10.t * Math.pow(MARATHON_KM / 10, 1.06) : null;
-
-  // ── Method 2: Pure Riegel from 5K (race-verified) ─────────────────────────
-  var m_riegel5 = bestActual.k5 ? bestActual.k5.t * Math.pow(MARATHON_KM / 5, 1.06) : null;
-
-  // ── Method 3: Garmin watch model ──────────────────────────────────────────
-  var m_garmin = (typeof GARMIN_LATEST_PRED !== 'undefined' && GARMIN_LATEST_PRED) ? GARMIN_LATEST_PRED.tmar : null;
-
-  // ── Method 4: Daniels VDOT from 10K, applied to marathon (assumes endurance
-  //    trained). Simplified VDOT-style formula. ────────────────────────────
-  var m_daniels = null;
-  if (bestActual.k10) {
-    // VDOT estimate (Daniels) for 10K time T(s): VDOT ≈ (-4.6 + 0.182258 * (10000/T*60) + 0.000104 * (10000/T*60)^2) / (0.8 + 0.1894393 * exp(-0.012778 * T/60) + 0.2989558 * exp(-0.1932605 * T/60))
-    var speed = 10000 / bestActual.k10.t * 60; // m/min
-    var t = bestActual.k10.t / 60;             // minutes
+  // ── VDOT (Daniels) from a race time at a given distance (metres) ──────────
+  function vdotFromRace(timeSec, distMetres) {
+    var speed = distMetres / timeSec * 60; // m/min
+    var t = timeSec / 60;
     var numer = -4.6 + 0.182258 * speed + 0.000104 * speed * speed;
     var denom = 0.8 + 0.1894393 * Math.exp(-0.012778 * t) + 0.2989558 * Math.exp(-0.1932605 * t);
-    var vdot = numer / denom;
-    // Marathon equivalent at that VDOT: use Daniels' inverse - solve for marathon time
-    // Approximation: marathon time (min) ≈ 26.2188 * 1609.34 / vMar, where vMar ≈ vdot-pace at 84% intensity
-    // Use empirical mapping: VDOT 55 ≈ 3:10:49 marathon
-    // Linear interp around the table: every 1 VDOT ≈ 70s on marathon
-    var vdotToMar = 3 * 3600 + 10 * 60 + 49; // baseline at VDOT 55
-    m_daniels = vdotToMar + (55 - vdot) * 70;
+    return numer / denom;
+  }
+  // Equivalent time at a target distance from a VDOT (uses Daniels' table interp)
+  function timeFromVDOT(vdot, targetDistKm) {
+    // Anchor times at VDOT 55 for each common distance (Daniels' running formula)
+    var anchors = {
+      k5:  { dist:5,       sec: 18*60 + 50 },   // 18:50
+      k10: { dist:10,      sec: 39*60 + 9 },    // 39:09
+      hm:  { dist:21.0975, sec: 1*3600 + 26*60 + 47 }, // 1:26:47
+      mar: { dist:42.195,  sec: 3*3600 + 0*60 + 28 }   // 3:00:28
+    };
+    // Pick closest distance anchor
+    var best = null, bestGap = 1e9;
+    Object.keys(anchors).forEach(function(k) {
+      var gap = Math.abs(anchors[k].dist - targetDistKm);
+      if (gap < bestGap) { bestGap = gap; best = anchors[k]; }
+    });
+    // VDOT-to-time linear approx around 55:
+    var perVdot;
+    if (targetDistKm <= 5.5) perVdot = 16;      // 5K: ~16s per VDOT point
+    else if (targetDistKm <= 10.5) perVdot = 30; // 10K: ~30s
+    else if (targetDistKm <= 22) perVdot = 60;   // HM: ~60s
+    else perVdot = 130;                          // Mar: ~130s
+    return best.sec + (55 - vdot) * perVdot;
   }
 
-  // ── Method 5: Training-pace projection (sustain current fitness pace) ────
-  var m_trainingPace = (typeof currentFitnessPace !== 'undefined' && currentFitnessPace)
-    ? currentFitnessPace * MARATHON_KM : null;
+  // ── Compute methods + ensemble for any target distance ────────────────────
+  function compute(targetKey) {
+    var T = TARGETS[targetKey];
+    var methods = [];
 
-  // ── Method 6: Endurance-adjusted Riegel (apply penalty for long-run gap) ─
-  var m_endurance = null;
-  if (m_riegel10) {
-    // Penalty: 0% if longest >= 32km, scales up to 12% if longest = 17km
-    var lr = trueLongest;
-    var penalty = clamp((32 - lr) / 15 * 0.12, 0, 0.12);
-    // Volume penalty: 0% if 4wk avg >= 55km, up to 5% if avg 30km
-    var volPen = clamp((55 - fourWkAvg) / 25 * 0.05, 0, 0.05);
-    m_endurance = m_riegel10 * (1 + penalty + volPen);
-  }
+    // Garmin watch model
+    var garmin = (typeof GARMIN_LATEST_PRED !== 'undefined' && GARMIN_LATEST_PRED) ? GARMIN_LATEST_PRED[T.garminField] : null;
+    if (garmin) methods.push({ id:'garmin', name:'Garmin watch model', desc:'VO2max + lactate threshold + recent training load', time: garmin });
 
-  var methods = [
-    { id:'garmin',     name:'Garmin watch model',           desc:'VO2max + lactate threshold + recent training load', time: m_garmin },
-    { id:'riegel10',   name:'Riegel from 10K race',         desc:'41:27 race extrapolated (best=' + (bestActual.k10 ? fmtMin(bestActual.k10.t) + ' over ' + bestActual.k10.dist.toFixed(2) + 'km' : 'n/a') + ')', time: m_riegel10 },
-    { id:'daniels',    name:"Daniels' VDOT",                desc:'VDOT-based equivalent marathon (assumes endurance trained)', time: m_daniels },
-    { id:'training',   name:'Training-pace projection',     desc:'4-week fitness pace × 42.195km', time: m_trainingPace },
-    { id:'endurance',  name:'Endurance-adjusted Riegel',    desc:'Riegel + long-run gap penalty (longest ' + trueLongest.toFixed(0) + 'km, 4wk vol ' + Math.round(fourWkAvg) + 'km)', time: m_endurance },
-    { id:'riegel5',    name:'Riegel from 5K race',          desc:'Aggressive: 5K rarely scales cleanly to marathon', time: m_riegel5 }
-  ].filter(function(x){ return x.time != null; });
+    // Raw current PB at this distance
+    if (bestActual[targetKey]) {
+      methods.push({
+        id:'pb', name:'Current PB at this distance',
+        desc: bestActual[targetKey].isRace ? ('Race-verified: ' + bestActual[targetKey].src) : ('Best effort in training: ' + bestActual[targetKey].src),
+        time: bestActual[targetKey].t
+      });
+    }
 
-  // ── Weight assignment: depends on endurance readiness ────────────────────
-  // Liam HAS done a 30km long run historically, so endurance ceiling is real.
-  // But current visible long-run is only 17.5km (needs to rebuild). Weight
-  // accordingly: trust Garmin + Daniels more, discount aggressive Riegel.
-  var weights = {
-    garmin:    0.30,
-    daniels:   0.25,
-    riegel10:  0.15,
-    training:  0.15,
-    endurance: 0.15,
-    riegel5:   0.00
-  };
-  // Build ensemble
-  var totalW = 0, sum = 0;
-  methods.forEach(function(m) { var w = weights[m.id] || 0; sum += m.time * w; totalW += w; });
-  var ensemble = totalW > 0 ? sum / totalW : null;
+    // Riegel from each OTHER distance where we have a race-verified PB
+    ORDER.forEach(function(src) {
+      if (src === targetKey) return;
+      if (!bestActual[src] || !bestActual[src].isRace) return;
+      var srcDist = TARGETS[src].dist;
+      var rTime = bestActual[src].t * Math.pow(T.dist / srcDist, 1.06);
+      methods.push({
+        id:'riegel_' + src,
+        name:'Riegel from ' + TARGETS[src].label + ' PB',
+        desc: fmtTime(bestActual[src].t) + ' over ' + bestActual[src].dist.toFixed(2) + 'km, scaled with Riegel exponent 1.06',
+        time: rTime
+      });
+    });
 
-  // ── Best / worst case scenarios ───────────────────────────────────────────
-  var times = methods.map(function(m){return m.time;});
-  var best = Math.min.apply(null, times);
-  var worst = Math.max.apply(null, times);
-  // Cap worst case at endurance-adjusted (if available)
-  if (m_endurance) worst = Math.max(worst, m_endurance * 1.04);
+    // Daniels VDOT (use the strongest race-verified anchor: prefer 10K)
+    var anchor = null;
+    if (bestActual.k10 && bestActual.k10.isRace) anchor = { time: bestActual.k10.t, dist: 10000, label:'10K' };
+    else if (bestActual.k5 && bestActual.k5.isRace) anchor = { time: bestActual.k5.t, dist: 5000, label:'5K' };
+    else if (bestActual.hm && bestActual.hm.isRace) anchor = { time: bestActual.hm.t, dist: 21097.5, label:'HM' };
+    if (anchor) {
+      var vdot = vdotFromRace(anchor.time, anchor.dist);
+      var t = timeFromVDOT(vdot, T.dist);
+      methods.push({
+        id:'daniels',
+        name:"Daniels' VDOT",
+        desc: 'VDOT ' + vdot.toFixed(1) + ' from ' + anchor.label + ' PB, applied to ' + T.label,
+        time: t
+      });
+    }
 
-  // ── Probabilities (logistic on margin from ensemble) ─────────────────────
-  function prob(target) {
-    if (ensemble == null) return null;
-    var margin = target - ensemble; // positive = ensemble is faster than target
-    // Spread σ based on disagreement across methods
+    // Training-pace projection (marathon only - other distances are run faster than fitness pace)
+    if (targetKey === 'mar' && typeof currentFitnessPace !== 'undefined' && currentFitnessPace) {
+      methods.push({
+        id:'training', name:'Training-pace projection',
+        desc:'4-week fitness pace × ' + T.dist + 'km',
+        time: currentFitnessPace * T.dist
+      });
+    }
+
+    // Endurance-adjusted Riegel (marathon only)
+    if (targetKey === 'mar') {
+      var riegelM = methods.filter(function(m){return m.id === 'riegel_k10';})[0];
+      if (riegelM) {
+        var penalty = clamp((32 - trueLongest) / 15 * 0.12, 0, 0.12);
+        var volPen = clamp((55 - fourWkAvg) / 25 * 0.05, 0, 0.05);
+        methods.push({
+          id:'endurance',
+          name:'Endurance-adjusted Riegel',
+          desc:'Riegel-10K + long-run gap (longest ' + trueLongest.toFixed(0) + 'km, 4wk vol ' + Math.round(fourWkAvg) + 'km)',
+          time: riegelM.time * (1 + penalty + volPen)
+        });
+      }
+    }
+
+    // Weights per distance
+    var weightsByDist = {
+      k5:  { garmin:0.30, pb:0.30, daniels:0.20, riegel_k10:0.20, riegel_hm:0.00, riegel_mar:0.00 },
+      k10: { garmin:0.30, pb:0.30, daniels:0.25, riegel_k5:0.10, riegel_hm:0.05, riegel_mar:0.00 },
+      hm:  { garmin:0.40, daniels:0.30, riegel_k10:0.25, pb:0.05, riegel_k5:0.00, riegel_mar:0.00 },
+      mar: { garmin:0.30, daniels:0.25, riegel_k10:0.15, training:0.15, endurance:0.15, pb:0.00, riegel_k5:0.00, riegel_hm:0.00 }
+    };
+    var weights = weightsByDist[targetKey] || {};
+
+    // Renormalise across methods that actually exist
+    var available = methods.map(function(m){return m.id;});
+    var rawSum = 0;
+    available.forEach(function(id){ rawSum += (weights[id] || 0); });
+    if (rawSum < 0.01) {
+      methods.forEach(function(m){ m.weight = 1/methods.length; });
+    } else {
+      methods.forEach(function(m){ m.weight = (weights[m.id] || 0) / rawSum; });
+    }
+
+    var ensemble = 0;
+    methods.forEach(function(m){ ensemble += m.time * m.weight; });
+
+    var times = methods.map(function(m){return m.time;}).sort(function(a,b){return a-b;});
+    var best = times[0];
+    var worst = times[times.length-1];
+
+    // Probability of beating a target (logistic on margin, sigma from weighted std)
     var variance = 0;
-    methods.forEach(function(m){ variance += Math.pow(m.time - ensemble, 2) * (weights[m.id] || 0); });
-    var sigma = Math.sqrt(variance / totalW) || 300;
-    var p = 1 / (1 + Math.exp(-margin / sigma));
-    return Math.round(clamp(p * 100, 1, 99));
+    methods.forEach(function(m){ variance += m.weight * Math.pow(m.time - ensemble, 2); });
+    var sigma = Math.sqrt(variance) || 60;
+    function prob(target) {
+      var margin = target - ensemble;
+      return Math.round(clamp((1 / (1 + Math.exp(-margin / sigma))) * 100, 1, 99));
+    }
+
+    return {
+      target: T, methods: methods, ensemble: ensemble,
+      best: best, worst: worst, sigma: sigma,
+      pGoal: prob(T.goal), pStretch: prob(T.stretch), pSoft: prob(T.soft)
+    };
   }
-  var p_target = prob(TARGET_SECS);  // sub-3:25
-  var p_330 = prob(SUB_3_30);
-  var p_320 = prob(SUB_3_20);
 
-  // ── Position on band (best -> worst, where best = green/left, worst = orange/right) ──
-  var bandPctOf = function(time) {
-    if (worst === best) return 50;
-    return clamp((time - best) / (worst - best) * 100, 0, 100);
-  };
-  var ensemblePct = bandPctOf(ensemble);
-  var targetPct = bandPctOf(TARGET_SECS);
-  // Band gradient stops: 0-33% green (best), 33-66% blue (mid), 66-100% orange (worst)
-  var bestPct = 33, midPct = 66;
-
-  // ── Key levers ────────────────────────────────────────────────────────────
-  function leverImpact(name, currentVal, targetVal, secsPerUnit, body) {
-    var gap = targetVal - currentVal;
-    if (gap <= 0) return { name:name, impact:'On target', body:body };
-    var saving = gap * secsPerUnit;
-    return { name:name, impact:'-' + diffStr(saving).replace('+','') + ' if achieved', body:body };
+  // ── Levers per distance ───────────────────────────────────────────────────
+  function leversFor(key) {
+    if (key === 'mar') return [
+      { name:'Rebuild 30km long run', impact:'Up to -3:40', body:'You\'ve done it before. Long run progression is the single biggest marathon variable. Each km of long-run ceiling above current ≈ 18s off marathon.' },
+      { name:'Push weekly volume to 55km', impact:'Up to -1:00', body:'Current 4-week avg ' + Math.round(fourWkAvg) + 'km. Aerobic capacity scales with consistent volume. Each +1km/wk ≈ 14s off marathon by race day.' },
+      { name:'Marathon-pace specificity', impact:'-2 to -4 min', body:'Add 2-3 long runs with 20-25km at 4:52/km from W9 onwards. This is what closes the Riegel-vs-Garmin gap.' }
+    ];
+    if (key === 'hm') return [
+      { name:'Long threshold reps', impact:'-30 to -90s', body:'4×2km or 3×3km at HM pace (4:15-4:20/km) builds the lactate-clearance system the half-marathon depends on.' },
+      { name:'Race-pace progression long run', impact:'-30 to -60s', body:'15-18km long runs with the final 5-8km at HM pace. Trains pace discipline late in a hard half.' },
+      { name:'Aerobic volume floor', impact:'Stabiliser', body:'HM benefits from 45-55km/wk sustained. Below 40km/wk and late-race fade creeps in.' }
+    ];
+    if (key === 'k10') return [
+      { name:'VO2max intervals', impact:'-15 to -45s', body:'5×3min or 4×4min at 3:50-4:00/km is the highest-leverage 10K work. VO2max gains take 4-6 weeks to consolidate.' },
+      { name:'Threshold work', impact:'-15 to -30s', body:'2×15min or 3×10min at tempo (4:25-4:35) raises the lactate threshold ceiling, which is what hurts in the back half of a 10K.' },
+      { name:'5K speed reserve', impact:'-10 to -20s', body:'Faster 5K time means 10K pace feels relatively easier. Short hill reps and 200-400m intervals build the reserve.' }
+    ];
+    if (key === 'k5') return [
+      { name:'VO2max intervals', impact:'-10 to -25s', body:'5×3min at 3:50/km or 12×400m at sub-3:50/km hits the VO2max system directly. Most leverage of any session for 5K.' },
+      { name:'Race-pace tune-ups', impact:'-5 to -15s', body:'1-2 parkruns or short tempo efforts close to race pace each month. 5K is technique + tactics + suffer-tolerance.' },
+      { name:'Short hill reps', impact:'-5 to -15s', body:'6-10×30s hard hill reps build the leg power and stride economy that the 5K rewards.' }
+    ];
+    return [];
   }
-  var levers = [
-    leverImpact('Rebuild 30km long run', visibleLongest, 30, 18,
-      'You\'ve done it before. Get back to 30km long runs in the build phase. Each km of long-run ceiling above current ≈ 18s off marathon.'),
-    leverImpact('Push weekly volume to 55km', fourWkAvg, 55, 14,
-      'Aerobic capacity scales with consistent volume. Current 4-week avg ' + Math.round(fourWkAvg) + 'km. Each +1km/wk ≈ 14s off marathon by race day.'),
-    { name:'Marathon-pace specificity', impact:'-2 to -4 min',
-      body:'Add 2-3 long runs with 20-25km at 4:52/km from W9 onwards. This is what closes the Riegel-vs-Garmin gap.' }
-  ];
 
-  // ── Narrative ─────────────────────────────────────────────────────────────
-  function narrative() {
+  function narrativeFor(key, r) {
+    var T = r.target;
     var bits = [];
-    bits.push('<strong>Ensemble projection: ' + fmtTime(ensemble) + '.</strong>');
-    if (ensemble < TARGET_SECS) {
-      bits.push('That puts you <strong>' + diffStr(TARGET_SECS - ensemble).replace('+','') + ' under</strong> the 3:25 target.');
+    bits.push('<strong>' + T.label + ' ensemble: ' + fmtTime(r.ensemble) + '.</strong>');
+    if (r.ensemble < T.goal) {
+      bits.push(' That puts you <strong>' + diffStr(r.ensemble - T.goal) + '</strong> on the goal of ' + fmtTime(T.goal) + '.');
     } else {
-      bits.push('That puts you <strong>' + diffStr(ensemble - TARGET_SECS).replace('+','') + ' over</strong> the 3:25 target.');
+      bits.push(' That sits <strong>' + diffStr(r.ensemble - T.goal) + '</strong> against the goal of ' + fmtTime(T.goal) + '.');
     }
-    bits.push(' Weighting leans on Garmin (30%) and Daniels VDOT (25%) because they factor recent training load; Riegel-5K is excluded (5K rarely projects cleanly to 42km).');
-    bits.push(' Endurance-adjusted Riegel adds a long-run-gap penalty using current visible long run of ' + visibleLongest.toFixed(1) + 'km - you have a 30km long run from Sep 2025 in the bank, so rebuilding to that level should be achievable within the marathon block.');
-    if (p_target >= 60) {
-      bits.push(' <strong>3:25 is the realistic call</strong> if the 17-week block delivers the planned long-run progression and threshold work.');
-    } else if (p_target >= 40) {
-      bits.push(' <strong>3:25 is within reach but not assumed</strong> - probability around ' + p_target + '%. Needs a clean block.');
+    var pb = bestActual[key];
+    if (pb && pb.isRace) {
+      bits.push(' Current race-verified PB: <strong>' + fmtTime(pb.t) + '</strong> (' + pb.src + ').');
+    } else if (pb) {
+      bits.push(' Best ' + T.label + ' effort to date is <strong>' + fmtTime(pb.t) + '</strong> (training, not race-verified).');
     } else {
-      bits.push(' <strong>3:25 looks tight</strong> at current trajectory (' + p_target + '% probability). Long-run rebuild is the lever that moves the number most.');
+      bits.push(' No ' + T.label + ' race effort on file yet - prediction relies on Riegel scaling, Garmin and Daniels.');
     }
-    bits.push(' Days to race: <strong>' + daysToRace + '</strong>.');
+    if (key === 'mar') {
+      bits.push(' Longest run in the dataset is ' + visibleLongest.toFixed(1) + 'km but you have a 30km long run from Sep 2025 in the bank, so the endurance ceiling is real - rebuilding it is the main driver of the projection.');
+    } else if (key === 'hm') {
+      bits.push(' HM sits in the sweet spot of your current fitness shape: enough endurance from marathon prep, with the threshold work landing well. Garmin\'s prediction here is the most trustworthy of the four distances.');
+    } else if (key === 'k10') {
+      bits.push(' Your April 41:27 race shows the 10K engine is real. The newer Garmin 39:50 prediction reflects current VO2max gains. Time-trialling a clean 10K mid-build phase would tighten the projection.');
+    } else if (key === 'k5') {
+      bits.push(' 5K is most volatile in projections because course, weather and tactics matter more than the model. Treat the band as a sharpness range rather than a single number.');
+    }
+    bits.push(' Race window: <strong>' + daysToRace + ' days</strong> to Cologne.');
     return bits.join('');
   }
 
-  // ── Render ────────────────────────────────────────────────────────────────
-  var heroHtml = '<div class="fc-hero">' +
-    '<div class="fc-hero-eyebrow">🔮 Forecast · multi-method ensemble</div>' +
-    '<div class="fc-hero-title">Cologne Marathon · 4 October 2026 · ' + daysToRace + ' days out</div>' +
-    '<div class="fc-hero-row">' +
-      '<div class="fc-hero-main">' +
-        '<div class="fc-hero-label">Ensemble projection</div>' +
-        '<div class="fc-hero-val">' + fmtTime(ensemble) + '</div>' +
-        '<div class="fc-hero-sub">Weighted blend of ' + methods.length + ' independent prediction methods. ' +
-          (ensemble < TARGET_SECS ? '<span style="color:#10b981">' + diffStr(TARGET_SECS - ensemble).replace('+','') + ' under</span>' : '<span style="color:#f59e0b">' + diffStr(ensemble - TARGET_SECS).replace('+','') + ' over</span>') +
-          ' the 3:25 target.</div>' +
-      '</div>' +
-      '<div class="fc-hero-side">' +
-        '<div class="fc-hero-label">Best case</div>' +
-        '<div class="fc-hero-side-val" style="color:#34d399">' + fmtTime(best) + '</div>' +
-        '<div class="fc-hero-side-band">Garmin / Riegel-10K ceiling</div>' +
-      '</div>' +
-      '<div class="fc-hero-side">' +
-        '<div class="fc-hero-label">Worst case</div>' +
-        '<div class="fc-hero-side-val" style="color:#fbbf24">' + fmtTime(worst) + '</div>' +
-        '<div class="fc-hero-side-band">Endurance-penalty scenario</div>' +
-      '</div>' +
-    '</div>' +
-    '<div class="fc-band" style="--bestPct:' + bestPct + '%;--midPct:' + midPct + '%">' +
-      '<div class="fc-band-marker" style="left:' + ensemblePct + '%" title="Ensemble: ' + fmtTime(ensemble) + '"></div>' +
-      '<div class="fc-band-marker" style="left:' + targetPct + '%;background:#fde047;height:18px;top:-4px" title="Target: ' + fmtTime(TARGET_SECS) + '"></div>' +
-    '</div>' +
-    '<div class="fc-band-labels"><span>' + fmtTime(best) + ' best</span><span style="color:#fde047">▼ 3:25 target</span><span>' + fmtTime(worst) + ' worst</span></div>' +
-  '</div>';
-
-  function probCard(label, sub, pct, color) {
-    return '<div class="fc-prob ' + color + '"><div class="fc-prob-h">' + label + '</div>' +
-      '<div class="fc-prob-pct">' + (pct != null ? pct + '%' : '--') + '</div>' +
-      '<div class="fc-prob-sub">' + sub + '</div>' +
-      '<div class="fc-prob-bar" style="width:' + (pct || 0) + '%"></div></div>';
+  // ── Tabs ──────────────────────────────────────────────────────────────────
+  function buildTabs(activeKey) {
+    return '<div class="ms-pills" style="margin-bottom:14px">' + ORDER.map(function(k) {
+      var T = TARGETS[k];
+      var quick = compute(k);
+      return '<div class="ms-pill ' + (k===activeKey?'active':'') + '" data-fck="' + k + '">' +
+        '<div class="ms-pill-month">' + T.label + '</div>' +
+        '<div class="ms-pill-km">' + fmtTime(quick.ensemble) + '</div>' +
+        '<div class="ms-pill-runs">goal ' + fmtTime(T.goal) + '</div>' +
+      '</div>';
+    }).join('') + '</div>';
   }
-  var probGrid = '<div class="fc-prob-grid">' +
-    probCard('Sub-3:30', 'Stretch threshold', p_330, 'green') +
-    probCard('Sub-3:25 (target)', 'Stated marathon goal', p_target, 'blue') +
-    probCard('Sub-3:20', 'Garmin best case', p_320, 'orange') +
-  '</div>';
 
-  function methodRow(m) {
-    var w = weights[m.id] || 0;
-    var wClass = w >= 0.25 ? 'high' : (w === 0 ? 'low' : '');
-    return '<div class="fc-method-row">' +
-      '<div class="fc-method-name">' + m.name + '<small>' + m.desc + '</small></div>' +
-      '<div class="fc-method-time">' + fmtTime(m.time) + '</div>' +
-      '<div class="fc-method-weight ' + wClass + '">' + Math.round(w*100) + '%</div>' +
+  // ── Render for a given target ────────────────────────────────────────────
+  function renderFor(activeKey) {
+    var r = compute(activeKey);
+    var T = r.target;
+
+    var bestPct = 33, midPct = 66;
+    function bandPctOf(t) {
+      if (r.worst === r.best) return 50;
+      return clamp((t - r.best) / (r.worst - r.best) * 100, 0, 100);
+    }
+    var ensemblePct = bandPctOf(r.ensemble);
+    var goalPct = bandPctOf(T.goal);
+
+    var deltaToGoal = r.ensemble - T.goal;
+    var deltaColor = deltaToGoal <= 0 ? '#10b981' : '#f59e0b';
+    var deltaLabel = deltaToGoal <= 0 ? diffStr(deltaToGoal) + ' on goal' : diffStr(deltaToGoal) + ' off goal';
+
+    var heroHtml = '<div class="fc-hero">' +
+      '<div class="fc-hero-eyebrow">🔮 Forecast · ' + T.label + '</div>' +
+      '<div class="fc-hero-title">' + T.raceLabel + ' · ' + r.methods.length + '-method ensemble · ' + daysToRace + ' days to Cologne</div>' +
+      '<div class="fc-hero-row">' +
+        '<div class="fc-hero-main">' +
+          '<div class="fc-hero-label">Ensemble projection</div>' +
+          '<div class="fc-hero-val">' + fmtTime(r.ensemble) + '</div>' +
+          '<div class="fc-hero-sub"><span style="color:' + deltaColor + '">' + deltaLabel + '</span> · target ' + fmtTime(T.goal) + '</div>' +
+        '</div>' +
+        '<div class="fc-hero-side">' +
+          '<div class="fc-hero-label">Best case</div>' +
+          '<div class="fc-hero-side-val" style="color:#34d399">' + fmtTime(r.best) + '</div>' +
+          '<div class="fc-hero-side-band">fastest method</div>' +
+        '</div>' +
+        '<div class="fc-hero-side">' +
+          '<div class="fc-hero-label">Worst case</div>' +
+          '<div class="fc-hero-side-val" style="color:#fbbf24">' + fmtTime(r.worst) + '</div>' +
+          '<div class="fc-hero-side-band">slowest method</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="fc-band" style="--bestPct:' + bestPct + '%;--midPct:' + midPct + '%">' +
+        '<div class="fc-band-marker" style="left:' + ensemblePct + '%" title="Ensemble: ' + fmtTime(r.ensemble) + '"></div>' +
+        '<div class="fc-band-marker" style="left:' + goalPct + '%;background:#fde047;height:18px;top:-4px" title="Goal: ' + fmtTime(T.goal) + '"></div>' +
+      '</div>' +
+      '<div class="fc-band-labels"><span>' + fmtTime(r.best) + '</span><span style="color:#fde047">▼ ' + T.label + ' goal</span><span>' + fmtTime(r.worst) + '</span></div>' +
     '</div>';
+
+    function probCard(label, sub, pct, color) {
+      return '<div class="fc-prob ' + color + '"><div class="fc-prob-h">' + label + '</div>' +
+        '<div class="fc-prob-pct">' + (pct != null ? pct + '%' : '--') + '</div>' +
+        '<div class="fc-prob-sub">' + sub + '</div>' +
+        '<div class="fc-prob-bar" style="width:' + (pct || 0) + '%"></div></div>';
+    }
+    var probGrid = '<div class="fc-prob-grid">' +
+      probCard('Sub ' + fmtTime(T.soft),    'Soft / safe', r.pSoft, 'green') +
+      probCard('Sub ' + fmtTime(T.goal),    'Goal',        r.pGoal, 'blue') +
+      probCard('Sub ' + fmtTime(T.stretch), 'Stretch',     r.pStretch, 'orange') +
+    '</div>';
+
+    function methodRow(m) {
+      var wClass = m.weight >= 0.25 ? 'high' : (m.weight === 0 ? 'low' : '');
+      return '<div class="fc-method-row">' +
+        '<div class="fc-method-name">' + m.name + '<small>' + m.desc + '</small></div>' +
+        '<div class="fc-method-time">' + fmtTime(m.time) + '</div>' +
+        '<div class="fc-method-weight ' + wClass + '">' + Math.round(m.weight*100) + '%</div>' +
+      '</div>';
+    }
+    var methodsHtml = '<div class="fc-section"><div class="fc-section-h">Methods <span class="fc-section-h-meta">' + r.methods.length + ' predictors, weights normalised across what\'s available</span></div>' +
+      r.methods.slice().sort(function(a,b){return a.time - b.time;}).map(methodRow).join('') +
+    '</div>';
+
+    var scenarios = '<div class="fc-section"><div class="fc-section-h">Scenarios</div>' +
+      '<div class="fc-scenario">' +
+        '<div class="fc-scn best"><div class="fc-scn-h">Best case</div><div class="fc-scn-time">' + fmtTime(r.best) + '</div><div class="fc-scn-body">Sharp peak, no race-day issues, all signals align. The Garmin / Riegel ceiling holds.</div></div>' +
+        '<div class="fc-scn mid"><div class="fc-scn-h">Realistic median</div><div class="fc-scn-time">' + fmtTime(r.ensemble) + '</div><div class="fc-scn-body">Ensemble projection. Typical execution of the planned training block.</div></div>' +
+        '<div class="fc-scn worst"><div class="fc-scn-h">Worst case</div><div class="fc-scn-time">' + fmtTime(r.worst) + '</div><div class="fc-scn-body">Interrupted build, suboptimal race conditions, or under-trained for the specific demands of this distance.</div></div>' +
+      '</div></div>';
+
+    var levers = leversFor(activeKey);
+    var leversHtml = levers.length ? '<div class="fc-section"><div class="fc-section-h">Key levers <span class="fc-section-h-meta">what would move the ' + T.label + ' time most between now and race day</span></div>' +
+      '<div class="fc-levers">' + levers.map(function(l) {
+        return '<div class="fc-lever"><div class="fc-lever-h">' + l.name + '</div><div class="fc-lever-impact">' + l.impact + '</div><div class="fc-lever-body">' + l.body + '</div></div>';
+      }).join('') + '</div></div>' : '';
+
+    var narrativeHtml = '<div class="fc-section"><div class="fc-narrative-h">Analyst note</div><div class="fc-narrative">' + narrativeFor(activeKey, r) + '</div></div>';
+
+    pg.innerHTML = buildTabs(activeKey) + heroHtml + probGrid + scenarios + methodsHtml + leversHtml + narrativeHtml;
+
+    pg.querySelectorAll('.ms-pill').forEach(function(el) {
+      el.addEventListener('click', function() { renderFor(el.dataset.fck); });
+    });
   }
-  var methodsHtml = '<div class="fc-section"><div class="fc-section-h">Methods <span class="fc-section-h-meta">six predictors, blended by reliability for current fitness state</span></div>' +
-    methods.sort(function(a,b){return a.time - b.time;}).map(methodRow).join('') +
-  '</div>';
 
-  var scenarios = '<div class="fc-section"><div class="fc-section-h">Scenarios</div>' +
-    '<div class="fc-scenario">' +
-      '<div class="fc-scn best"><div class="fc-scn-h">Best case</div><div class="fc-scn-time">' + fmtTime(best) + '</div><div class="fc-scn-body">Clean 17-week block, healthy, full 32km long run, 4-5 marathon-pace sessions ≥25km. Garmin&#39;s prediction holds.</div></div>' +
-      '<div class="fc-scn mid"><div class="fc-scn-h">Realistic median</div><div class="fc-scn-time">' + fmtTime(ensemble) + '</div><div class="fc-scn-body">Typical block, 1-2 missed weeks tolerated, long run peaks at 28-30km. Ensemble lands here.</div></div>' +
-      '<div class="fc-scn worst"><div class="fc-scn-h">Worst case</div><div class="fc-scn-time">' + fmtTime(worst) + '</div><div class="fc-scn-body">Interrupted build, long run capped &lt;26km, limited marathon-pace specificity. Late-race fade likely.</div></div>' +
-    '</div></div>';
-
-  var leversHtml = '<div class="fc-section"><div class="fc-section-h">Key levers <span class="fc-section-h-meta">what would move the number most between now and race day</span></div>' +
-    '<div class="fc-levers">' + levers.map(function(l) {
-      return '<div class="fc-lever"><div class="fc-lever-h">' + l.name + '</div><div class="fc-lever-impact">' + l.impact + '</div><div class="fc-lever-body">' + l.body + '</div></div>';
-    }).join('') + '</div></div>';
-
-  var narrativeHtml = '<div class="fc-section"><div class="fc-narrative-h">Analyst note</div><div class="fc-narrative">' + narrative() + '</div></div>';
-
-  pg.innerHTML = heroHtml + probGrid + scenarios + methodsHtml + leversHtml + narrativeHtml;
+  renderFor('mar');
 })();
 
 document.getElementById('pg-plan').addEventListener('click', function(e) {
