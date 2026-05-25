@@ -34,6 +34,7 @@ jobs:
           STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
           GH_PAT: ${{ secrets.GH_PAT }}
           GH_REPO: ${{ github.repository }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         run: python3 automation/ci_sync.py
 
       - name: Commit & push
@@ -48,3 +49,13 @@ jobs:
             git pull --rebase origin main
             git push || (sleep 15 && git pull --rebase origin main && git push)
           fi
+
+      - name: Notify Slack on failure
+        if: failure()
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          curl -s -X POST https://slack.com/api/chat.postMessage \
+            -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"channel\":\"C0B3VDBP9LG\",\"text\":\"*Strava sync failed* :x: Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"

@@ -12,6 +12,8 @@ import re
 import sys
 from datetime import datetime, timezone
 
+import time
+
 import requests
 
 # ── Credentials from GitHub secrets ──────────────────────────────────────────
@@ -28,8 +30,44 @@ CLASSIFIED_CSV = os.path.join(REPO_DIR, 'classified_runs.csv')
 DASHBOARD_HTML = os.path.join(REPO_DIR, 'index.html')
 
 # ── 1. Token refresh ──────────────────────────────────────────────────────────
+def _strava_post_with_retry(url, data, retries=3, backoff=15):
+    """POST to Strava with exponential-backoff retry on 5xx / network errors."""
+    for attempt in range(retries):
+        try:
+            resp = requests.post(url, data=data, timeout=30)
+            if resp.status_code < 500:
+                return resp          # success or 4xx — don't retry 4xx
+            print(f"[retry] Strava POST {resp.status_code} (attempt {attempt+1}/{retries})", file=sys.stderr)
+        except requests.exceptions.RequestException as e:
+            print(f"[retry] Strava POST network error: {e} (attempt {attempt+1}/{retries})", file=sys.stderr)
+            if attempt == retries - 1:
+                raise
+        if attempt < retries - 1:
+            time.sleep(backoff * (attempt + 1))
+    resp.raise_for_status()
+    return resp
+
+
+def _strava_get_with_retry(url, headers, params=None, retries=3, backoff=15):
+    """GET from Strava with exponential-backoff retry on 5xx / network errors."""
+    for attempt in range(retries):
+        try:
+            resp = requests.get(url, headers=headers, params=params, timeout=30)
+            if resp.status_code < 500:
+                return resp
+            print(f"[retry] Strava GET {resp.status_code} (attempt {attempt+1}/{retries})", file=sys.stderr)
+        except requests.exceptions.RequestException as e:
+            print(f"[retry] Strava GET network error: {e} (attempt {attempt+1}/{retries})", file=sys.stderr)
+            if attempt == retries - 1:
+                raise
+        if attempt < retries - 1:
+            time.sleep(backoff * (attempt + 1))
+    resp.raise_for_status()
+    return resp
+
+
 def get_access_token():
-    resp = requests.post('https://www.strava.com/oauth/token', data={
+    resp = _strava_post_with_retry('https://www.strava.com/oauth/token', data={
         'client_id':     CLIENT_ID,
         'client_secret': CLIENT_SECRET,
         'refresh_token': REFRESH_TOKEN,
@@ -87,9 +125,11 @@ def fetch_recent(access_token, after_ts):
     activities = []
     page = 1
     while True:
-        resp = requests.get('https://www.strava.com/api/v3/athlete/activities', headers={
-            'Authorization': f'Bearer {access_token}'
-        }, params={'after': after_ts, 'per_page': 100, 'page': page})
+        resp = _strava_get_with_retry(
+            'https://www.strava.com/api/v3/athlete/activities',
+            headers={'Authorization': f'Bearer {access_token}'},
+            params={'after': after_ts, 'per_page': 100, 'page': page},
+        )
         resp.raise_for_status()
         batch = resp.json()
         if not batch:
