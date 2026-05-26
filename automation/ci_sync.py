@@ -10,7 +10,7 @@ import json
 import os
 import re
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import time
 
@@ -48,19 +48,29 @@ def _strava_post_with_retry(url, data, retries=3, backoff=15):
     return resp
 
 
-def _strava_get_with_retry(url, headers, params=None, retries=4, backoff=15):
-    """GET from Strava with exponential-backoff retry on 5xx/429 errors."""
+def _strava_get_with_retry(url, headers, params=None, retries=3, backoff=15):
+    """GET from Strava with retry on 5xx. Exits gracefully on daily rate limit."""
     for attempt in range(retries):
         try:
             resp = requests.get(url, headers=headers, params=params, timeout=30)
             if resp.status_code == 429:
-                # Log rate limit state
-                usage = resp.headers.get('X-ReadRateLimit-Usage', '?')
-                limit = resp.headers.get('X-ReadRateLimit-Limit', '?')
-                print(f"[rate-limit] 429 on attempt {attempt+1}/{retries}. Usage: {usage} / {limit}", file=sys.stderr)
+                usage = resp.headers.get('X-ReadRateLimit-Usage', '0,0')
+                limit = resp.headers.get('X-ReadRateLimit-Limit', '100,1000')
+                print(f"[rate-limit] 429. Usage: {usage} / {limit}")
+                try:
+                    daily_used  = int(usage.split(',')[1])
+                    daily_limit = int(limit.split(',')[1])
+                except (ValueError, IndexError):
+                    daily_used, daily_limit = 0, 1000
+                if daily_used >= daily_limit:
+                    # Daily cap hit — nothing we can do until midnight UTC. Exit
+                    # cleanly so GitHub doesn't send a failure email.
+                    print(f"[rate-limit] Daily limit exhausted ({daily_used}/{daily_limit}). Will retry after midnight UTC.")
+                    sys.exit(0)
+                # 15-min window — wait and retry once
                 if attempt < retries - 1:
-                    wait = backoff * (2 ** attempt)
-                    print(f"[rate-limit] Waiting {wait}s before retry...", file=sys.stderr)
+                    wait = 15 * (2 ** attempt)
+                    print(f"[rate-limit] 15-min window. Waiting {wait}s...")
                     time.sleep(wait)
                 continue
             if resp.status_code < 500:
@@ -170,9 +180,9 @@ def update_cache(cache, activities, access_token):
     for act in activities:
         aid = str(act['id'])
         if aid not in cache:
-            # Fetch detail (for description)
+            # Fetch detail (for laps + description)
             try:
-                detail = requests.get(
+                detail = _strava_get_with_retry(
                     f'https://www.strava.com/api/v3/activities/{aid}',
                     headers={'Authorization': f'Bearer {access_token}'}
                 ).json()
@@ -473,10 +483,12 @@ def main():
         print("[csv] classified_runs.csv missing or empty — nothing to base off.", file=sys.stderr)
         sys.exit(1)
 
-    # 3. Determine fetch window (last classified date, minus 24h buffer)
+    # 3. Determine fetch window — last classified date minus 24h, capped at 14 days
     last_dt = last_classified_date(rows)
     after_ts = int(last_dt.timestamp()) - 86400
-    print(f"[fetch] Fetching Strava activities after {last_dt.date()} (with 24h buffer)...")
+    min_ts   = int((datetime.now(timezone.utc) - timedelta(days=14)).timestamp())
+    after_ts = max(after_ts, min_ts)
+    print(f"[fetch] Fetching Strava activities after {datetime.fromtimestamp(after_ts, tz=timezone.utc).date()}...")
 
     # 4. Fetch new activities
     activities = fetch_recent(access_token, after_ts)
