@@ -49,39 +49,42 @@ def _strava_post_with_retry(url, data, retries=3, backoff=15):
 
 
 def _strava_get_with_retry(url, headers, params=None, retries=3, backoff=15):
-    """GET from Strava with retry on 5xx. Exits gracefully on daily rate limit."""
+    """GET from Strava with retry on 5xx. Exits gracefully on rate limit."""
+    last_429 = None
     for attempt in range(retries):
         try:
             resp = requests.get(url, headers=headers, params=params, timeout=30)
             if resp.status_code == 429:
-                usage = resp.headers.get('X-ReadRateLimit-Usage', '0,0')
-                limit = resp.headers.get('X-ReadRateLimit-Limit', '100,1000')
-                print(f"[rate-limit] 429. Usage: {usage} / {limit}")
+                last_429 = resp
+                usage = resp.headers.get('X-ReadRateLimit-Usage', '')
+                limit = resp.headers.get('X-ReadRateLimit-Limit', '')
+                print(f"[rate-limit] 429 (attempt {attempt+1}/{retries}). Usage: {usage or '?'} / {limit or '?'}")
                 try:
                     daily_used  = int(usage.split(',')[1])
                     daily_limit = int(limit.split(',')[1])
-                except (ValueError, IndexError):
-                    daily_used, daily_limit = 0, 1000
-                if daily_used >= daily_limit:
-                    # Daily cap hit — nothing we can do until midnight UTC. Exit
-                    # cleanly so GitHub doesn't send a failure email.
-                    print(f"[rate-limit] Daily limit exhausted ({daily_used}/{daily_limit}). Will retry after midnight UTC.")
-                    sys.exit(0)
-                # 15-min window — wait and retry once
+                    if daily_used >= daily_limit:
+                        print(f"[rate-limit] Daily limit exhausted. Will retry after midnight UTC.")
+                        sys.exit(0)
+                except (ValueError, IndexError, AttributeError):
+                    pass
                 if attempt < retries - 1:
                     wait = 15 * (2 ** attempt)
-                    print(f"[rate-limit] 15-min window. Waiting {wait}s...")
+                    print(f"[rate-limit] Waiting {wait}s...")
                     time.sleep(wait)
                 continue
             if resp.status_code < 500:
                 return resp
             print(f"[retry] Strava GET {resp.status_code} (attempt {attempt+1}/{retries})", file=sys.stderr)
         except requests.exceptions.RequestException as e:
-            print(f"[retry] Strava GET network error: {e} (attempt {attempt+1}/{retries})", file=sys.stderr)
+            print(f"[retry] network error: {e} (attempt {attempt+1}/{retries})", file=sys.stderr)
             if attempt == retries - 1:
                 raise
         if attempt < retries - 1:
             time.sleep(backoff * (attempt + 1))
+    # All retries exhausted on 429 — exit cleanly rather than emailing a failure
+    if last_429 is not None:
+        print("[rate-limit] All retries exhausted on 429. Exiting cleanly.")
+        sys.exit(0)
     resp.raise_for_status()
     return resp
 
