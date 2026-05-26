@@ -48,11 +48,21 @@ def _strava_post_with_retry(url, data, retries=3, backoff=15):
     return resp
 
 
-def _strava_get_with_retry(url, headers, params=None, retries=3, backoff=15):
-    """GET from Strava with exponential-backoff retry on 5xx / network errors."""
+def _strava_get_with_retry(url, headers, params=None, retries=4, backoff=15):
+    """GET from Strava with exponential-backoff retry on 5xx/429 errors."""
     for attempt in range(retries):
         try:
             resp = requests.get(url, headers=headers, params=params, timeout=30)
+            if resp.status_code == 429:
+                # Log rate limit state
+                usage = resp.headers.get('X-ReadRateLimit-Usage', '?')
+                limit = resp.headers.get('X-ReadRateLimit-Limit', '?')
+                print(f"[rate-limit] 429 on attempt {attempt+1}/{retries}. Usage: {usage} / {limit}", file=sys.stderr)
+                if attempt < retries - 1:
+                    wait = backoff * (2 ** attempt)
+                    print(f"[rate-limit] Waiting {wait}s before retry...", file=sys.stderr)
+                    time.sleep(wait)
+                continue
             if resp.status_code < 500:
                 return resp
             print(f"[retry] Strava GET {resp.status_code} (attempt {attempt+1}/{retries})", file=sys.stderr)
