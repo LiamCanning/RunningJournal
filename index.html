@@ -9,20 +9,22 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#FAFAF7;--bg2:#F0EFEC;--card:#fff;--card2:#F7F7F5;--card3:#EDEDE9;
-  --bdr:#E5E5E2;--bdr2:#D4D4D0;
-  --t1:#0A0A0A;--t2:#525252;--t3:#8A8A8A;
-  --grn:#059669;--grn2:#047857;--grnGlow:rgba(5,150,105,.12);--grnSoft:rgba(5,150,105,.06);
-  --org:#c06c1c;--orgGlow:rgba(192,108,28,.08);
+  --bg:#F5F2EB;--bg2:#FAF8F4;--card:#FFFFFF;--card2:#FAF8F4;--card3:#E8E4DC;
+  --bdr:#E0DDD6;--bdr2:#C8C4BC;
+  --t1:#0A0A0A;--t2:#3D3B36;--t3:#8A8680;
+  --grn:#0F766E;--grn2:#0D6B63;--grnGlow:rgba(15,118,110,.12);--grnSoft:rgba(15,118,110,.06);
+  --org:#B45309;--orgGlow:rgba(180,83,9,.08);
   --red:#d32828;--redGlow:rgba(211,40,40,.06);
-  --blu:#1e6cc0;--bluGlow:rgba(30,108,192,.08);
-  --prp:#6a4ec8;
-  --accent:var(--grn);
-  --grd1:linear-gradient(135deg,#059669 0%,#047857 100%);
-  --grd2:linear-gradient(135deg,#c06c1c 0%,#a05a14 100%);
-  --grd3:linear-gradient(135deg,#1e6cc0 0%,#1558a8 100%);
-  --shadow:0 1px 4px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
-  --shadowL:0 4px 20px rgba(0,0,0,.08);
+  --blu:#2563EB;--bluGlow:rgba(37,99,235,.08);
+  --prp:#4338CA;
+  --accent:var(--blu);
+  /* data colour system — matches The Paper */
+  --c-race:#2563EB;--c-easy:#0F766E;--c-intervals:#4338CA;--c-tempo:#B45309;--c-long:#4D7C0F;
+  --grd1:linear-gradient(135deg,#0F766E 0%,#0D6B63 100%);
+  --grd2:linear-gradient(135deg,#B45309 0%,#923F05 100%);
+  --grd3:linear-gradient(135deg,#2563EB 0%,#1D4FD8 100%);
+  --shadow:none;
+  --shadowL:none;
 }
 body{font-family:'Geist',system-ui,-apple-system,sans-serif;color:var(--t1);background:var(--bg);line-height:1.5;-webkit-font-smoothing:antialiased;font-feature-settings:"ss01","cv11"}
 .mono{font-family:'Geist Mono',monospace;font-feature-settings:"zero","ss05"}
@@ -31,20 +33,22 @@ body{font-family:'Geist',system-ui,-apple-system,sans-serif;color:var(--t1);back
 .shell{display:flex;flex-direction:column;min-height:100vh;background:var(--bg)}
 .main-wrap{flex:1;width:100%;max-width:1320px;margin:0 auto;padding:32px 32px 80px}
 
+/* CHROME STRIPE */
+.chrome-stripe{height:3px;background:linear-gradient(to right,var(--c-race),var(--c-easy),var(--c-intervals),var(--c-tempo));position:sticky;top:0;z-index:101}
 /* CHROME BAR */
-.chrome{background:var(--card);border-bottom:1px solid var(--bdr);padding:13px 32px;display:flex;align-items:center;gap:16px;font-size:13px;position:sticky;top:0;z-index:100}
-.chrome .brand{font-weight:600;letter-spacing:-0.01em;color:var(--t1)}
-.chrome .chrome-sep{color:var(--bdr2)}
-.chrome .chrome-meta{color:var(--t3);font-size:12px}
+.chrome{background:var(--bg);border-bottom:1px solid var(--bdr2);padding:0 32px;height:44px;display:flex;align-items:center;gap:12px;font-size:13px;position:sticky;top:3px;z-index:100}
+.chrome .brand{font-family:'Geist',sans-serif;font-weight:600;font-size:13px;letter-spacing:-0.01em;color:var(--t1)}
+.chrome .chrome-sep{color:var(--bdr2);font-size:12px}
+.chrome .chrome-meta{font-family:'Geist Mono',monospace;font-size:11px;color:var(--t3);letter-spacing:0.04em;text-transform:uppercase}
 .chrome .chrome-spacer{flex:1}
-.chrome .chrome-cd{font-family:'Geist Mono',monospace;font-size:12px;color:var(--t3)}
+.chrome .chrome-cd{font-family:'Geist Mono',monospace;font-weight:500;font-size:11px;letter-spacing:-0.02em;background:var(--t1);color:var(--bg);padding:3px 8px}
 
 /* TAB NAV */
-.bb-nav{background:var(--bg);border-bottom:1px solid var(--bdr);padding:0 32px;display:flex;gap:0;overflow-x:auto;scrollbar-width:none;position:sticky;top:46px;z-index:90}
+.bb-nav{background:var(--bg);border-bottom:1px solid var(--bdr2);padding:0 32px;display:flex;gap:0;overflow-x:auto;scrollbar-width:none;position:sticky;top:47px;z-index:90}
 .bb-nav::-webkit-scrollbar{display:none}
-.nav-btn{font-family:'Geist',sans-serif;font-size:13px;font-weight:500;padding:13px 16px;cursor:pointer;border:none;border-bottom:2px solid transparent;border-top:none;border-left:none;border-right:none;background:transparent;color:var(--t3);border-radius:0;transition:color .15s;white-space:nowrap;position:relative;margin-bottom:-1px;letter-spacing:-0.005em}
-.nav-btn:hover{color:var(--t1)}
-.nav-btn.on{color:var(--t1);border-bottom-color:var(--t1)}
+.nav-btn{font-family:'Geist Mono',monospace;font-size:11px;font-weight:400;letter-spacing:0.05em;text-transform:uppercase;padding:12px 16px;cursor:pointer;border:none;border-bottom:2px solid transparent;border-top:none;border-left:none;border-right:none;background:transparent;color:var(--t3);border-radius:0;transition:color .15s;white-space:nowrap;position:relative;margin-bottom:-1px}
+.nav-btn:hover{color:var(--t2)}
+.nav-btn.on{color:var(--t1);border-bottom-color:var(--accent)}
 .nav-btn.on::before{display:none}
 .nb-icon{display:none;font-size:18px;line-height:1}
 .nb-label{display:block}
@@ -1121,10 +1125,202 @@ textarea.race-modal-inp{resize:vertical;min-height:56px}
 .race-modal-save{background:var(--grn);color:#fff}
 .race-modal-cancel:hover,.race-modal-save:hover{opacity:.85}
 
+/* ═══════════════════════════════════════════════════════════
+   THE PAPER — global overrides
+   Applied on top of existing component CSS to shift the
+   dashboard to an editorial, flat, cream-background aesthetic.
+   ═══════════════════════════════════════════════════════════ */
+
+/* Strip rounded corners from all card-like elements */
+.st,.pb,.rc,.ic,.ann-goal,.cal-card,.fc,.prog,.streak-card,.load-card,
+.goal-card,.pred-card,.loc-card,.rec-card,.ring-card,.feed-item,.pw,.cmp,
+.chart-wrap,.dash-card,.act-feed,.week-card,.coach-watch-card,.coach-mantra,
+.coach-hurt,.coach-mindset,.phase-h,.int-toolbar .cmp-toggle,.dtab,.cal-filter-group,
+.race-cmp-toggle,.race-cmp-panel,.race-cmp-col,.strat-modal,.strat-goal,
+.coach-hero,.cal-hero,.monthly-insight,.monthly-daily,.monthly-msg,
+.profile-item,.pr-card,.ic-detail,.rfi-stat-item,.perf-profile,
+.rep-summary,.traj-strip,.load-chart-wrap,.fc-card,.fc-hero,.fc-scn,
+.race-modal,.week-nav-btn,.max-week-btn,.rf-search,.rf-pill,
+.ann-goal-prog-track,.goal-progress-track,.pw-progress,.shoe-bar,
+.consistency-bar,.loc-bar,.hr-bar-fill,.zone-bar-outer,.sb-bar,
+.prog-bar,.wk-bar,.bar-fill,.day-bar,.load-bar-fill,
+.ic-best-chip,.garmin-badge,.endurance-badge,.cal-card-cd,
+.rc-dist-chip,.badge,.pw-now-badge,.rfi-badge,
+.dec-badge,.rep-bar-wrap,.hm-cell {
+  border-radius: 0 !important;
+}
+/* Exceptions: pills, chips, circles — keep small radius */
+.pill { border-radius: 3px !important; }
+.vol-tip { border-radius: 4px !important; }
+.cal-card-dist { border-radius: 0 !important; }
+.pb-badge { border-radius: 2px !important; }
+
+/* Remove all box shadows */
+.st:hover,.pb:hover,.rc:hover,.ic:hover,.cal-card:hover,
+.loc-card:hover,.week-card:hover,.feed-item:hover { box-shadow: none !important; }
+
+/* Dash hero — replace green gradient with cream editorial style */
+.dash-hero {
+  background: var(--card) !important;
+  border: none !important;
+  border-top: 3px solid var(--c-race) !important;
+  border-radius: 0 !important;
+  color: var(--t1) !important;
+}
+.dash-hero::before,.dash-hero::after { display: none !important; }
+.dash-hero-race { color: var(--t1) !important; font-size: 26px; }
+.dash-hero-date { color: var(--t3) !important; opacity: 1 !important; }
+.dash-hero-goal { color: var(--t2) !important; opacity: 1 !important; }
+.dash-hero-pill { background: var(--bg) !important; color: var(--t1) !important; border: 1px solid var(--bdr2); border-radius: 0 !important; }
+.dash-hero-prog { background: var(--bdr) !important; }
+.dash-hero-prog-fill { background: var(--c-race) !important; }
+.dash-hero-prog-label { color: var(--t3) !important; opacity: 1 !important; }
+.dash-hero-status { background: var(--bg) !important; color: var(--t2) !important; border: 1px solid var(--bdr2); -webkit-backdrop-filter: none !important; backdrop-filter: none !important; border-radius: 0 !important; }
+
+/* Monthly header — replace dark gradient with cream */
+.monthly-header {
+  background: var(--card) !important;
+  border: none !important;
+  border-top: 3px solid var(--c-race) !important;
+  border-radius: 0 !important;
+  color: var(--t1) !important;
+}
+.monthly-name { color: var(--accent) !important; letter-spacing: 0.07em; }
+.monthly-tagline { color: var(--t1) !important; }
+.monthly-sub { color: var(--t3) !important; opacity: 1 !important; }
+.monthly-daily { background: var(--card) !important; border: 1px solid var(--bdr) !important; }
+.monthly-daily-h { color: var(--c-easy) !important; }
+.monthly-daily-session { color: var(--t1) !important; }
+
+/* Coach hero — replace dark gradient with cream */
+.coach-hero {
+  background: var(--card) !important;
+  border: none !important;
+  border-top: 3px solid var(--c-intervals) !important;
+  border-radius: 0 !important;
+}
+.coach-hero::before { display: none !important; }
+.coach-hero-eyebrow { color: var(--c-intervals) !important; }
+.coach-hero-race { color: var(--t1) !important; }
+.coach-hero-meta { color: var(--t3) !important; opacity: 1 !important; }
+.coach-hero-goal.a-goal { background: var(--grnSoft) !important; border-color: var(--grn) !important; }
+.coach-hero-goal.b-goal { background: var(--bluGlow) !important; border-color: var(--blu) !important; }
+.coach-hero-goal-time { color: var(--t1) !important; }
+.coach-hero-goal-pace { color: var(--t3) !important; opacity: 1 !important; }
+
+/* Calendar hero — replace green gradient */
+.cal-hero {
+  background: var(--card) !important;
+  border: none !important;
+  border-top: 3px solid var(--c-race) !important;
+  border-radius: 0 !important;
+  color: var(--t1) !important;
+}
+.cal-hero::before { display: none !important; }
+.cal-hero-lbl { color: var(--t3) !important; opacity: 1 !important; }
+.cal-hero-name { color: var(--t1) !important; }
+.cal-hero-meta { color: var(--t2) !important; opacity: 1 !important; }
+.cal-hero-cd { color: var(--accent) !important; }
+.cal-hero-cdlbl { color: var(--t3) !important; opacity: 1 !important; }
+
+/* Trajectory strip — replace dark gradient */
+.traj-strip {
+  background: var(--card) !important;
+  border: 1px solid var(--bdr) !important;
+  border-top: 3px solid var(--c-intervals) !important;
+}
+.traj-eyebrow { color: var(--c-intervals) !important; }
+.traj-prob { color: var(--c-race) !important; }
+.traj-time { color: var(--t1) !important; }
+
+/* Strat modal — update header */
+.strat-modal-head {
+  background: var(--card) !important;
+  color: var(--t1) !important;
+  border-bottom: 2px solid var(--t1) !important;
+  border-radius: 0 !important;
+}
+.strat-modal { border-radius: 0 !important; border: 1px solid var(--bdr) !important; }
+.strat-modal-close { background: var(--bg) !important; color: var(--t1) !important; border: 1px solid var(--bdr); border-radius: 0 !important; }
+
+/* Active card treatments — use race blue */
+.st.a { border-color: var(--c-race) !important; background: var(--bluGlow) !important; }
+.st.a::before { background: var(--grd3) !important; }
+.st.a .sv { color: var(--c-race) !important; }
+
+/* Nav active state override (mobile) */
+@media(max-width:768px) {
+  .nav-btn.on { color: var(--accent) !important; border-top-color: var(--accent) !important; }
+  .nav-btn.on .nb-label { color: var(--accent) !important; }
+}
+
+/* Section headers — match The Paper style */
+.sec-h {
+  font-family: 'Geist Mono', monospace !important;
+  font-size: 11px !important;
+  letter-spacing: 0.07em !important;
+  text-transform: uppercase !important;
+  color: var(--t3) !important;
+  font-weight: 400 !important;
+  margin-bottom: 20px !important;
+}
+.sec-h::after { background: var(--bdr2) !important; }
+
+/* Run type badge colour remapping */
+.rfi-badge.easy,.rfi-badge.moderate,.rfi-badge.steady,.rfi-badge.fast,.rfi-badge.recovery {
+  background: rgba(15,118,110,.1) !important; color: var(--c-easy) !important;
+}
+.rfi-badge.tempo,.rfi-badge.progressive {
+  background: rgba(180,83,9,.1) !important; color: var(--c-tempo) !important;
+}
+.rfi-badge.intervals {
+  background: rgba(67,56,202,.1) !important; color: var(--c-intervals) !important;
+}
+.rfi-badge.long {
+  background: rgba(77,124,15,.1) !important; color: var(--c-long) !important;
+}
+.rfi-badge.race,.rfi-badge.parkrun {
+  background: rgba(37,99,235,.1) !important; color: var(--c-race) !important;
+}
+
+/* Heatmap cells — shift to race blue */
+.hm-cell.l1{background:rgba(37,99,235,.15) !important}
+.hm-cell.l2{background:rgba(37,99,235,.35) !important}
+.hm-cell.l3{background:rgba(37,99,235,.6) !important}
+.hm-cell.l4{background:var(--c-race) !important}
+
+/* Search and filter inputs */
+.rf-search:focus { border-color: var(--accent) !important; }
+.rf-pill.on { background: var(--accent) !important; border-color: var(--accent) !important; }
+
+/* Modal boxes */
+.modal-box { border-radius: 0 !important; border: 1px solid var(--bdr); }
+.strat-overlay { -webkit-backdrop-filter: none; backdrop-filter: none; }
+
+/* Rep tab active state */
+.rep-tab.active { color: var(--accent) !important; border-bottom-color: var(--accent) !important; }
+
+/* Forecast narrative */
+.fc-narrative { border-radius: 0 !important; }
+
+/* Plan phase headings */
+.phase-h.base { background: var(--bluGlow) !important; border-color: rgba(37,99,235,.2) !important; color: var(--blu) !important; }
+.phase-h.build { background: var(--grnSoft) !important; border-color: rgba(15,118,110,.2) !important; color: var(--grn) !important; }
+
+/* Current plan week highlight */
+.pw.pw-current { border-left-color: var(--accent) !important; box-shadow: none !important; }
+.pw-now-badge { background: var(--accent) !important; }
+
+/* Form inputs */
+.race-modal-inp:focus { border-color: var(--accent) !important; }
+.race-modal-save { background: var(--accent) !important; }
+.cal-add-btn { background: var(--accent) !important; border-radius: 0 !important; }
+
 </style>
 </head>
 <body>
 <div class="shell">
+<div class="chrome-stripe"></div>
 <div class="chrome">
 <span class="brand">Liam's Running</span>
 <span class="chrome-sep">·</span>
@@ -2754,7 +2950,7 @@ var effortData = (function() {
     return path;
   });
   var svg = '<svg class="donut-svg" viewBox="0 0 160 160">' + paths.join('') +
-    '<text x="80" y="76" text-anchor="middle" font-family="JetBrains Mono" font-size="22" font-weight="800" fill="var(--t1)">' + total + '</text>' +
+    '<text x="80" y="76" text-anchor="middle" font-family="Geist Mono" font-size="22" font-weight="800" fill="var(--t1)">' + total + '</text>' +
     '<text x="80" y="93" text-anchor="middle" font-family="DM Sans" font-size="10" fill="var(--t3)" font-weight="600">runs</text></svg>';
   var legend = items.map(function(it) {
     return '<div class="donut-leg-item"><div class="donut-leg-dot" style="background:' + it.color + '"></div><span>' + it.name + '</span><span class="donut-leg-pct">' + it.pct + '%</span></div>';
@@ -2892,7 +3088,7 @@ document.getElementById('pg-dash').innerHTML =
       for (var g = 0; g <= maxKm * 1.1; g += gridStep) {
         var gy = svgH - padB - (g / (maxKm * 1.1)) * chartH;
         grid += '<line x1="' + padL + '" y1="' + gy.toFixed(1) + '" x2="' + svgW + '" y2="' + gy.toFixed(1) + '" stroke="var(--bdr)" stroke-width="0.5" opacity=".5"/>';
-        grid += '<text x="' + (padL - 6) + '" y="' + (gy + 4).toFixed(1) + '" fill="var(--t3)" font-size="11" text-anchor="end" font-family="JetBrains Mono">' + g + '</text>';
+        grid += '<text x="' + (padL - 6) + '" y="' + (gy + 4).toFixed(1) + '" fill="var(--t3)" font-size="11" text-anchor="end" font-family="Geist Mono">' + g + '</text>';
       }
       var bars = chartWks.map(function(k, i) {
         var wk = weeklyMap[k] || { km:0, intensity:{} };
@@ -2910,9 +3106,9 @@ document.getElementById('pg-dash').innerHTML =
         });
         var topY = svgH - padB - totalH;
         // Total km label above bar
-        var label = wk.km >= 1 ? '<text x="' + (x + bw/2).toFixed(1) + '" y="' + (topY - 6).toFixed(1) + '" fill="' + (isCur ? 'var(--grn)' : 'var(--t2)') + '" font-size="' + (isCur ? '13' : '11') + '" text-anchor="middle" font-family="JetBrains Mono" font-weight="' + (isCur ? '700' : '600') + '">' + Math.round(wk.km) + '</text>' : '';
+        var label = wk.km >= 1 ? '<text x="' + (x + bw/2).toFixed(1) + '" y="' + (topY - 6).toFixed(1) + '" fill="' + (isCur ? 'var(--grn)' : 'var(--t2)') + '" font-size="' + (isCur ? '13' : '11') + '" text-anchor="middle" font-family="Geist Mono" font-weight="' + (isCur ? '700' : '600') + '">' + Math.round(wk.km) + '</text>' : '';
         // Week label below bar
-        var wkLabel = '<text x="' + (x + bw/2).toFixed(1) + '" y="' + (svgH - 6) + '" fill="' + (isCur ? 'var(--grn)' : 'var(--t3)') + '" font-size="9" text-anchor="middle" font-family="JetBrains Mono" font-weight="' + (isCur ? '700' : '500') + '">W' + k.split('W')[1] + '</text>';
+        var wkLabel = '<text x="' + (x + bw/2).toFixed(1) + '" y="' + (svgH - 6) + '" fill="' + (isCur ? 'var(--grn)' : 'var(--t3)') + '" font-size="9" text-anchor="middle" font-family="Geist Mono" font-weight="' + (isCur ? '700' : '500') + '">W' + k.split('W')[1] + '</text>';
         return '<g>' + segs + label + wkLabel + '</g>';
       }).join('');
       // Legend
@@ -2930,142 +3126,16 @@ document.getElementById('pg-dash').innerHTML =
         legend +
         '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--bdr);margin-top:12px">' +
           '<span style="font-size:12px;color:var(--t3)">Last 12 weeks</span>' +
-          '<span style="font-size:14px;color:var(--grn);font-weight:700;font-family:JetBrains Mono">' + Math.round(curWeekKm) + '\u202f/\u202f' + weeklyTarget + '\u202fkm</span>' +
+          '<span style="font-size:14px;color:var(--grn);font-weight:700;font-family:Geist Mono">' + Math.round(curWeekKm) + '\u202f/\u202f' + weeklyTarget + '\u202fkm</span>' +
         '</div>' +
       '</div>';
     })() +
   '</div>' +
 
-  // 4. GARMIN 2-COL: readiness + ACWR
-  '<div class="dash-row dash-row-2">' +
+  // 4. NEXT RACE BLOCK (filled after raceCalendar loads)
+  '<div id="dash-next-race"></div>' +
 
-    (function() {
-      var latest = GARMIN_READINESS[GARMIN_READINESS.length - 1];
-      var score = latest.score || 0;
-      var level = latest.level || 'UNKNOWN';
-      var levelColor = level === 'PRIME' ? 'var(--grn)' : level === 'HIGH' ? '#22c55e' : level === 'MODERATE' ? 'var(--org)' : level === 'LOW' ? '#ea580c' : 'var(--red)';
-      var components = [{label:'Sleep',val:latest.sleep},{label:'Recovery',val:latest.recovery},{label:'ACWR',val:latest.acwr},{label:'HRV',val:latest.hrv}];
-      var last14 = GARMIN_READINESS.slice(-14);
-      var rMax = Math.max.apply(null, last14.map(function(d) { return d.score || 0; }));
-      var miniBars = last14.map(function(d) {
-        var s = d.score || 0;
-        var pct = rMax > 0 ? Math.max(5, (s / rMax) * 100) : 5;
-        var c = s >= 70 ? 'var(--grn)' : s >= 50 ? 'var(--org)' : 'var(--red)';
-        return '<div class="rm-bar" style="height:' + pct + '%;background:' + c + '" title="' + d.date + ': ' + s + '"></div>';
-      }).join('');
-      return '<div><div class="sec-h" style="margin-bottom:8px">Training readiness</div>' +
-        '<div class="dash-card">' +
-          '<div class="readiness-gauge">' +
-            '<div class="readiness-score mono" style="color:' + levelColor + '">' + score + '</div>' +
-            '<div class="readiness-level" style="color:' + levelColor + '">' + level + '</div>' +
-          '</div>' +
-          '<div class="readiness-bars">' +
-            components.map(function(c) {
-              var bc = c.val >= 70 ? 'var(--grn)' : c.val >= 50 ? 'var(--org)' : 'var(--red)';
-              return '<div class="readiness-bar-item"><div class="rl">' + c.label + '</div><div class="rv mono">' + c.val + '%</div>' +
-                '<div class="bar-track"><div class="bar-value" style="width:' + c.val + '%;background:' + bc + '"></div></div></div>';
-            }).join('') +
-          '</div>' +
-          '<div style="margin-top:16px"><div style="font-size:9px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Last 14 days</div>' +
-            '<div class="readiness-mini">' + miniBars + '</div>' +
-          '</div>' +
-        '</div></div>';
-    })() +
-
-    (function() {
-      var latest = GARMIN_ACWR[GARMIN_ACWR.length - 1];
-      var ratio = latest.ratio || 0;
-      var riskLabel = ratio < 0.8 ? 'LOW' : ratio <= 1.3 ? 'OPTIMAL' : 'HIGH';
-      var riskColor = ratio < 0.8 ? 'var(--blu)' : ratio <= 1.3 ? 'var(--grn)' : 'var(--red)';
-      var sweetStart = (0.8 / 2.0) * 100;
-      var sweetEnd = (1.3 / 2.0) * 100;
-      var markerPos = Math.min(Math.max((ratio / 2.0) * 100, 1), 99);
-      var last30 = GARMIN_ACWR.slice(-30);
-      var aMax = Math.max.apply(null, last30.map(function(d) { return d.ratio || 0; }));
-      var aMin = Math.min.apply(null, last30.map(function(d) { return d.ratio || 0; }));
-      var aRange = aMax - aMin || 0.1;
-      var sparkBars = last30.map(function(d) {
-        var rv = d.ratio || 0;
-        var pct = Math.max(8, ((rv - aMin) / aRange) * 100);
-        var c = rv < 0.8 ? 'var(--blu)' : rv <= 1.3 ? 'var(--grn)' : 'var(--red)';
-        return '<div class="sp-bar" style="height:' + pct + '%;background:' + c + '"></div>';
-      }).join('');
-      return '<div><div class="sec-h" style="margin-bottom:8px">ACWR injury risk</div>' +
-        '<div class="dash-card">' +
-          '<div style="display:flex;align-items:center;gap:20px;margin-bottom:16px">' +
-            '<div><div style="font-size:10px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:1px">Ratio</div>' +
-              '<div class="mono" style="font-size:36px;font-weight:800;color:' + riskColor + '">' + ratio.toFixed(2) + '</div>' +
-              '<div style="font-size:11px;font-weight:700;color:' + riskColor + '">' + riskLabel + '</div></div>' +
-            '<div style="flex:1;display:flex;gap:16px">' +
-              '<div style="text-align:center"><div style="font-size:9px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:1px">Acute</div><div class="mono" style="font-size:20px;font-weight:700">' + Math.round(latest.acute) + '</div></div>' +
-              '<div style="text-align:center"><div style="font-size:9px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:1px">Chronic</div><div class="mono" style="font-size:20px;font-weight:700">' + Math.round(latest.chronic) + '</div></div>' +
-            '</div>' +
-          '</div>' +
-          '<div class="acwr-meter">' +
-            '<div class="zone" style="left:0;width:' + sweetStart + '%;background:rgba(30,108,192,.15)"></div>' +
-            '<div class="zone" style="left:' + sweetStart + '%;width:' + (sweetEnd - sweetStart) + '%;background:rgba(13,140,84,.18)"></div>' +
-            '<div class="zone" style="left:' + sweetEnd + '%;width:' + (100 - sweetEnd) + '%;background:rgba(211,40,40,.1)"></div>' +
-            '<div class="marker" style="left:' + markerPos + '%"></div>' +
-          '</div>' +
-          '<div class="acwr-labels"><span>0.0 Undertrained</span><span>0.8</span><span>Sweet spot</span><span>1.3</span><span>2.0 Danger</span></div>' +
-          '<div style="margin-top:16px"><div style="font-size:9px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">ACWR ratio (30 days)</div>' +
-            '<div class="garmin-sparkline">' + sparkBars + '</div>' +
-          '</div>' +
-        '</div></div>';
-    })() +
-
-  '</div>' +
-
-  // 5. 3-COL: TRAINING LOAD + STREAKS + EFFORT DONUT
-  '<div class="dash-row dash-row-3">' +
-
-    '<div><div class="sec-h" style="margin-bottom:8px">Training load</div>' +
-    '<div class="dash-card">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bdr2)">' +
-        '<span style="font-size:12px;color:var(--t3);font-weight:600">Fitness (CTL)</span>' +
-        '<span class="mono" style="font-size:22px;font-weight:800;color:var(--grn)">' + currentCTL + '</span>' +
-      '</div>' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bdr2)">' +
-        '<span style="font-size:12px;color:var(--t3);font-weight:600">Fatigue (ATL)</span>' +
-        '<span class="mono" style="font-size:22px;font-weight:800;color:var(--org)">' + currentATL + '</span>' +
-      '</div>' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0">' +
-        '<span style="font-size:12px;color:var(--t3);font-weight:600">Freshness (TSB)</span>' +
-        '<span class="mono" style="font-size:22px;font-weight:800;color:' + freshColor + '">' + (currentTSB > 0 ? '+' : '') + currentTSB + '</span>' +
-      '</div>' +
-      '<div style="font-size:11px;font-weight:700;color:' + freshColor + ';text-align:right;padding-top:2px">' + freshLabel + '</div>' +
-    '</div></div>' +
-
-    '<div><div class="sec-h" style="margin-bottom:8px">Streaks</div>' +
-    '<div class="dash-card">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bdr2)">' +
-        '<div><div style="font-size:12px;color:var(--t3);font-weight:600">Day streak</div><div style="font-size:10px;color:var(--t3);opacity:.7">Best: ' + streakData.longestDay + ' days</div></div>' +
-        '<span class="mono" style="font-size:22px;font-weight:800;color:var(--grn)">' + streakData.dayStreak + '</span>' +
-      '</div>' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bdr2)">' +
-        '<div><div style="font-size:12px;color:var(--t3);font-weight:600">Weekly streak</div><div style="font-size:10px;color:var(--t3);opacity:.7">Best: ' + streakData.longestWeek + ' wks</div></div>' +
-        '<span class="mono" style="font-size:22px;font-weight:800;color:var(--blu)">' + streakData.weekStreak + '</span>' +
-      '</div>' +
-      '<div style="padding:8px 0">' +
-        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
-          '<span style="font-size:12px;color:var(--t3);font-weight:600">Consistency (12 wks)</span>' +
-          '<span class="mono" style="font-size:22px;font-weight:800;color:' + (streakData.conPct >= 75 ? 'var(--grn)' : streakData.conPct >= 50 ? 'var(--org)' : 'var(--red)') + '">' + streakData.conPct + '%</span>' +
-        '</div>' +
-        '<div class="consistency-bar"><div class="consistency-fill" style="width:' + streakData.conPct + '%"></div></div>' +
-      '</div>' +
-    '</div></div>' +
-
-    '<div><div class="sec-h" style="margin-bottom:8px">Effort mix</div>' +
-    '<div class="dash-card">' +
-      '<div class="donut-wrap">' + effortData.svg +
-      '<div><div class="donut-legend">' + effortData.legend + '</div>' +
-      '<div style="margin-top:8px;font-size:12px;color:var(--t3);font-weight:600">Easy: <span class="mono" style="color:' + (effortData.easyPct >= 75 ? 'var(--grn)' : 'var(--org)') + '">' + effortData.easyPct + '%</span> <span style="opacity:.6">(target 80%)</span></div>' +
-      '</div></div>' +
-    '</div></div>' +
-
-  '</div>' +
-
-  // 6. SHOE MILEAGE
+  // 5. SHOE MILEAGE
   (function() {
     if (!SHOES || SHOES.length === 0) return '';
     var shoeCards = SHOES.filter(function(s){return !s.retired;}).map(function(shoe) {
@@ -3158,7 +3228,7 @@ document.getElementById('pg-performance').innerHTML =
         html+='<div style="background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:14px 14px 12px;position:relative;overflow:hidden">'+
           '<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+d.color+';border-radius:12px 12px 0 0"></div>'+
           '<div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-bottom:6px">'+d.label+'</div>'+
-          '<div style="font-family:\'JetBrains Mono\';font-size:22px;font-weight:800;color:var(--t1);line-height:1;margin-bottom:3px">'+fmtT(pb.time)+'</div>'+
+          '<div style="font-family:\'Geist Mono\';font-size:22px;font-weight:800;color:var(--t1);line-height:1;margin-bottom:3px">'+fmtT(pb.time)+'</div>'+
           '<div style="font-size:11px;color:'+d.color+';font-weight:700;margin-bottom:8px">'+fmtPace(pb.time,d.exact)+'</div>'+
           '<div style="font-size:11px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+pb.source+'">'+cleanName(pb.source)+'</div>'+
           '<div style="font-size:11px;color:var(--t3);margin-top:2px">'+pb.date+'</div>'+
@@ -3167,7 +3237,7 @@ document.getElementById('pg-performance').innerHTML =
         html+='<div style="background:var(--card);border:1px dashed var(--bdr);border-radius:12px;padding:14px 14px 12px;position:relative;overflow:hidden;opacity:.65">'+
           '<div style="position:absolute;top:0;left:0;right:0;height:3px;background:'+d.color+';border-radius:12px 12px 0 0;opacity:.3"></div>'+
           '<div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--t3);margin-bottom:6px">'+d.label+'</div>'+
-          '<div style="font-family:\'JetBrains Mono\';font-size:22px;font-weight:800;color:var(--t3);line-height:1;margin-bottom:3px">&#8212;</div>'+
+          '<div style="font-family:\'Geist Mono\';font-size:22px;font-weight:800;color:var(--t3);line-height:1;margin-bottom:3px">&#8212;</div>'+
           '<div style="font-size:11px;color:var(--t3);font-weight:700;margin-bottom:8px">'+(d.outerKey==='Marathon'?'Target: 3:25:00':'Not yet raced')+'</div>'+
           (d.outerKey==='Marathon'?'<div style="font-size:11px;color:var(--t3)">Cologne &middot; Oct 4 2026</div>':'')+
         '</div>';
@@ -3200,18 +3270,18 @@ document.getElementById('pg-performance').innerHTML =
     pts.forEach(function(d, i) {
       if (i === 0 || i === pts.length - 1 || d.vo2 === peak) {
         dots += '<circle cx="' + cx(i) + '" cy="' + cy(d.vo2) + '" r="3" fill="var(--grn)"/>';
-        dots += '<text x="' + cx(i) + '" y="' + (cy(d.vo2) - 6) + '" fill="var(--t2)" style="font-size:9px;font-family:JetBrains Mono" text-anchor="middle">' + d.vo2 + '</text>';
+        dots += '<text x="' + cx(i) + '" y="' + (cy(d.vo2) - 6) + '" fill="var(--t2)" style="font-size:9px;font-family:Geist Mono" text-anchor="middle">' + d.vo2 + '</text>';
       }
     });
     // Y axis labels
     var yLabels = '';
     for (var yv = Math.ceil(vMin); yv <= vMax; yv += 2) {
-      yLabels += '<text x="' + (px - 4) + '" y="' + (cy(yv) + 3) + '" fill="var(--t3)" style="font-size:8px;font-family:JetBrains Mono" text-anchor="end">' + yv + '</text>';
+      yLabels += '<text x="' + (px - 4) + '" y="' + (cy(yv) + 3) + '" fill="var(--t3)" style="font-size:8px;font-family:Geist Mono" text-anchor="end">' + yv + '</text>';
       yLabels += '<line x1="' + px + '" y1="' + cy(yv) + '" x2="' + (w - 10) + '" y2="' + cy(yv) + '" stroke="var(--bdr)" stroke-width="0.5"/>';
     }
     // X axis: first and last date
-    var xLabels = '<text x="' + cx(0) + '" y="' + (h - 4) + '" fill="var(--t3)" style="font-size:8px;font-family:JetBrains Mono" text-anchor="start">' + pts[0].date.slice(5) + '</text>' +
-                  '<text x="' + cx(pts.length - 1) + '" y="' + (h - 4) + '" fill="var(--t3)" style="font-size:8px;font-family:JetBrains Mono" text-anchor="end">' + pts[pts.length - 1].date.slice(5) + '</text>';
+    var xLabels = '<text x="' + cx(0) + '" y="' + (h - 4) + '" fill="var(--t3)" style="font-size:8px;font-family:Geist Mono" text-anchor="start">' + pts[0].date.slice(5) + '</text>' +
+                  '<text x="' + cx(pts.length - 1) + '" y="' + (h - 4) + '" fill="var(--t3)" style="font-size:8px;font-family:Geist Mono" text-anchor="end">' + pts[pts.length - 1].date.slice(5) + '</text>';
 
     return '<div class="sec"><div class="sec-h">VO2max (Garmin)</div><div class="g3">' +
       '<div class="st a"><div class="sl">Current</div><div class="sv mono" style="color:var(--grn)"><span class="anim-num" data-target="' + cur + '">' + cur + '</span></div><div class="sd">ml/kg/min</div></div>' +
@@ -3654,7 +3724,166 @@ document.getElementById('pg-health').innerHTML =
       '<div style="flex:1;min-width:100px;text-align:center;padding:10px;background:var(--card2);border-radius:8px"><div style="font-size:11px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:1px">After 3+ days</div><div class="mono" style="font-size:18px;font-weight:700;margin-top:4px">' + (avgPace(afterRestPaces['3+']) ? secsToTimeMS(avgPace(afterRestPaces['3+'])) + '/km' : '--') + '</div></div>' +
     '</div>' +
     '<div style="font-size:12px;color:var(--t3);margin-top:10px;line-height:1.6">Running faster after 2–3 days rest vs 1 day is normal and shows good recovery. If your pace is <em>worse</em> after more rest, it may signal fatigue accumulation or poor sleep quality.</div>' +
-  '</div></div>';
+  '</div></div>' +
+
+  // TRAINING READINESS
+  (function() {
+    if (!GARMIN_READINESS || !GARMIN_READINESS.length) return '';
+    var recent = GARMIN_READINESS.slice(-14);
+    var latest = GARMIN_READINESS[GARMIN_READINESS.length - 1];
+    var levelColor = {'PRIME':'var(--c-easy)','HIGH':'var(--c-easy)','MODERATE':'var(--c-tempo)','LOW':'var(--red)','POOR':'var(--red)'}[latest.level] || 'var(--t2)';
+    var levelLabel = {'PRIME':'Prime','HIGH':'High','MODERATE':'Moderate','LOW':'Low','POOR':'Poor'}[latest.level] || latest.level;
+    var svgW = 480, svgH = 52, padL = 0, padB = 4;
+    var vals = recent.map(function(d){return d.score;});
+    var vMin = 0, vMax = 100;
+    function cx(i){ return padL + (i / (vals.length - 1)) * (svgW - padL); }
+    function cy(v){ return svgH - padB - ((v - vMin) / (vMax - vMin)) * (svgH - padB - 4); }
+    var area = 'M' + cx(0) + ',' + cy(vals[0]);
+    vals.forEach(function(v,i){ area += ' L' + cx(i) + ',' + cy(v); });
+    area += ' L' + cx(vals.length-1) + ',' + (svgH-padB) + ' L' + cx(0) + ',' + (svgH-padB) + ' Z';
+    var line = vals.map(function(v,i){ return cx(i)+','+cy(v); }).join(' ');
+    var dots = vals.map(function(v,i){
+      var c = v >= 80 ? 'var(--c-easy)' : v >= 60 ? 'var(--c-tempo)' : 'var(--red)';
+      return '<circle cx="'+cx(i)+'" cy="'+cy(v)+'" r="2.5" fill="'+c+'"/>';
+    }).join('');
+    return '<div class="sec"><div class="sec-h">Training readiness</div>' +
+      '<div style="display:flex;gap:16px;align-items:flex-start">' +
+        '<div style="min-width:120px">' +
+          '<div style="font-size:56px;font-weight:200;font-family:\'Geist\',sans-serif;line-height:1;color:'+levelColor+';letter-spacing:-0.03em">'+latest.score+'</div>' +
+          '<div style="font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:0.07em;text-transform:uppercase;color:'+levelColor+';margin-top:4px">'+levelLabel+'</div>' +
+          '<div style="font-family:\'Geist Mono\',monospace;font-size:10px;color:var(--t3);margin-top:12px">'+latest.date+'</div>' +
+        '</div>' +
+        '<div style="flex:1">' +
+          '<div style="font-size:11px;color:var(--t3);margin-bottom:8px;font-family:\'Geist Mono\',monospace;text-transform:uppercase;letter-spacing:0.07em">14-day trend</div>' +
+          '<svg viewBox="0 0 '+svgW+' '+svgH+'" style="width:100%;height:52px;display:block" preserveAspectRatio="none">' +
+            '<path d="'+area+'" fill="'+levelColor+'" opacity=".08"/>' +
+            '<polyline points="'+line+'" fill="none" stroke="'+levelColor+'" stroke-width="1.5"/>' +
+            dots +
+          '</svg>' +
+          '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px">' +
+            '<div style="text-align:center"><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:0.05em;font-family:\'Geist Mono\',monospace">Sleep</div><div style="font-size:22px;font-weight:300;font-family:\'Geist\',sans-serif;color:var(--t1)">'+latest.sleep+'</div></div>' +
+            '<div style="text-align:center"><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:0.05em;font-family:\'Geist Mono\',monospace">Recovery</div><div style="font-size:22px;font-weight:300;font-family:\'Geist\',sans-serif;color:var(--t1)">'+latest.recovery+'</div></div>' +
+            '<div style="text-align:center"><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:0.05em;font-family:\'Geist Mono\',monospace">HRV</div><div style="font-size:22px;font-weight:300;font-family:\'Geist\',sans-serif;color:var(--t1)">'+(latest.hrv||'--')+'</div></div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  })() +
+
+  // ACWR - ACUTE:CHRONIC WORKLOAD RATIO
+  (function() {
+    if (!GARMIN_ACWR || !GARMIN_ACWR.length) return '';
+    var recent = GARMIN_ACWR.slice(-42);
+    var latest = GARMIN_ACWR[GARMIN_ACWR.length - 1];
+    var rStatus = latest.status;
+    var rColor = rStatus === 'OPTIMAL' ? 'var(--c-easy)' : rStatus === 'HIGH' ? 'var(--c-tempo)' : rStatus === 'VERY_HIGH' ? 'var(--red)' : 'var(--c-intervals)';
+    var rLabel = {'OPTIMAL':'Optimal','HIGH':'High','VERY_HIGH':'Very high','LOW':'Low','VERY_LOW':'Very low'}[rStatus] || rStatus;
+    var svgW=720, svgH=80, padL=0, padB=12, padT=6;
+    var chartH = svgH - padB - padT;
+    function cx(i){ return (i / (recent.length - 1)) * svgW; }
+    function ratioToY(r){ var clamped=Math.min(Math.max(r,0),2.5); return padT + ((2.5 - clamped) / 2.5) * chartH; }
+    // Safe zone band (0.8-1.3)
+    var bandY1 = ratioToY(1.3), bandY2 = ratioToY(0.8);
+    var lineAcute = recent.map(function(d,i){ return cx(i)+','+ratioToY(d.ratio); }).join(' ');
+    var dots = recent.slice(-7).map(function(d,i){
+      var idx = recent.length - 7 + i;
+      var c = d.status === 'OPTIMAL' ? 'var(--c-easy)' : d.status === 'HIGH' || d.status === 'VERY_HIGH' ? 'var(--red)' : 'var(--c-intervals)';
+      return '<circle cx="'+cx(idx)+'" cy="'+ratioToY(d.ratio)+'" r="2.5" fill="'+c+'"/>';
+    }).join('');
+    return '<div class="sec"><div class="sec-h">Acute:Chronic workload ratio</div>' +
+      '<div style="display:flex;gap:20px;align-items:flex-start;margin-bottom:16px">' +
+        '<div>' +
+          '<div style="font-size:48px;font-weight:200;font-family:\'Geist\',sans-serif;line-height:1;color:'+rColor+';letter-spacing:-0.02em">'+latest.ratio.toFixed(1)+'</div>' +
+          '<div style="font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:0.07em;text-transform:uppercase;color:'+rColor+';margin-top:4px">'+rLabel+'</div>' +
+        '</div>' +
+        '<div style="flex:1;font-size:12px;color:var(--t2);line-height:1.6;padding-top:6px">' +
+          'ACWR = acute load (7-day) / chronic load (28-day). <strong style="color:var(--c-easy)">0.8-1.3 is optimal</strong> - train hard enough to improve without overreaching. Above 1.5 raises injury risk. Below 0.8 means under-training.' +
+        '</div>' +
+      '</div>' +
+      '<div style="border:1px solid var(--bdr)">' +
+        '<svg viewBox="0 0 '+svgW+' '+svgH+'" style="width:100%;height:80px;display:block" preserveAspectRatio="none">' +
+          '<rect x="0" y="'+bandY1+'" width="'+svgW+'" height="'+(bandY2-bandY1)+'" fill="var(--c-easy)" opacity=".06"/>' +
+          '<line x1="0" y1="'+ratioToY(1)+'" x2="'+svgW+'" y2="'+ratioToY(1)+'" stroke="var(--bdr2)" stroke-width="0.8" stroke-dasharray="3,3"/>' +
+          '<polyline points="'+lineAcute+'" fill="none" stroke="'+rColor+'" stroke-width="1.5" opacity=".8"/>' +
+          dots +
+        '</svg>' +
+        '<div style="display:flex;justify-content:space-between;padding:4px 8px;border-top:1px solid var(--bdr)">' +
+          '<span style="font-family:\'Geist Mono\',monospace;font-size:10px;color:var(--t3)">'+recent[0].date+'</span>' +
+          '<span style="font-family:\'Geist Mono\',monospace;font-size:10px;color:var(--c-easy)">Optimal zone: 0.8-1.3</span>' +
+          '<span style="font-family:\'Geist Mono\',monospace;font-size:10px;color:var(--t3)">'+latest.date+'</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  })() +
+
+  // TRAINING STATUS
+  (function() {
+    if (!GARMIN_TRAINING_STATUS || !GARMIN_TRAINING_STATUS.length) return '';
+    var latest = GARMIN_TRAINING_STATUS[GARMIN_TRAINING_STATUS.length - 1];
+    var statusColors = {'PRODUCTIVE':'var(--c-easy)','PEAKING':'var(--c-race)','MAINTAINING':'var(--c-intervals)','RECOVERY':'var(--c-tempo)','DETRAINING':'var(--red)','OVERREACHING':'var(--red)','NO_DATA':'var(--t3)'};
+    var statusLabel = {'PRODUCTIVE':'Productive','PEAKING':'Peaking','MAINTAINING':'Maintaining','RECOVERY':'Recovery','DETRAINING':'Detraining','OVERREACHING':'Overreaching'};
+    var sColor = statusColors[latest.status] || 'var(--t2)';
+    var sLabel = statusLabel[latest.status] || latest.status;
+    var recent14 = GARMIN_TRAINING_STATUS.slice(-14);
+    var statusBars = recent14.map(function(d) {
+      var c = statusColors[d.status] || 'var(--t3)';
+      var h = d.status === 'PRODUCTIVE' ? 100 : d.status === 'PEAKING' ? 100 : d.status === 'MAINTAINING' ? 65 : d.status === 'RECOVERY' ? 40 : 25;
+      return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">' +
+        '<div style="width:100%;height:'+h+'%;background:'+c+';opacity:.7;min-height:4px;border-top:2px solid '+c+'"></div>' +
+        '<div style="font-size:7px;color:var(--t3);font-family:\'Geist Mono\',monospace;text-align:center">' + d.date.slice(5).replace('-','/') + '</div>' +
+      '</div>';
+    }).join('');
+    return '<div class="sec"><div class="sec-h">Training status (Garmin)</div>' +
+      '<div style="display:flex;gap:20px;align-items:center;margin-bottom:20px">' +
+        '<div>' +
+          '<div style="font-size:36px;font-weight:300;font-family:\'Geist\',sans-serif;letter-spacing:-0.02em;color:'+sColor+'">'+sLabel+'</div>' +
+          '<div style="font-family:\'Geist Mono\',monospace;font-size:10px;color:var(--t3);margin-top:4px;text-transform:uppercase;letter-spacing:0.07em">'+latest.date+' · Trend: '+latest.trend.toLowerCase().replace('_',' ')+'</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;align-items:flex-end;gap:3px;height:72px;border-bottom:1px solid var(--bdr)">'+statusBars+'</div>' +
+    '</div>';
+  })() +
+
+  // EFFORT MIX (run type distribution)
+  (function() {
+    var typeCounts = {};
+    var typeKm = {};
+    allRuns.forEach(function(r) {
+      var t = r.type || 'Easy';
+      typeCounts[t] = (typeCounts[t] || 0) + 1;
+      typeKm[t] = (typeKm[t] || 0) + r.dist;
+    });
+    var typeColors = {
+      'Easy':'var(--c-easy)', 'Long Run':'var(--c-long)', 'Intervals':'var(--c-intervals)',
+      'Tempo Run':'var(--c-tempo)', 'Race':'var(--c-race)', 'Recovery':'var(--t3)',
+      'Carrera':'var(--c-race)'
+    };
+    var order = ['Easy','Long Run','Tempo Run','Intervals','Race','Recovery'];
+    var total = allRuns.length;
+    var items = order.filter(function(t){return typeCounts[t];}).map(function(t) {
+      var pct = Math.round(typeCounts[t] / total * 100);
+      var km = Math.round(typeKm[t]);
+      var c = typeColors[t] || 'var(--t3)';
+      return {t:t, pct:pct, km:km, count:typeCounts[t], color:c};
+    });
+    var barTotal = items.reduce(function(s,x){return s+x.pct;},0);
+    var barHtml = items.map(function(x){
+      return '<div style="flex:'+(x.pct/barTotal)+';background:'+x.color+';height:8px" title="'+x.t+' '+x.pct+'%"></div>';
+    }).join('');
+    var rowHtml = items.map(function(x){
+      return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bdr)">' +
+        '<div style="width:10px;height:10px;background:'+x.color+';flex-shrink:0"></div>' +
+        '<div style="flex:1;font-size:13px;font-weight:600;color:var(--t1)">'+x.t+'</div>' +
+        '<div style="font-family:\'Geist Mono\',monospace;font-size:12px;color:var(--t2);min-width:40px;text-align:right">'+x.pct+'%</div>' +
+        '<div style="font-family:\'Geist Mono\',monospace;font-size:11px;color:var(--t3);min-width:60px;text-align:right">'+x.km+' km</div>' +
+        '<div style="font-family:\'Geist Mono\',monospace;font-size:11px;color:var(--t3);min-width:50px;text-align:right">'+x.count+' runs</div>' +
+      '</div>';
+    }).join('');
+    return '<div class="sec"><div class="sec-h">Effort mix</div>' +
+      '<div style="display:flex;gap:0;height:8px;border:1px solid var(--bdr);overflow:hidden;margin-bottom:20px">'+barHtml+'</div>' +
+      rowHtml +
+    '</div>';
+  })();
 
 // ===== VOLUME PAGE =====
 document.getElementById('pg-volume').innerHTML =
@@ -3714,7 +3943,7 @@ document.getElementById('pg-volume').innerHTML =
       // Big km + sub stats
       '<div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px">' +
         '<div style="display:flex;align-items:flex-end;gap:6px">' +
-          '<div style="font-size:52px;font-weight:800;line-height:1;font-family:\'JetBrains Mono\',monospace">' + twKm + '</div>' +
+          '<div style="font-size:52px;font-weight:800;line-height:1;font-family:\'Geist Mono\',monospace">' + twKm + '</div>' +
           '<div style="font-size:18px;font-weight:600;opacity:.7;margin-bottom:7px">km</div>' +
         '</div>' +
         '<div style="display:flex;gap:18px;text-align:right">' +
@@ -3787,7 +4016,7 @@ document.getElementById('pg-volume').innerHTML =
     var gridLines = gridKms.map(function(g) {
       var gy = padT + (h - padT - padB) * (1 - g / (maxKm * 1.1));
       return '<line x1="' + padL + '" y1="' + gy + '" x2="' + (w - padR) + '" y2="' + gy + '" stroke="var(--bdr)" stroke-width="1"/>' +
-        '<text x="' + (padL - 4) + '" y="' + (gy + 3) + '" text-anchor="end" font-size="9" fill="var(--t3)" font-family="JetBrains Mono,monospace">' + g + '</text>';
+        '<text x="' + (padL - 4) + '" y="' + (gy + 3) + '" text-anchor="end" font-size="9" fill="var(--t3)" font-family="Geist Mono,monospace">' + g + '</text>';
     }).join('');
     // Helper: ISO week key → Monday date
     function isoKeyToMon(key) {
@@ -3821,7 +4050,7 @@ document.getElementById('pg-volume').innerHTML =
       return '<g data-k="' + k + '" data-info="' + infoStr + '" style="cursor:pointer" pointer-events="all">' +
         '<rect x="' + x + '" y="' + y + '" width="' + barW + '" height="' + barH + '" rx="2" fill="' + fill + '" opacity="' + opacity + '" pointer-events="all"/>' +
         '<rect x="' + x + '" y="' + padT + '" width="' + barW + '" height="' + (h - padT - padB) + '" fill="#000" opacity="0" pointer-events="all"/>' +
-        (isCurrent ? '<text x="' + (x + barW / 2) + '" y="' + (y - 5) + '" text-anchor="middle" font-size="9" font-weight="700" fill="#0d8c54" font-family="JetBrains Mono,monospace">' + km + '</text>' : '') +
+        (isCurrent ? '<text x="' + (x + barW / 2) + '" y="' + (y - 5) + '" text-anchor="middle" font-size="9" font-weight="700" fill="#0d8c54" font-family="Geist Mono,monospace">' + km + '</text>' : '') +
         (label ? '<text x="' + (x + barW / 2) + '" y="' + (h - padB + 12) + '" text-anchor="middle" font-size="8" fill="var(--t3)" font-family="Inter,sans-serif">' + label + '</text>' : '') +
       '</g>';
     }).join('');
@@ -3920,7 +4149,7 @@ document.getElementById('pg-volume').innerHTML =
       var mLabel = k.split('-')[1];
       var mNames = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
       return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end">' +
-        '<div style="font-size:8px;font-family:\'JetBrains Mono\';color:var(--t3);margin-bottom:3px">' + Math.round(monthlyElev[k]) + '</div>' +
+        '<div style="font-size:8px;font-family:\'Geist Mono\';color:var(--t3);margin-bottom:3px">' + Math.round(monthlyElev[k]) + '</div>' +
         '<div style="width:100%;border-radius:4px 4px 0 0;background:var(--grd2);opacity:.5;height:' + pct + '%;min-height:3px"></div>' +
         '<div style="font-size:7px;color:var(--t3);margin-top:3px;font-weight:600">' + mNames[parseInt(mLabel)] + '</div>' +
       '</div>';
@@ -3958,7 +4187,7 @@ document.getElementById('pg-volume').innerHTML =
       var gy = cy2(gv);
       if (gy > py && gy < h - pb) {
         gridLines += '<line x1="' + px + '" y1="' + gy + '" x2="' + (w-8) + '" y2="' + gy + '" stroke="var(--bdr)" stroke-width="0.5" opacity=".5"/>';
-        gridLines += '<text x="' + (px-4) + '" y="' + (gy+3) + '" fill="var(--t3)" style="font-size:8px;font-family:JetBrains Mono" text-anchor="end">' + Math.round(gv) + '</text>';
+        gridLines += '<text x="' + (px-4) + '" y="' + (gy+3) + '" fill="var(--t3)" style="font-size:8px;font-family:Geist Mono" text-anchor="end">' + Math.round(gv) + '</text>';
       }
     }
     // X axis labels (month starts)
@@ -3966,7 +4195,7 @@ document.getElementById('pg-volume').innerHTML =
     chartDays.forEach(function(d, i) {
       if (d.day.slice(8) === '01') {
         var mNames = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        xLabels += '<text x="' + cx2(i) + '" y="' + (h-4) + '" fill="var(--t3)" style="font-size:8px;font-family:JetBrains Mono" text-anchor="middle">' + mNames[parseInt(d.day.slice(5,7))] + '</text>';
+        xLabels += '<text x="' + cx2(i) + '" y="' + (h-4) + '" fill="var(--t3)" style="font-size:8px;font-family:Geist Mono" text-anchor="middle">' + mNames[parseInt(d.day.slice(5,7))] + '</text>';
       }
     });
     // Lines
@@ -4173,10 +4402,10 @@ function renderRaces() {
       '<svg viewBox="0 0 ' + ptW + ' ' + ptH + '" style="width:100%;display:block" preserveAspectRatio="xMidYMid meet">' +
         '<polyline points="' + ptLine + '" fill="none" stroke="var(--grn)" stroke-width="1.5" opacity=".4"/>' +
         ptDots +
-        '<text x="' + ptPadL + '" y="' + (ptH - 2) + '" fill="var(--t3)" font-size="8" font-family="JetBrains Mono">' + chronoAll[0].date + '</text>' +
-        '<text x="' + (ptW - 10) + '" y="' + (ptH - 2) + '" fill="var(--t3)" font-size="8" font-family="JetBrains Mono" text-anchor="end">' + chronoAll[chronoAll.length-1].date + '</text>' +
-        '<text x="' + (ptPadL - 3) + '" y="' + (ptY(ptMin) + 3) + '" fill="var(--t3)" font-size="7" font-family="JetBrains Mono" text-anchor="end">' + secsToTimeMS(Math.round(ptMin)) + '</text>' +
-        '<text x="' + (ptPadL - 3) + '" y="' + (ptY(ptMax) + 3) + '" fill="var(--t3)" font-size="7" font-family="JetBrains Mono" text-anchor="end">' + secsToTimeMS(Math.round(ptMax)) + '</text>' +
+        '<text x="' + ptPadL + '" y="' + (ptH - 2) + '" fill="var(--t3)" font-size="8" font-family="Geist Mono">' + chronoAll[0].date + '</text>' +
+        '<text x="' + (ptW - 10) + '" y="' + (ptH - 2) + '" fill="var(--t3)" font-size="8" font-family="Geist Mono" text-anchor="end">' + chronoAll[chronoAll.length-1].date + '</text>' +
+        '<text x="' + (ptPadL - 3) + '" y="' + (ptY(ptMin) + 3) + '" fill="var(--t3)" font-size="7" font-family="Geist Mono" text-anchor="end">' + secsToTimeMS(Math.round(ptMin)) + '</text>' +
+        '<text x="' + (ptPadL - 3) + '" y="' + (ptY(ptMax) + 3) + '" fill="var(--t3)" font-size="7" font-family="Geist Mono" text-anchor="end">' + secsToTimeMS(Math.round(ptMax)) + '</text>' +
       '</svg>' +
       '<div style="font-size:11px;color:var(--t3);margin-top:4px">Lower = faster. Dot size = PB. Color = distance category.</div>' +
     '</div>';
@@ -4621,6 +4850,52 @@ function getAllRaces(){
   function notDel(r){ return del.indexOf(raceId(r))<0; }
   return raceCalendar.filter(notDel).concat(getUserRaces().filter(notDel));
 }
+// Fill in the Next Race block now that raceCalendar is defined
+(function() {
+  var el = document.getElementById('dash-next-race');
+  if (!el) return;
+  var _now = new Date();
+  var todayStr = _now.toISOString().slice(0,10);
+  var upcoming = getAllRaces().filter(function(r) {
+    return r.date > todayStr && (r.status === 'confirmed' || r.status === 'possibility');
+  }).sort(function(a,b){ return a.date > b.date ? 1 : -1; });
+  if (!upcoming.length) return;
+  var nr = upcoming[0];
+  var nrDate = new Date(nr.date + 'T00:00:00');
+  var nrDays = Math.ceil((nrDate - _now) / 864e5);
+  var nrFmt = nrDate.toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+  var distColor = nr.distKm >= 42 ? 'var(--c-race)' : nr.distKm >= 21 ? 'var(--c-intervals)' : nr.distKm >= 10 ? 'var(--c-easy)' : 'var(--c-tempo)';
+  var moreRaces = upcoming.slice(1, 4).map(function(r2) {
+    var d2 = new Date(r2.date + 'T00:00:00');
+    var days2 = Math.ceil((d2 - _now) / 864e5);
+    var d2Fmt = d2.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+    return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bdr)">' +
+      '<span class="mono" style="font-size:11px;color:var(--t3);min-width:32px">' + days2 + 'd</span>' +
+      '<span style="flex:1;font-size:13px;font-weight:600;color:var(--t1)">' + r2.name + '</span>' +
+      '<span style="font-size:11px;color:var(--t3)">' + r2.dist + ' · ' + d2Fmt + '</span>' +
+    '</div>';
+  }).join('');
+  el.innerHTML =
+    '<div class="sec-h" style="margin-bottom:8px">Next race</div>' +
+    '<div style="display:grid;grid-template-columns:3fr 2fr;gap:0;border-top:2px solid var(--t1);border-bottom:1px solid var(--bdr2);margin-bottom:24px">' +
+      '<div style="padding:24px 28px 24px 0;border-right:1px solid var(--bdr)">' +
+        '<div style="font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:0.07em;text-transform:uppercase;color:var(--t3);margin-bottom:10px">' + nr.dist + ' · ' + nr.location + '</div>' +
+        '<div style="font-size:32px;font-weight:300;letter-spacing:-0.03em;color:var(--t1);line-height:1.1;margin-bottom:8px">' + nr.name + '</div>' +
+        '<div style="font-family:\'Geist Mono\',monospace;font-size:12px;color:var(--t3)">' + nrFmt + '</div>' +
+        (nr.notes ? '<div style="margin-top:14px;font-size:13px;color:var(--t2);font-style:italic">' + nr.notes + '</div>' : '') +
+        (moreRaces ? '<div style="margin-top:20px;border-top:1px solid var(--bdr);padding-top:4px">' + moreRaces + '</div>' : '') +
+      '</div>' +
+      '<div style="padding:24px 0 24px 28px;display:flex;flex-direction:column;justify-content:center">' +
+        '<div style="font-family:\'Geist\',sans-serif;font-weight:200;font-size:80px;line-height:1;color:' + distColor + ';letter-spacing:-0.04em">' + nrDays + '</div>' +
+        '<div style="font-family:\'Geist Mono\',monospace;font-size:11px;letter-spacing:0.07em;text-transform:uppercase;color:var(--t2);margin-top:6px">days to go</div>' +
+        (nr.status === 'confirmed' ?
+          '<div style="margin-top:16px;display:inline-block;font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:0.05em;text-transform:uppercase;color:var(--c-easy);border:1px solid var(--c-easy);padding:3px 8px">Registered</div>' :
+          '<div style="margin-top:16px;display:inline-block;font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:0.05em;text-transform:uppercase;color:var(--c-tempo);border:1px solid var(--c-tempo);padding:3px 8px">Possibility</div>'
+        ) +
+      '</div>' +
+    '</div>';
+})();
+
 // ─────────────────────────────────────────────────────────────────────────────
 function renderCalendar() {
   var today = new Date(); today.setHours(0,0,0,0);
@@ -4834,7 +5109,7 @@ function renderCalendar() {
         '</div>' +
       '</div>' +
       '<div style="text-align:right;flex-shrink:0">' +
-        '<div style="font-family:\'JetBrains Mono\';font-size:32px;font-weight:800;color:' + urgColor + ';line-height:1">' + nd + '</div>' +
+        '<div style="font-family:\'Geist Mono\';font-size:32px;font-weight:800;color:' + urgColor + ';line-height:1">' + nd + '</div>' +
         '<div style="font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);font-weight:700;margin-top:2px">days</div>' +
       '</div>' +
     '</div>';
@@ -5090,10 +5365,10 @@ function renderIntPage() {
         '<path d="' + ipArea + '" fill="var(--red)" opacity=".06"/>' +
         '<polyline points="' + ipLinePts + '" fill="none" stroke="var(--red)" stroke-width="2" opacity=".6"/>' +
         ipDots +
-        '<text x="' + ipPadL + '" y="' + (ipH - 2) + '" fill="var(--t3)" font-size="8" font-family="JetBrains Mono">' + bestPaces[0].date + '</text>' +
-        '<text x="' + (ipW - 10) + '" y="' + (ipH - 2) + '" fill="var(--t3)" font-size="8" font-family="JetBrains Mono" text-anchor="end">' + bestPaces[bestPaces.length-1].date + '</text>' +
-        '<text x="' + (ipPadL - 3) + '" y="' + (ipY(ipMin) + 3) + '" fill="var(--t3)" font-size="7" font-family="JetBrains Mono" text-anchor="end">' + secsToTimeMS(Math.round(ipMin)) + '</text>' +
-        '<text x="' + (ipPadL - 3) + '" y="' + (ipY(ipMax) + 3) + '" fill="var(--t3)" font-size="7" font-family="JetBrains Mono" text-anchor="end">' + secsToTimeMS(Math.round(ipMax)) + '</text>' +
+        '<text x="' + ipPadL + '" y="' + (ipH - 2) + '" fill="var(--t3)" font-size="8" font-family="Geist Mono">' + bestPaces[0].date + '</text>' +
+        '<text x="' + (ipW - 10) + '" y="' + (ipH - 2) + '" fill="var(--t3)" font-size="8" font-family="Geist Mono" text-anchor="end">' + bestPaces[bestPaces.length-1].date + '</text>' +
+        '<text x="' + (ipPadL - 3) + '" y="' + (ipY(ipMin) + 3) + '" fill="var(--t3)" font-size="7" font-family="Geist Mono" text-anchor="end">' + secsToTimeMS(Math.round(ipMin)) + '</text>' +
+        '<text x="' + (ipPadL - 3) + '" y="' + (ipY(ipMax) + 3) + '" fill="var(--t3)" font-size="7" font-family="Geist Mono" text-anchor="end">' + secsToTimeMS(Math.round(ipMax)) + '</text>' +
       '</svg>' +
       '<div style="font-size:11px;color:var(--t3);margin-top:4px">Lower = faster. Green dots = all-time best reps.</div>' +
     '</div>';
@@ -6132,8 +6407,8 @@ document.getElementById('pg-plan').innerHTML = plan.map(function(p) {
     function row(label, time, cum, isLast) {
       return '<tr' + (isLast ? ' style="background:rgba(96,165,250,.06)"' : '') + '>' +
         '<td style="padding:6px 10px;color:var(--t3);font-size:11px">' + label + '</td>' +
-        '<td style="padding:6px 10px;font-family:JetBrains Mono,monospace;color:var(--t1);font-size:13px;text-align:right">' + fmtTime(Math.round(time)) + '</td>' +
-        '<td style="padding:6px 10px;font-family:JetBrains Mono,monospace;color:var(--t2);font-size:13px;text-align:right">' + fmtTime(Math.round(cum)) + '</td>' +
+        '<td style="padding:6px 10px;font-family:Geist Mono,monospace;color:var(--t1);font-size:13px;text-align:right">' + fmtTime(Math.round(time)) + '</td>' +
+        '<td style="padding:6px 10px;font-family:Geist Mono,monospace;color:var(--t2);font-size:13px;text-align:right">' + fmtTime(Math.round(cum)) + '</td>' +
       '</tr>';
     }
 
@@ -6249,8 +6524,8 @@ document.getElementById('pg-plan').innerHTML = plan.map(function(p) {
       '<div class="fc-section-h">Pace splits at ensemble target <span class="fc-section-h-meta">' + fmtTime(r.ensemble) + ' · ' + paceStr(r.ensemble, T.dist) + ' average</span></div>' +
       buildSplitTable(r.ensemble, T.dist) +
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px;padding-top:14px;border-top:1px solid var(--bdr)">' +
-        '<div><div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--grn);margin-bottom:6px">If you hit the goal ' + fmtTime(T.goal) + '</div><div style="font-family:JetBrains Mono,monospace;font-size:18px;font-weight:800;color:var(--t1)">' + paceStr(T.goal, T.dist) + '</div><div style="font-size:11px;color:var(--t3);margin-top:4px">Even-pace target for ' + T.label + '</div></div>' +
-        '<div><div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#60a5fa;margin-bottom:6px">Stretch goal ' + fmtTime(T.stretch) + '</div><div style="font-family:JetBrains Mono,monospace;font-size:18px;font-weight:800;color:var(--t1)">' + paceStr(T.stretch, T.dist) + '</div><div style="font-size:11px;color:var(--t3);margin-top:4px">Required pace if everything clicks</div></div>' +
+        '<div><div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--grn);margin-bottom:6px">If you hit the goal ' + fmtTime(T.goal) + '</div><div style="font-family:Geist Mono,monospace;font-size:18px;font-weight:800;color:var(--t1)">' + paceStr(T.goal, T.dist) + '</div><div style="font-size:11px;color:var(--t3);margin-top:4px">Even-pace target for ' + T.label + '</div></div>' +
+        '<div><div style="font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#60a5fa;margin-bottom:6px">Stretch goal ' + fmtTime(T.stretch) + '</div><div style="font-family:Geist Mono,monospace;font-size:18px;font-weight:800;color:var(--t1)">' + paceStr(T.stretch, T.dist) + '</div><div style="font-size:11px;color:var(--t3);margin-top:4px">Required pace if everything clicks</div></div>' +
       '</div>' +
     '</div>';
 
@@ -6427,7 +6702,7 @@ function renderAllRunsTab() {
         h += '<tr style="border-top:1px solid var(--bdr2)">' +
              '<td style="padding:6px 8px 6px 0;color:var(--t3);font-size:11px">Rep ' + (i+1) + '</td>' +
              '<td style="padding:6px 8px">' +
-               '<span style="font-weight:700;color:' + paceCol + ';font-family:\'JetBrains Mono\',monospace;font-size:14px">' + t + '</span>' +
+               '<span style="font-weight:700;color:' + paceCol + ';font-family:\'Geist Mono\',monospace;font-size:14px">' + t + '</span>' +
              '</td>' +
              '<td style="padding:6px 8px">' +
                '<div style="height:6px;border-radius:3px;width:' + barW + 'px;background:' + paceCol + ';opacity:.7"></div>' +
@@ -6482,7 +6757,7 @@ function renderAllRunsTab() {
              '<td style="padding:6px 8px 6px 0;color:var(--t3);font-size:11px">' + lapLabel + '</td>' +
              '<td style="padding:6px 8px;color:var(--t2)">' + lap.dist.toFixed(2) + ' km</td>' +
              '<td style="padding:6px 8px">' +
-               '<span style="font-weight:700;color:' + paceCol + ';font-family:\'JetBrains Mono\',monospace;font-size:13px">' + (lap.pace || '–') + '</span>' +
+               '<span style="font-weight:700;color:' + paceCol + ';font-family:\'Geist Mono\',monospace;font-size:13px">' + (lap.pace || '–') + '</span>' +
                '<span style="color:var(--t3);font-size:10px"> /km</span>' +
                '<span style="color:var(--t3);font-size:10px;margin-left:8px">(' + timeStr + ')</span>' +
              '</td>' +
@@ -6649,7 +6924,7 @@ function showRepModal(selectedIds) {
           var isBest = Math.abs(rep.timeSecs - bestTime) < 0.5;
           // For time-based reps, show distance; for distance-based, show time
           var repDisplay = rep.isTimeBased ? rep.distanceKm + 'km' : rep.time;
-          sideBySideHtml += '<td class="' + (isBest ? 'bv' : '') + '" style="font-family:JetBrains Mono">' + repDisplay + ' <span style="font-size:10px;opacity:.6">(' + rep.pace + ')</span></td>';
+          sideBySideHtml += '<td class="' + (isBest ? 'bv' : '') + '" style="font-family:Geist Mono">' + repDisplay + ' <span style="font-size:10px;opacity:.6">(' + rep.pace + ')</span></td>';
         } else {
           sideBySideHtml += '<td> - </td>';
         }
@@ -6663,7 +6938,7 @@ function showRepModal(selectedIds) {
       if (s.repData && s.repData.reps.length > 0) {
         var avgTime = s.repData.reps.reduce(function(sum,r){return sum+r.timeSecs},0) / s.repData.reps.length;
         var m = Math.floor(avgTime/60), sec = Math.round(avgTime%60);
-        sideBySideHtml += '<td style="font-family:JetBrains Mono">' + m + ':' + (sec<10?'0':'') + sec + '</td>';
+        sideBySideHtml += '<td style="font-family:Geist Mono">' + m + ':' + (sec<10?'0':'') + sec + '</td>';
       } else {
         sideBySideHtml += '<td> - </td>';
       }
