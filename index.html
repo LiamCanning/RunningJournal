@@ -477,7 +477,7 @@ body{font-family:'Geist',system-ui,-apple-system,sans-serif;color:var(--t1);back
 .mb-logged-val{font-family:'Geist Mono';font-weight:700}
 .mb-logged-note{color:var(--t2);font-style:italic}
 /* BLOCK LOG SUMMARY */
-.mb-log-summary{margin-top:24px}
+.mb-log-delete{background:none;border:none;cursor:pointer;color:var(--t3);font-size:11px;padding:0 0 0 8px;flex-shrink:0;line-height:1}.mb-log-delete:hover{color:var(--red)}.mb-wk-logged-km{font-size:10px;font-weight:700;color:var(--grn);font-family:'Geist Mono';margin-right:6px;opacity:.85}.rep-rest-row{display:grid;grid-template-columns:60px 1fr 100px 100px;gap:16px;align-items:center;padding:2px 0 10px 22px;font-size:11px;color:var(--t3);border-bottom:1px dashed var(--bdr2)}.rep-rest-label{font-size:10px;font-weight:600;opacity:.6;letter-spacing:.3px}.mb-log-summary{margin-top:24px}
 .mb-log-summary-h{font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:12px}
 .mb-log-table{width:100%;border-collapse:collapse;font-size:12px}
 .mb-log-table th{text-align:left;padding:6px 10px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);border-bottom:2px solid var(--bdr)}
@@ -2336,15 +2336,38 @@ ints.forEach(function(iv) {
   if (!laps || laps.length < 2) return;
   var avgS = paceToSecs(iv.pace);
   if (!avgS) return;
-  var threshold = avgS * 0.92; // laps >8% faster than avg are reps
-  var fastLaps = laps.filter(function(l) { return l.dist >= 0.2 && l.pace && paceToSecs(l.pace) < threshold; });
-  if (fastLaps.length >= 2) {
-    var reps = fastLaps.map(function(l, i) {
+
+  var workLaps, repRests;
+  if (iv.repInfo && iv.repInfo.intervalType === 'time' && iv.repInfo.timeSecs) {
+    // Time-based: filter by duration so rest laps (half the time) are excluded
+    var minRepTime = iv.repInfo.timeSecs * 0.7;
+    workLaps = laps.filter(function(l) { return l.time >= minRepTime && l.dist >= 0.25; });
+    // Pair each work lap with the lap immediately following it (the rest)
+    repRests = workLaps.map(function(wl) {
+      var wi = laps.indexOf(wl);
+      var next = wi >= 0 && wi + 1 < laps.length ? laps[wi + 1] : null;
+      // Only use as rest if it's notably shorter than the work lap
+      return (next && next.time < wl.time * 0.75) ? next : null;
+    });
+  } else {
+    var threshold = avgS * 0.92;
+    workLaps = laps.filter(function(l) { return l.dist >= 0.2 && l.pace && paceToSecs(l.pace) < threshold; });
+    repRests = workLaps.map(function() { return null; });
+  }
+
+  if (workLaps && workLaps.length >= 2) {
+    var reps = workLaps.map(function(l, i) {
       var ps = paceToSecs(l.pace);
-      return { num: i + 1, time: secsToTimeMS(l.time), timeSecs: l.time, paceSecs: ps, pace: l.pace, distanceKm: l.dist.toFixed(2), isFromDesc: false };
+      var rest = repRests[i];
+      return {
+        num: i + 1, time: secsToTimeMS(l.time), timeSecs: l.time,
+        paceSecs: ps, pace: l.pace, distanceKm: l.dist.toFixed(2),
+        hr: l.hr, isFromDesc: false,
+        restLap: rest ? { time: rest.time, pace: rest.pace, dist: rest.dist, hr: rest.hr } : null,
+      };
     });
     var fastestPs = Math.min.apply(null, reps.map(function(r) { return r.paceSecs; }));
-    iv.repData = { reps: reps, repDist: fastLaps[0].dist, repLabel: fastLaps.length + ' reps', intervalType: 'distance' };
+    iv.repData = { reps: reps, repDist: workLaps[0].dist, repLabel: workLaps.length + ' reps', intervalType: iv.repInfo && iv.repInfo.intervalType === 'time' ? 'time' : 'distance' };
     iv.best = secsToTimeMS(Math.round(fastestPs));
     iv.repSource = 'strava';
   }
@@ -6036,7 +6059,7 @@ function renderLogEntry(key) {
   if (entry.pace) parts.push('<span class="mb-logged-val">' + entry.pace + '/km</span>');
   if (entry.rpe)  parts.push('RPE <span class="mb-logged-val">' + entry.rpe + '</span>');
   if (entry.notes) parts.push('<span class="mb-logged-note">' + entry.notes + '</span>');
-  return '<div class="mb-logged-entry" data-logkey="' + key + '">' + parts.join(' · ') + '</div>';
+  return '<div class="mb-logged-entry" data-logkey="' + key + '">' + parts.join(' \u00b7 ') + '<button class="mb-log-delete" data-deletekey="' + key + '" title="Delete">\u2715</button></div>';
 }
 
 // Render log form
@@ -6069,7 +6092,12 @@ function renderMarathonBlock() {
         // Count logged sessions for progress
         var loggedCount = w.sessions.filter(function(s){ return mbLogs[w.id + '_' + s.id]; }).length;
         var totalLoggable = w.sessions.length;
+        var weekLoggedKm = w.sessions.reduce(function(sum, s) {
+          var e = mbLogs[w.id + '_' + s.id];
+          return sum + (e && e.km ? parseFloat(e.km) || 0 : 0);
+        }, 0);
         var pct = totalLoggable > 0 ? Math.round(loggedCount / totalLoggable * 100) : 0;
+        var kmTag = weekLoggedKm > 0 ? '<span class="mb-wk-logged-km">' + weekLoggedKm.toFixed(1) + '\u202fkm</span>' : '';
         var progressHtml = '<div class="pw-progress"><div class="pw-progress-fill" style="width:' + pct + '%"></div></div>';
         var sessionsHtml = w.sessions.map(function(s) {
           var logKey = w.id + '_' + s.id;
@@ -6093,7 +6121,7 @@ function renderMarathonBlock() {
         }).join('');
         return '<div class="' + cls + '" data-wid="' + w.id + '">' +
           '<div class="mb-head"><span class="mb-label">' + w.wk + nowBadge + tagBadge + '</span>' +
-          '<span class="mb-vol">' + progressHtml + w.vol + '</span></div>' +
+          '<span class="mb-vol">' + progressHtml + kmTag + w.vol + '</span></div>' +
           '<div class="mb-body">' +
             (w.note ? '<div class="mb-note">' + w.note + '</div>' : '') +
             '<div>' + sessionsHtml + '</div>' +
@@ -7116,6 +7144,19 @@ document.getElementById('pg-plan').addEventListener('click', function(e) {
     if (form) form.classList.remove('open');
     e.stopPropagation(); return;
   }
+  // Delete log entry
+  var delBtn = e.target.closest('[data-deletekey]');
+  if (delBtn) {
+    var key = delBtn.dataset.deletekey;
+    delete mbLogs[key];
+    saveMbLogs();
+    document.getElementById('pg-plan').innerHTML =
+      buildPaceZonesKey() +
+      renderPhase1() +
+      renderMarathonBlock() +
+      '<div class="mb-log-summary"><div class="mb-log-summary-h">Block log \u2014 all sessions</div>' + renderBlockLog() + '</div>';
+    e.stopPropagation(); return;
+  }
 });
 
 
@@ -7523,12 +7564,23 @@ function showRepModal(selectedIds) {
         }
         // For time-based reps, show distance; for distance-based, show time
         var repDisplay = isTimeInterval ? r.distanceKm + 'km' : r.time;
+        var restHtml = '';
+        if (r.restLap) {
+          var rl = r.restLap;
+          var restTimeStr = rl.time ? Math.floor(rl.time/60) + ':' + (rl.time%60<10?'0':'') + (rl.time%60) : '';
+          restHtml = '<div class="rep-rest-row">' +
+            '<div class="rep-rest-label">rec</div>' +
+            '<div></div>' +
+            '<div class="rep-time" style="opacity:.55">' + restTimeStr + 's' + (rl.dist ? ' / ' + rl.dist.toFixed(2) + 'km' : '') + '</div>' +
+            '<div class="rep-pace" style="opacity:.55">' + (rl.pace || '') + '</div>' +
+          '</div>';
+        }
         sessionHtml += '<div class="rep-row">' +
           '<div class="rep-num">R' + (ri+1) + '</div>' +
           '<div class="rep-bar-wrap"><div class="rep-bar" style="width:' + barWidth + '%;background:' + (isFastest ? 'var(--grn)' : isSlowest ? 'var(--org)' : 'var(--grd1)') + '"></div></div>' +
-          '<div class="rep-time">' + repDisplay + '</div>' +
+          '<div class="rep-time">' + repDisplay + (r.hr ? '<span style="font-size:10px;opacity:.5;margin-left:4px">' + Math.round(r.hr) + 'bpm</span>' : '') + '</div>' +
           '<div class="rep-pace">' + r.pace + '</div>' +
-          '</div>';
+          '</div>' + restHtml;
       });
 
       if (isTimeInterval) {
