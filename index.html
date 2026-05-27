@@ -430,6 +430,61 @@ body{font-family:'Geist',system-ui,-apple-system,sans-serif;color:var(--t1);back
 .pd-chk:hover{border-color:var(--grn)}.pd-chk.done{background:var(--grn);border-color:var(--grn)}
 .pd-chk.done::after{content:'';display:block;width:6px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);margin-top:-2px}
 
+
+/* PACE ZONES KEY */
+.pz-key{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:16px 18px;margin-bottom:20px}
+.pz-key-title{font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:10px}
+.pz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px}
+.pz-zone{border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:2px}
+.pz-zone-name{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.pz-zone-pace{font-family:'Geist Mono',monospace;font-size:13px;font-weight:700}
+.pz-zone-sub{font-size:10px;color:var(--t3)}
+/* MB WEEK CARDS */
+.mb-week{background:var(--card);border:1px solid var(--bdr);border-radius:12px;margin-bottom:8px;overflow:hidden;transition:all .2s}
+.mb-week:hover{border-color:var(--bdr2)}
+.mb-week.mb-past{opacity:.5}.mb-week.mb-past:hover{opacity:.75}
+.mb-week.mb-current{border-left:4px solid var(--grn);box-shadow:0 0 0 1px var(--grn),var(--shadowL)}
+.mb-head{padding:14px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;-webkit-user-select:none;user-select:none}
+.mb-label{font-size:14px;font-weight:700}
+.mb-vol{font-family:'Geist Mono';font-size:13px;font-weight:700;color:var(--grn);display:flex;align-items:center;gap:10px}
+.mb-body{display:none;padding:0 20px 16px;border-top:1px solid var(--bdr)}
+.mb-week.open .mb-body{display:block}
+.mb-note{background:var(--bg2);border-left:3px solid var(--grn);padding:8px 12px;font-size:12px;color:var(--t2);border-radius:0 6px 6px 0;margin:12px 0 8px;line-height:1.5}
+.mb-sess{display:grid;grid-template-columns:52px 1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid var(--bdr);font-size:13px;align-items:start}
+.mb-sess:last-child{border:none}
+.mb-sess-day{font-weight:800;font-size:10px;text-transform:uppercase;color:var(--t3);padding-top:4px;line-height:1.4}
+.mb-sess-day.flex-day{color:var(--org)}
+.mb-sess-main{display:flex;flex-direction:column;gap:4px}
+.mb-sess-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mb-sess-desc{color:var(--t2);font-size:12px;line-height:1.6;margin-top:2px}
+.mb-flex-badge{font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;background:var(--orgGlow);color:var(--org);padding:2px 7px;border-radius:4px;border:1px solid rgba(245,158,66,.2)}
+.mb-club-badge{font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;background:var(--bluGlow);color:var(--blu);padding:2px 7px;border-radius:4px;border:1px solid rgba(78,159,255,.15)}
+.mb-rpe{font-size:10px;font-weight:700;font-family:'Geist Mono';color:var(--t3)}
+.mb-log-btn{font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;background:var(--bg2);border:1px solid var(--bdr2);color:var(--t2);cursor:pointer;white-space:nowrap;transition:all .15s}
+.mb-log-btn:hover{background:var(--card2);color:var(--t1)}
+.mb-log-btn.logged{background:var(--grnSoft);color:var(--grn);border-color:rgba(34,201,122,.3)}
+.mb-log-form{background:var(--bg2);border-radius:8px;padding:12px;margin-top:8px;display:none}
+.mb-log-form.open{display:block}
+.mb-log-row{display:grid;grid-template-columns:1fr 1fr 1fr 60px;gap:8px;margin-bottom:8px}
+.mb-log-field{display:flex;flex-direction:column;gap:3px}
+.mb-log-label{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
+.mb-log-input{background:var(--card);border:1px solid var(--bdr2);border-radius:6px;padding:6px 8px;font-size:12px;color:var(--t1);font-family:inherit;width:100%;box-sizing:border-box}
+.mb-log-input:focus{outline:none;border-color:var(--grn)}
+.mb-log-notes{width:100%;margin-bottom:8px}
+.mb-log-save{background:var(--grn);color:#fff;border:none;border-radius:6px;padding:6px 16px;font-size:12px;font-weight:700;cursor:pointer}
+.mb-log-cancel{background:transparent;border:1px solid var(--bdr2);border-radius:6px;padding:6px 12px;font-size:12px;color:var(--t2);cursor:pointer;margin-left:6px}
+.mb-logged-entry{background:var(--grnSoft);border-radius:6px;padding:6px 10px;margin-top:6px;font-size:11px;color:var(--grn);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.mb-logged-val{font-family:'Geist Mono';font-weight:700}
+.mb-logged-note{color:var(--t2);font-style:italic}
+/* BLOCK LOG SUMMARY */
+.mb-log-summary{margin-top:24px}
+.mb-log-summary-h{font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:12px}
+.mb-log-table{width:100%;border-collapse:collapse;font-size:12px}
+.mb-log-table th{text-align:left;padding:6px 10px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);border-bottom:2px solid var(--bdr)}
+.mb-log-table td{padding:7px 10px;border-bottom:1px solid var(--bdr);color:var(--t2)}
+.mb-log-table td:first-child{color:var(--t1);font-weight:600}
+.mb-log-table td .mono{font-family:'Geist Mono';color:var(--grn)}
+
 /* STREAK & CONSISTENCY */
 .streak-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
 .streak-card{background:var(--card);border:1px solid var(--bdr);border-radius:12px;padding:16px 18px;text-align:center}
@@ -2324,34 +2379,284 @@ var plan = [
     {wk:'Week 7 (May 12\u201318)',vol:'45 km',days:[{d:'Mon',t:'Rest',c:'tr2',desc:''},{d:'Tue',t:'Club',c:'tq',desc:'Club intervals'},{d:'Wed',t:'Easy',c:'te',desc:'Easy 8km'},{d:'Thu',t:'Tempo',c:'tq',desc:'10km w/ 6km @ 4:40/km'},{d:'Fri',t:'Strength',c:'tr2',desc:'Strength'},{d:'Sat',t:'Easy',c:'te',desc:'Easy 5km'},{d:'Sun',t:'Long run',c:'tl',desc:'18km @ 5:35-5:45'}]},
     {wk:'Week 8 (May 19\u201325) - 5K RACE',vol:'38 km',days:[{d:'Mon',t:'Rest',c:'tr2',desc:''},{d:'Tue',t:'Club',c:'tq',desc:'Club intervals - keep sharp'},{d:'Wed',t:'Easy',c:'te',desc:'Easy 6km'},{d:'Thu',t:'Easy',c:'te',desc:'Easy 5km + strides'},{d:'Fri',t:'Rest',c:'tr2',desc:'Full rest'},{d:'Sat',t:'RACE',c:'tx',desc:'\u{1F3C6} Carrera a Marta 5K'},{d:'Sun',t:'Long run',c:'tl',desc:'14km easy'}]},
     {wk:'Week 9 (May 26\u2013Jun 1)',vol:'45 km',days:[{d:'Mon',t:'Rest',c:'tr2',desc:''},{d:'Tue',t:'Club',c:'tq',desc:'Club intervals'},{d:'Wed',t:'Easy',c:'te',desc:'Easy 8km'},{d:'Thu',t:'Tempo',c:'tq',desc:'10km w/ 5km @ 4:35/km'},{d:'Fri',t:'Strength',c:'tr2',desc:'Strength'},{d:'Sat',t:'Easy',c:'te',desc:'Easy 6km + strides'},{d:'Sun',t:'Long run',c:'tl',desc:'18km @ 5:35-5:45'}]},
-  ]},
-  {phase:'base-m',label:'Marathon Block - Base (Jun 2\u2013Jun 28)',cls:'base',weeks:[
-    {wk:'MB W1 (Jun 2\u20138)',vol:'45 km',days:[{d:'Mon',t:'Gym',c:'ts',desc:'20min easy (5:40) + gym (squats/hip thrusts/lunges 3x10) + core'},{d:'Tue',t:'Club',c:'tq',desc:'20min easy + multisaltos + 5x20s progresivos (5:00/km) rec 1min + core + mobility'},{d:'Wed',t:'Gym',c:'ts',desc:'20min easy (5:40) + gym + core'},{d:'Thu',t:'Club',c:'tq',desc:'20min easy + 8x short hills (8-12s) rec 1min + 3x30s progresivos + 20min easy + core'},{d:'Fri',t:'Rest',c:'tr2',desc:''},{d:'Sat',t:'Gradas',c:'te',desc:'45min easy + 4x3min gradas rec 2min + 10min easy + mobility'},{d:'Sun',t:'Long run',c:'tl',desc:'50min easy (5:40) on undulating terrain + core'}]},
-    {wk:'MB W2 (Jun 9\u201315)',vol:'48 km',days:[{d:'Mon',t:'Gym',c:'ts',desc:'20min easy + gym (3x10) + core + rope'},{d:'Tue',t:'Club',c:'tq',desc:'20min easy + fartlek 2x6x20s steady (5:00) rec 1min/2min + 4x3min gradas + 20min easy (5:30) + core'},{d:'Wed',t:'Gym',c:'ts',desc:'20min easy + gym + core + rope'},{d:'Thu',t:'Club',c:'tq',desc:'20min easy + 10x short hills (8-12s) rec 1min + 10min easy (5:30) + core'},{d:'Fri',t:'Rest',c:'tr2',desc:''},{d:'Sat',t:'Easy',c:'te',desc:'40min easy (5:40) + multisaltos + core'},{d:'Sun',t:'Long run',c:'tl',desc:'55min easy (5:40) on undulating terrain + core'}]},
-    {wk:'MB W3 (Jun 16\u201322) - HOLIDAY',vol:'15 km',days:[{d:'Mon',t:'Rest',c:'tr2',desc:'Travel/rest'},{d:'Tue',t:'Easy',c:'te',desc:'35-40min easy (5:40-5:50) wherever you are'},{d:'Wed',t:'Rest',c:'tr2',desc:'Rest'},{d:'Thu',t:'Rest',c:'tr2',desc:'Rest'},{d:'Fri',t:'Easy',c:'te',desc:'40-45min easy (5:40-5:50)'},{d:'Sat',t:'Rest',c:'tr2',desc:'Rest'},{d:'Sun',t:'Rest',c:'tr2',desc:'Rest/travel home'}]},
-    {wk:'MB W4 (Jun 23\u201329) - RE-ENTRY',vol:'44 km',days:[{d:'Mon',t:'Gym',c:'ts',desc:'20min easy + gym (3x10) + core + rope. Re-entry week - keep everything controlled.'},{d:'Tue',t:'Club',c:'tq',desc:'20min easy + multisaltos + 6x1min steady (5:00) rec 1min jog + 10min easy. Reduced from W2 - legs need re-waking, not punishing.'},{d:'Wed',t:'Gym',c:'ts',desc:'20min easy + gym + core'},{d:'Thu',t:'Club',c:'tq',desc:'20min easy + multisaltos + 5x4min steady (5:05) rec 2min jog + core. Do not chase W2 numbers today.'},{d:'Fri',t:'Rest',c:'tr2',desc:''},{d:'Sat',t:'Steady',c:'te',desc:'20min easy + 2x15min steady (5:05) rec 2min jog + 5min easy + mobility'},{d:'Sun',t:'Long run',c:'tl',desc:'55min easy (5:40-5:50) + core. First gut training run: 1 gel at 30min with water. Note response.'}]},
-  ]},
-  {phase:'threshold',label:'Marathon Block - Threshold (Jun 30\u2013Jul 27)',cls:'threshold',weeks:[
-    {wk:'MB W5 (Jun 30\u2013Jul 6)',vol:'55 km',days:[{d:'Mon',t:'Gym',c:'ts',desc:'20min easy + gym (3x10 + vert jumps 3x4) + core'},{d:'Tue',t:'Club',c:'tq',desc:'20min easy + multisaltos + 40min steady (5:05) + mobility. Keep HR stable.'},{d:'Wed',t:'Gym',c:'ts',desc:'20min easy + gym + core'},{d:'Thu',t:'Club',c:'tq',desc:'20min easy + multisaltos + 2x20s prog + 30min at MP (4:55) + 10min easy + core'},{d:'Fri',t:'Rest',c:'tr2',desc:''},{d:'Sat',t:'Gradas',c:'te',desc:'20min easy + 4x4min gradas rec 2min + 40min easy (5:30) + core'},{d:'Sun',t:'Long run',c:'tl',desc:'1h30 easy (5:40). GUT TRAINING: 2 gels at 30min and 60min, water only alongside (not isotonic). Note brand and stomach response - this is your gel lab. Target 50-60g carbs/hr.'}]},
-    {wk:'MB W6 (Jul 7\u201313)',vol:'55 km',days:[{d:'Mon',t:'Gym',c:'ts',desc:'20min easy + gym (3x10) + core'},{d:'Tue',t:'Club',c:'tq',desc:'20min easy + multisaltos + 2x100m prog + 5x3min at I pace (3:55) rec 3min jog + 20min easy + core'},{d:'Wed',t:'Gym',c:'ts',desc:'20min easy + gym + core'},{d:'Thu',t:'Club',c:'tq',desc:'20min easy + multisaltos + 40min steady (5:05) + mobility'},{d:'Fri',t:'Rest',c:'tr2',desc:''},{d:'Sat',t:'Steady',c:'te',desc:'65min easy/steady (5:10-5:15) + core'},{d:'Sun',t:'Long run',c:'tl',desc:'1h45 easy (5:40). GUT TRAINING: 3 gels at 30/60/90min, water only. If MB W5 caused issues, try a different brand today (Maurten or SiS isotonic). Log the result.'}]},
-    {wk:'MB W7 (Jul 14\u201320)',vol:'58 km',days:[{d:'Mon',t:'Gym',c:'ts',desc:'20min easy + gym (3x8 + vert jumps 3x5) + core'},{d:'Tue',t:'Club',c:'tq',desc:'20min easy + multisaltos + 2x100m prog + 6x3min at I pace (3:55) rec 3min jog + 10min easy + core'},{d:'Wed',t:'Gym',c:'ts',desc:'20min easy + gym + core'},{d:'Thu',t:'Club',c:'tq',desc:'20min easy + multisaltos + 40min steady (5:05) + 20min mobility'},{d:'Fri',t:'Rest',c:'tr2',desc:''},{d:'Sat',t:'Steady',c:'te',desc:'65min easy/steady (5:10-5:15) + core'},{d:'Sun',t:'Long run',c:'tl',desc:'1h50 easy (5:40). GUT TRAINING: 3 gels at 30/60/90min with your chosen brand from W5-W6. Gut should be adapting now. Chase 60g carbs/hr.'}]},
-    {wk:'MB W8 (Jul 21\u201327) - DELOAD',vol:'45 km',days:[{d:'Mon',t:'Gym',c:'ts',desc:'20min easy + gym (3x8) + core'},{d:'Tue',t:'Club',c:'tq',desc:'20min easy + multisaltos + 2x20s prog + 5x3min at I pace (3:55) rec 3min + core. Short & sharp.'},{d:'Wed',t:'Gym',c:'ts',desc:'20min easy + gym + core'},{d:'Thu',t:'Easy',c:'te',desc:'50min easy/steady (5:25-5:35) + mobility'},{d:'Fri',t:'Rest',c:'tr2',desc:'Legs up before weekend'},{d:'Sat',t:'15K Race?',c:'tx',desc:'If 15K race: run progressive (5K steady + 5K MP + 5K hard). If no race: 4x5min at tempo (4:30) rec 5min jog'},{d:'Sun',t:'Long run',c:'tl',desc:'If raced Sat, afternoon: 1h10 very easy (5:45). If no race: 1h30 easy.'}]},
-  ]},
-  {phase:'specificity',label:'Marathon Block - Specificity (Jul 28\u2013Aug 24)',cls:'specificity',weeks:[
-    {wk:'MB W9 (Jul 28\u2013Aug 3)',vol:'60 km',days:[{d:'Mon',t:'Gym',c:'ts',desc:'20min easy + gym (3x7 + vert jumps 3x6) + core'},{d:'Tue',t:'Club',c:'tq',desc:'20min easy + multisaltos + 2x20s prog + 2x15min at MP (4:55) rec 3min jog + 10min easy + core'},{d:'Wed',t:'Gym',c:'ts',desc:'20min easy + gym + core'},{d:'Thu',t:'Club',c:'te',desc:'60min easy (5:35) + core + mobility. Keep easy even if club pushes pace.'},{d:'Fri',t:'Rest',c:'tr2',desc:''},{d:'Sat',t:'Steady',c:'te',desc:'20min easy + 40min steady (5:05) + core'},{d:'Sun',t:'Long run',c:'tl',desc:'2h15 easy (5:40) flat terrain. ~24km. GUT TRAINING: 4 gels at 30/60/90/105min with your confirmed gel. Water only alongside. Target 60-70g carbs/hr.'}]},
-    {wk:'MB W10 (Aug 4\u201310)',vol:'63 km',days:[{d:'Mon',t:'Gym',c:'ts',desc:'20min easy + gym (3x7) + core'},{d:'Tue',t:'Club',c:'tq',desc:'20min easy (5:30) + multisaltos + 2x20min at MP (4:55) rec 3min jog + core'},{d:'Wed',t:'Gym',c:'ts',desc:'20min easy + gym + core'},{d:'Thu',t:'Club',c:'tq',desc:'20min easy + multisaltos + 6x20s prog rec 1min + 30min steady (5:05) + mobility'},{d:'Fri',t:'Rest',c:'tr2',desc:''},{d:'Sat',t:'Steady',c:'te',desc:'20min easy + 40min steady (5:05) + core'},{d:'Sun',t:'Long run',c:'tl',desc:'2h20 easy (5:40) flat terrain. ~26km. GUT + CAFFEINE TEST: gels at 30/60min (non-caf), then ☕ CAFFEINATED gel at 90min (simulating km 30 caffeine timing), then non-caf at 120min. Note: any jitteriness, palpitations, or GI change after the caffeinated gel. This is your first race-simulation caffeine test.'}]},
-    {wk:'MB W11 (Aug 11\u201317)',vol:'66 km',days:[{d:'Mon',t:'Gym',c:'ts',desc:'30min easy + gym (3x6 + vert jumps 3x5 w/5kg) + core'},{d:'Tue',t:'Club',c:'tq',desc:'20min easy + multisaltos + 2x20s prog + 6x5min at tempo (4:30) rec 2min jog + 10min easy + core'},{d:'Wed',t:'Gym',c:'ts',desc:'30min easy + gym + core'},{d:'Thu',t:'Club',c:'tq',desc:'20min easy + 3x10min at tempo (4:30) rec 2min jog + 10min easy + core'},{d:'Fri',t:'Rest',c:'tr2',desc:''},{d:'Sat',t:'Progression',c:'te',desc:'1h10 (20min easy 5:40 + 50min steady 5:05) + core'},{d:'Sun',t:'Long run',c:'tl',desc:'2h30 progressive: 30min easy (5:35) + 75min steady (5:05) + 45min MP (4:55). ~28km — your longest ever. GUT + CAFFEINE: gels at 30/60min (non-caf), ☕ caffeinated gel at 90min, non-caf at 120min, ☕ caffeinated at 150min. Two caffeinated gels — exactly as Koln. By the end of this run you will know your caffeine response. Expect discomfort in the final 30min. That is the point.'}]},
-    {wk:'MB W12 (Aug 18\u201324) - DELOAD / HM Race?',vol:'42 km',days:[{d:'Mon',t:'Easy',c:'te',desc:'20min easy (5:30) + core'},{d:'Tue',t:'Club',c:'tq',desc:'20min easy + multisaltos + 2x20s prog + 5x4min at tempo (4:30) rec 2min jog + core'},{d:'Wed',t:'Rest',c:'tr2',desc:'Full rest - legs up'},{d:'Thu',t:'Club',c:'te',desc:'20min easy + multisaltos + 6x20s prog rec 1min + 20min easy + mobility. Easy if HM this weekend.'},{d:'Fri',t:'Rest',c:'tr2',desc:''},{d:'Sat',t:'Shakeout',c:'te',desc:'25min easy (5:30) + 4x100m prog + core'},{d:'Sun',t:'HM Race?',c:'tx',desc:'If HM: target 1:42-1:44 (4:55/km - MP test). If no race: 1h30 easy with last 30min at MP.'}]},
-  ]},
-  {phase:'consolidation',label:'Marathon Block - Consolidation (Aug 25\u2013Sep 14)',cls:'consolidation',weeks:[
-    {wk:'MB W13 (Aug 25\u201331)',vol:'70 km',days:[{d:'Mon',t:'Gym',c:'ts',desc:'30min easy + gym (3x5 + vert jumps 3x5 w/5kg) + core'},{d:'Tue',t:'Club',c:'te',desc:'20min easy (5:30) + 40min steady (5:05) + core'},{d:'Wed',t:'Gym',c:'ts',desc:'20min easy + gym + core'},{d:'Thu',t:'Club',c:'tq',desc:'20min easy + multisaltos + 2x20s prog + 20min MP (4:55) rec 3min + 10min MP (4:55) + 10min easy + core'},{d:'Fri',t:'Rest',c:'tr2',desc:''},{d:'Sat',t:'Progression',c:'te',desc:'1h10 (20min easy 5:15 + 20min steady 5:10 + 30min steady 5:00) + core'},{d:'Sun',t:'Long run',c:'tl',desc:'KEY SESSION: 2h45 flat: 30min easy + 30min steady + 4x20min MP (4:55) rec 5min easy. ~30km. GUT REHEARSAL: use your confirmed race-day gel plan exactly as you will in Koln. Gel at 30/60/90/105/120/135min. Water at every simulated station. This is the defining session of the block.'}]},
-    {wk:'MB W14 (Sep 1\u20137)',vol:'60 km',days:[{d:'Mon',t:'Rest',c:'tr2',desc:'Full rest - recovery from last week\u2019s peak'},{d:'Tue',t:'Club',c:'tq',desc:'20min easy (5:30) + 20min steady (5:00) + 20min MP (4:55) + 10min easy + core'},{d:'Wed',t:'Gym',c:'ts',desc:'20min easy + gym (3x5) + core'},{d:'Thu',t:'Club',c:'tq',desc:'20min easy + multisaltos + 2x20s prog + 5x5min at tempo (4:30) rec 2min jog + core'},{d:'Fri',t:'Rest',c:'tr2',desc:''},{d:'Sat',t:'Steady',c:'te',desc:'1h20 (20min easy 5:15 + 1h steady 5:05) + core'},{d:'Sun',t:'Long run',c:'tl',desc:'KEY SESSION: 1h50 flat: 1h easy (5:35) + 40min MP (4:55) + 10min easy + core. ~21km. GUT TRAINING: maintain gel protocol. Lighter week after W13 - gut should feel fully adapted by now.'}]},
-    {wk:'MB W15 (Sep 8\u201314) - PEAK WEEK',vol:'72 km',days:[{d:'Mon',t:'Rest',c:'tr2',desc:'Full rest'},{d:'Tue',t:'Club',c:'tq',desc:'20min easy + multisaltos + 30min steady (5:05) + 20min MP (5:00) + 4x20s prog + mobility'},{d:'Wed',t:'Gym',c:'ts',desc:'20min easy + gym (3x4) + core'},{d:'Thu',t:'Club',c:'tq',desc:'20min easy + multisaltos + 2x20s prog + 2x20min at tempo (4:30) rec 3min jog + core. Last big effort before taper.'},{d:'Fri',t:'Rest',c:'tr2',desc:''},{d:'Sat',t:'Steady',c:'te',desc:'55min (15min easy 5:15 + 40min steady 5:05) + mobility. Shortened to protect Sunday.'},{d:'Sun',t:'Long run',c:'tl',desc:'PEAK LONG RUN: 2h45 flat: 1h easy (5:35) + 30min steady (5:05) + 1h05 MP (4:55). ~32km. FULL RACE REHEARSAL: exact race-day gel timing (6 gels), exact water intake, run the morning exactly as you plan to run Oct 4. After this session you will know you can do it.'}]},
-  ]},
-  {phase:'taper',label:'Marathon Block - Taper + Race (Sep 15\u2013Oct 4)',cls:'taper',weeks:[
-    {wk:'MB W16 (Sep 15\u201321)',vol:'42 km',days:[{d:'Mon',t:'Rest',c:'tr2',desc:'Full rest'},{d:'Tue',t:'Club',c:'tq',desc:'20min easy + multisaltos + 2x20s prog + 10x2min at tempo (4:30) rec 1min jog + 10min easy + mobility'},{d:'Wed',t:'Light gym',c:'ts',desc:'20min easy + light gym (3x4) + core'},{d:'Thu',t:'Club',c:'tq',desc:'10min easy + multisaltos + 2x20s prog + 20min MP (4:55) rec 3min + 10min easy + mobility. Lock in pace feel.'},{d:'Fri',t:'Rest',c:'tr2',desc:''},{d:'Sat',t:'Easy',c:'te',desc:'50min (20min easy 5:15 + 30min steady 5:10) + core'},{d:'Sun',t:'Last long',c:'tl',desc:'1h easy (5:30) + 30min MP (4:55) + core. Trust the training.'}]},
-    {wk:'RACE WEEK (Sep 22\u2013Oct 4)',vol:'20 km + race',days:[{d:'Mon',t:'Easy',c:'te',desc:'30min walk or very easy jog (5:30) + mobility'},{d:'Tue',t:'Activation',c:'tq',desc:'30min easy (5:30) + 10min MP (4:55) + 5x20s prog + mobility. Just a feel-good reminder.'},{d:'Wed',t:'Easy',c:'te',desc:'30min walk or very easy jog + mobility'},{d:'Thu',t:'Activation',c:'te',desc:'35min easy (5:30) + 5x20s prog + mobility. Last run before race.'},{d:'Fri',t:'Rest',c:'tr2',desc:'Full rest. Prepare kit, pin bib, lay everything out. Early night.'},{d:'Sat',t:'Shakeout',c:'te',desc:'20min easy + 4x100m prog. Hydrate, carb load, sleep early.'},{d:'Sun',t:'MARATHON',c:'tx',desc:'K\u00D6LN MARATHON - Target 3:28-3:30. Start 4:58, settle 4:55. Gel every 30min. Trust the work.'}]},
-  ]},
+  ]}
+];
+
+// ===== PACE ZONES =====
+var PACE_ZONES = [
+  {id:'E',  name:'Easy',      pace:'5:35–5:50', hr:'<145',   rpe:'2–3', bg:'var(--bluGlow)',   fg:'var(--blu)'},
+  {id:'LT1',name:'LT1',       pace:'4:48–5:05', hr:'152–163',rpe:'4',   bg:'rgba(34,201,122,.08)', fg:'var(--grn)'},
+  {id:'MP', name:'Mara pace', pace:'4:55',       hr:'163–172',rpe:'6',   bg:'var(--orgGlow)',   fg:'var(--org)'},
+  {id:'T',  name:'Tempo',     pace:'4:28–4:38', hr:'168–175',rpe:'6–7', bg:'rgba(106,78,200,.08)',fg:'var(--prp)'},
+  {id:'LT2',name:'Threshold', pace:'4:10–4:22', hr:'175–180',rpe:'7–8', bg:'var(--redGlow)',   fg:'var(--red)'},
+  {id:'I',  name:'Interval',  pace:'3:52–4:00', hr:'183–193',rpe:'8–9', bg:'var(--grnSoft)',   fg:'var(--grn)'},
+  {id:'R',  name:'Reps',      pace:'3:38–3:46', hr:'max',    rpe:'9–10',bg:'var(--card2)',     fg:'var(--t1)'},
+];
+
+// ===== MARATHON BLOCK PLAN =====
+// Each week: anchors (Tue club, Thu club, Sun long run) + flex (Mon/Fri/Sat quality) + wed + note
+// Sessions: id, day, t (label), c (badge class), rpe, desc, flex (bool), club (bool)
+var planMB = [
+ {phase:'base-m',label:'Marathon Block – Base (Jun 2–Jun 28)',cls:'base',pnote:'First four weeks establish the rhythm. The holiday week is a free pass. The only sessions that matter in this phase are the Sunday long runs — get those done and everything else is a bonus. Gut training starts in week 1: every long run over 45min takes a gel.',weeks:[
+  {id:'mbw1',wk:'MB W1 (Jun 2–8)',vol:'~50km',tag:'',
+   note:'First week of the marathon block. Let the club sessions settle before pushing quality on Monday. This week is about establishing pattern, not breaking records.',
+   sessions:[
+    {id:'flex',day:'Mon / Fri / Sat',t:'Quality',c:'tq',rpe:'4',flex:true,club:false,
+     desc:'8.5km. WU: 1.5km easy (5:40). Main: 3\xd710min @ LT1 (4:55–5:05/km), 2min easy jog rec. CD: 1.5km easy. Controlled effort — you should be able to manage short sentences during LT1 sections. HR target 152–163.'},
+    {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'wed',day:'Wed',t:'Easy / Gym',c:'te',rpe:'3',flex:false,club:false,
+     desc:'7km easy @ 5:40–5:50/km. Or gym + 20min easy. HR <145.'},
+    {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'3',flex:false,club:false,
+     desc:'60min easy @ 5:40–5:50/km. ~10.5km. HR <145. GEL TEST: 1 gel at 30min, water only. Note brand, flavour, and stomach response. This is the start of your gut-training protocol — every long run from here takes gels.'},
+   ]},
+  {id:'mbw2',wk:'MB W2 (Jun 9–15)',vol:'~53km',tag:'',
+   note:'Add a rep to Monday. The long run extends to 70min — first run where two gels are needed.',
+   sessions:[
+    {id:'flex',day:'Mon / Fri / Sat',t:'Quality',c:'tq',rpe:'4–5',flex:true,club:false,
+     desc:'10km. WU: 2km easy. Main: 4\xd710min @ LT1 (4:55–5:05/km), 90s easy jog rec. CD: 2km easy. RPE should feel like a 4–5 — not comfortable but not hard. Stay honest on recovery jogs, don’t let them drift to walking pace.'},
+    {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'wed',day:'Wed',t:'Easy / Gym',c:'te',rpe:'3',flex:false,club:false,
+     desc:'7km easy @ 5:40–5:50/km. Or gym + 20min easy.'},
+    {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'3',flex:false,club:false,
+     desc:'70min easy @ 5:40–5:50/km. ~12.5km. GUT: 2 gels (30min, 60min), water only. If W1 gel worked, use same brand. If not, try a different one today. Lock this in before W5.'},
+   ]},
+  {id:'mbw3',wk:'MB W3 (Jun 16–22) – HOLIDAY',vol:'~10km',tag:'HOLIDAY',
+   note:'Free week. No structure, no pressure. 10km across the week if you can — 2 easy runs of 4–5km each, 5:40+ pace. Run in the morning or evening to avoid heat. Showing up to W4 healthy and rested is the only goal.',
+   sessions:[
+    {id:'easy1',day:'Tue or Wed',t:'Easy',c:'te',rpe:'2–3',flex:true,club:false,
+     desc:'4–5km very easy @ 5:45–6:00/km wherever you are. Run by feel.'},
+    {id:'easy2',day:'Fri or Sat',t:'Easy',c:'te',rpe:'2–3',flex:true,club:false,
+     desc:'4–5km very easy @ 5:45–6:00/km. Stay loose.'},
+   ]},
+  {id:'mbw4',wk:'MB W4 (Jun 23–29) – RE-ENTRY',vol:'~50km',tag:'RE-ENTRY',
+   note:'Back from holiday. Legs need re-waking, not punishing. Monday is easy — no quality. The long run is the anchor for the week.',
+   sessions:[
+    {id:'flex',day:'Mon / Fri / Sat',t:'Easy + strides',c:'te',rpe:'3',flex:true,club:false,
+     desc:'50min easy @ 5:40–5:50/km. ~8.5km. At the end: 4\xd720s strides (build to 4:10/km, walk back). No quality work this week — legs need a gentle re-awakening after holiday.'},
+    {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after. Tell Fernando it’s re-entry week if he asks.'},
+    {id:'wed',day:'Wed',t:'Easy / Gym',c:'te',rpe:'3',flex:false,club:false,
+     desc:'7km easy @ 5:40–5:50/km. Or gym + 20min easy.'},
+    {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'3',flex:false,club:false,
+     desc:'60min easy @ 5:40–5:50/km. ~10.5km. GUT: 1 gel at 30min. Re-establish the protocol.'},
+   ]},
+ ]},
+ {phase:'threshold',label:'Marathon Block – Threshold (Jun 30–Jul 27)',cls:'threshold',pnote:'Four weeks of proper quality. Monday becomes a real session. Long runs extend to 100min with gut training continuing weekly. The deload in W8 is not optional — legs need it before the specificity block.',weeks:[
+  {id:'mbw5',wk:'MB W5 (Jun 30–Jul 6)',vol:'~58km',tag:'',
+   note:'First proper threshold Monday. 5 reps at T-pace. If 4:28 feels impossible, run 4:35–4:38 for all reps — do not chase splits at the cost of form.',
+   sessions:[
+    {id:'flex',day:'Mon / Fri / Sat',t:'T-pace intervals',c:'tq',rpe:'7',flex:true,club:false,
+     desc:'11km. WU: 2km easy. Main: 5\xd78min @ T pace (4:28–4:38/km), 90s standing rec. CD: 2km easy. Should feel controlled but uncomfortable. HR 168–175. If HR isn’t recovering below 165 in 90s by rep 3–4, reduce reps to 4.'},
+    {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'wed',day:'Wed',t:'Easy / Gym',c:'te',rpe:'3',flex:false,club:false,
+     desc:'8km easy @ 5:40–5:50/km. Or gym + 20min easy.'},
+    {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'3–4',flex:false,club:false,
+     desc:'80min easy @ 5:40–5:50/km. ~14km. GUT: 2 gels (30/60min). First proper long run of the threshold block. Run this strictly easy — save the effort for Monday.'},
+   ]},
+  {id:'mbw6',wk:'MB W6 (Jul 7–13)',vol:'~60km',tag:'',
+   note:'MP blocks added to Monday alongside threshold. This combination starts training your body to recognise marathon race effort.',
+   sessions:[
+    {id:'flex',day:'Mon / Fri / Sat',t:'MP + Threshold',c:'tq',rpe:'6–7',flex:true,club:false,
+     desc:'12km. WU: 2km easy. Main: 20min @ MP (4:55/km), 3min easy jog, then 15min @ T (4:28–4:38/km). CD: 2km easy. Notice how MP feels almost comfortable compared to T-pace. That’s the point. HR 163–172 on MP section, 168–175 on T section.'},
+    {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'wed',day:'Wed',t:'Easy / Gym',c:'te',rpe:'3',flex:false,club:false,
+     desc:'8km easy @ 5:40–5:50/km. Or gym + 20min easy.'},
+    {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'4',flex:false,club:false,
+     desc:'90min easy @ 5:40–5:50/km. ~16km. GUT: 3 gels (30/60/90min). First run long enough to replicate the volume of gels needed for the first half of Cologne.'},
+   ]},
+  {id:'mbw7',wk:'MB W7 (Jul 14–20)',vol:'~63km',tag:'',
+   note:'Hardest Monday of the threshold block. Six T-pace reps is full threshold stimulation. Expect discomfort from rep 4.',
+   sessions:[
+    {id:'flex',day:'Mon / Fri / Sat',t:'T-pace intervals',c:'tq',rpe:'7–8',flex:true,club:false,
+     desc:'13km. WU: 2km easy. Main: 6\xd78min @ T pace (4:28–4:38/km), 90s standing rec. CD: 2km easy. This is the biggest threshold session in the block. If HR isn’t recovering below 165bpm in 90s by rep 4–5, stop at 5 reps. Form matters more than the 6th rep.'},
+    {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'wed',day:'Wed',t:'Easy / Gym',c:'te',rpe:'3',flex:false,club:false,
+     desc:'8km easy @ 5:40–5:50/km. Or gym + 20min easy.'},
+    {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'4',flex:false,club:false,
+     desc:'100min easy @ 5:40–5:50/km. ~17.5km. GUT: 3 gels (30/60/90min). Same brand as W6 — gut should be adapting now. If no issues two weeks running, that’s your race gel.'},
+   ]},
+  {id:'mbw8',wk:'MB W8 (Jul 21–27) – DELOAD',vol:'~45km',tag:'DELOAD',
+   note:'The deload is not optional. Legs need this before the specificity block. Monday is easy. Long run is short. If there is a 15K race this weekend, treat Sunday as a race.',
+   sessions:[
+    {id:'flex',day:'Mon / Fri / Sat',t:'Easy + strides',c:'te',rpe:'3',flex:true,club:false,
+     desc:'45min easy @ 5:40/km + 5\xd720s strides at end. ~8.5km. No quality — this is a reset week. Legs should feel fresh. Use that energy for the long run.'},
+    {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'wed',day:'Wed',t:'Easy / Gym',c:'te',rpe:'2–3',flex:false,club:false,
+     desc:'6km easy @ 5:40–5:50/km. Or gym + short easy run.'},
+    {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'3',flex:false,club:false,
+     desc:'70min easy @ 5:40–5:50/km. ~12km. If 15K race: race it (progressive: 5K steady, 5K MP, 5K hard). GUT: 2 gels (30/60min) — maintain the habit even on a short week.'},
+   ]},
+ ]},
+ {phase:'specificity',label:'Marathon Block – Specificity (Jul 28–Aug 24)',cls:'specificity',pnote:'Long runs get serious. MP work appears in both Monday and Sunday sessions. Every Sunday from W9 is a significant training stimulus. Gut and caffeine protocols are tested here — W11 is the first double-caffeine-gel run, exactly as race day.',weeks:[
+  {id:'mbw9',wk:'MB W9 (Jul 28–Aug 3)',vol:'~62km',tag:'',
+   note:'Back into quality after deload. Longer reps on Monday (12min vs 8min). Sunday adds a 30min MP block after 80min easy — first taste of running MP on tired legs.',
+   sessions:[
+    {id:'flex',day:'Mon / Fri / Sat',t:'T-pace long reps',c:'tq',rpe:'7',flex:true,club:false,
+     desc:'13km. WU: 2km easy. Main: 3\xd712min @ T pace (4:28–4:38/km), 2min easy jog rec. CD: 3km easy. Focus on holding form in the final 4min of each rep — that’s when these reps do the work. HR 168–175.'},
+    {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'wed',day:'Wed',t:'Easy / Gym',c:'te',rpe:'3',flex:false,club:false,
+     desc:'8km easy @ 5:40–5:50/km. Or gym + 20min easy.'},
+    {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'5–6',flex:false,club:false,
+     desc:'110min. 80min easy @ 5:40 then 30min @ MP (4:55/km). ~20km. GUT: 4 gels (30/60/90/105min). Notice how MP feels after 80min easy — HR will be 163–172, effort should feel like a 6. That’s your marathon effort.'},
+   ]},
+  {id:'mbw10',wk:'MB W10 (Aug 4–10)',vol:'~65km',tag:'',
+   note:'Double MP blocks on Monday. Long run extends to 125min with caffeine gel test. The caffeine simulation is critical — log how you feel precisely.',
+   sessions:[
+    {id:'flex',day:'Mon / Fri / Sat',t:'Double MP blocks',c:'tq',rpe:'6–7',flex:true,club:false,
+     desc:'13.5km. WU: 2km easy. Main: 2\xd7(20min @ MP 4:55/km, 5min easy jog). CD: 3km easy. Monitor HR — if above 175 in the first 20min block you’re working too hard. Both blocks should feel the same. Target HR 163–172 throughout.'},
+    {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'wed',day:'Wed',t:'Easy / Gym',c:'te',rpe:'3',flex:false,club:false,
+     desc:'8km easy @ 5:40–5:50/km. Or gym + 20min easy.'},
+    {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'6',flex:false,club:false,
+     desc:'125min. 90min easy @ 5:40 then 35min @ MP (4:55). ~22.5km. GUT + CAFFEINE TEST: gels at 30/60min (non-caf), caffeinated gel at 90min, non-caf at 120min. First caffeine gel in training. Note any jitteriness, palpitations, or GI change in the final 35min. Log it precisely — this data shapes your race-day plan.'},
+   ]},
+  {id:'mbw11',wk:'MB W11 (Aug 11–17)',vol:'~68km',tag:'',
+   note:'Hardest week of the specificity block. 40 total minutes at T-pace on Monday. Sunday is 140min with a 50min MP finale and full double-caffeine protocol — exactly as Cologne.',
+   sessions:[
+    {id:'flex',day:'Mon / Fri / Sat',t:'T-pace high vol',c:'tq',rpe:'7–8',flex:true,club:false,
+     desc:'14km. WU: 2km easy. Main: 4\xd710min @ T pace (4:28–4:38/km), 2min easy jog rec. CD: 4km easy. 40 total minutes at threshold. Expect it to hurt from rep 3. That’s the adaptation stimulus. HR 168–175.'},
+    {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'wed',day:'Wed',t:'Easy / Gym',c:'te',rpe:'3',flex:false,club:false,
+     desc:'8km easy @ 5:40–5:50/km. Or gym + 20min easy.'},
+    {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'7–8',flex:false,club:false,
+     desc:'140min. 30min easy (5:40) → 50min @ LT1 (4:55–5:05) → 50min @ MP (4:55) → 10min easy. ~26km. GUT + CAFFEINE: gels at 30/60min (non-caf), caffeinated at 90min, non-caf at 120min, caffeinated at 150min. Two caffeinated gels — exactly as Cologne. By the end of this run you will know your caffeine response. Expect discomfort in the final 30min. That is the point.'},
+   ]},
+  {id:'mbw12',wk:'MB W12 (Aug 18–24) – DELOAD / HM?',vol:'~42km',tag:'DELOAD',
+   note:'Deload before the consolidation peak. If there is a half marathon race this weekend, this is your MP dress rehearsal. Target 1:42–1:44.',
+   sessions:[
+    {id:'flex',day:'Mon / Fri / Sat',t:'MP sharpener',c:'tq',rpe:'5–6',flex:true,club:false,
+     desc:'9km. WU: 2km easy. Main: 2\xd7(10min @ MP 4:55/km, 3min easy jog). CD: 3km easy. Light touch — legs are being saved for the HM or a big long run. Just enough to keep MP feel sharp.'},
+    {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'wed',day:'Wed',t:'Easy / Gym',c:'te',rpe:'2–3',flex:false,club:false,
+     desc:'6km easy @ 5:40–5:50/km. Keep legs fresh.'},
+    {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'long',day:'Sun',t:'HM race or Long run',c:'tl',rpe:'7–8',flex:false,club:false,
+     desc:'HM RACE: target 1:42–1:44 (4:55/km) — this is your MP as a race effort. Negative split. If no HM: 95min easy with final 25min @ MP (4:55/km). Either way this is your key data point on whether MP is realistic.'},
+   ]},
+ ]},
+ {phase:'consolidation',label:'Marathon Block – Consolidation (Aug 25–Sep 14)',cls:'consolidation',pnote:'Peak volume. W13 Sunday is the defining session of the entire block: 30km with exact race-day nutrition. W15 Sunday is the peak long run: 32km. Between them, W14 is a recovery week. Do not skip it.',weeks:[
+  {id:'mbw13',wk:'MB W13 (Aug 25–31)',vol:'~70km',tag:'',
+   note:'The hardest week of the block. Monday is 50 total minutes at T-pace. Sunday is the defining session — 30km with exact race-day gel protocol. Get both done and the marathon is within reach.',
+   sessions:[
+    {id:'flex',day:'Mon / Fri / Sat',t:'T-pace peak session',c:'tq',rpe:'8',flex:true,club:false,
+     desc:'15km. WU: 2km easy. Main: 5\xd710min @ T pace (4:28–4:38/km), 2min easy jog rec. CD: 3km easy. 50 total minutes at threshold — the most T-pace volume in the entire block. If you complete this fully you are ready for race day. HR 168–175 throughout.'},
+    {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'wed',day:'Wed',t:'Easy / Gym',c:'te',rpe:'3',flex:false,club:false,
+     desc:'8km easy @ 5:40–5:50/km. Or gym + 20min easy.'},
+    {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'long',day:'Sun',t:'KEY LONG RUN',c:'tl',rpe:'8',flex:false,club:false,
+     desc:'2h45. 30min easy → 30min @ LT1 (5:00–5:10/km) → 4\xd720min @ MP (4:55/km) rec 5min easy jog. ~30km. GEL REHEARSAL: use your exact race-day plan — gel at 30/60/90/105/120/135min, water at every simulated station (every 2km). This is the defining session of the 18 weeks. It will be hard. Do it anyway.'},
+   ]},
+  {id:'mbw14',wk:'MB W14 (Sep 1–7) – RECOVERY',vol:'~58km',tag:'',
+   note:'Recovery week after W13 peak. Monday is easy — no quality. Legs need it. Sunday is a solid session but nothing like last week.',
+   sessions:[
+    {id:'flex',day:'Mon / Fri / Sat',t:'Easy recovery',c:'te',rpe:'3',flex:true,club:false,
+     desc:'50min easy @ 5:40–5:50/km. ~8.5km. No quality. Your legs carried 30km last Sunday — let them rest. If you feel unusually good, 4\xd720s strides at the end. Nothing more.'},
+    {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'wed',day:'Wed',t:'Easy / Gym',c:'te',rpe:'3',flex:false,club:false,
+     desc:'7km easy @ 5:40–5:50/km. Or gym + 20min easy.'},
+    {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'6–7',flex:false,club:false,
+     desc:'1h50. 60min easy @ 5:40 → 40min @ MP (4:55) → 10min easy. ~21km. GUT: maintain gel protocol. If MP feels hard today, you haven’t recovered from W13 — run the MP section at LT1 instead.'},
+   ]},
+  {id:'mbw15',wk:'MB W15 (Sep 8–14) – PEAK WEEK',vol:'~72km',tag:'PEAK',
+   note:'The peak. Monday is controlled MP work — not a hard session. Sunday is 32km full race rehearsal. After this week the taper begins and fitness is locked in.',
+   sessions:[
+    {id:'flex',day:'Mon / Fri / Sat',t:'MP rehearsal',c:'tq',rpe:'6–7',flex:true,club:false,
+     desc:'11km. WU: 2km easy. Main: 2\xd715min @ MP (4:55/km), 3min easy jog. CD: 3km easy. Both blocks must be exactly 4:55/km. If it feels easy, good — that’s what you want before the biggest long run of the block. HR 163–172.'},
+    {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'wed',day:'Wed',t:'Easy / Gym',c:'te',rpe:'3',flex:false,club:false,
+     desc:'7km easy @ 5:40–5:50/km. Or gym. Protect Sunday.'},
+    {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'long',day:'Sun',t:'PEAK LONG RUN',c:'tl',rpe:'8',flex:false,club:false,
+     desc:'2h45. 60min easy (5:40) → 30min @ LT1 (5:00–5:10) → 65min @ MP (4:55). ~32km. FULL RACE REHEARSAL: exact race-day gear, exact gel timing (6 gels), exact water intake. Run the morning exactly as you plan to run October 4. After this session you will know you can do it.'},
+   ]},
+ ]},
+ {phase:'taper',label:'Marathon Block – Taper + Race (Sep 15–Oct 4)',cls:'taper',pnote:'Trust the taper. Volume drops sharply. Legs will feel heavy on days 5–10 — that’s glycogen supercompensation, not detraining. Short, sharp sessions only. Sleep, eat, rest. The work is done.',weeks:[
+  {id:'mbw16',wk:'MB W16 (Sep 15–21)',vol:'~42km',tag:'',
+   note:'Sharp quality, short volume. Monday session keeps the legs quick without digging deep. Sunday is the last run with effort.',
+   sessions:[
+    {id:'flex',day:'Mon / Fri / Sat',t:'T-pace sharpener',c:'tq',rpe:'6',flex:true,club:false,
+     desc:'10km. WU: 2km easy. Main: 3\xd78min @ T pace (4:28–4:38/km), 90s standing rec. CD: 3km easy. Short and sharp — quality over volume. Do not extend this session. Legs should feel good coming out of it.'},
+    {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after. Taper means slightly less volume but keep quality.'},
+    {id:'wed',day:'Wed',t:'Easy',c:'te',rpe:'2–3',flex:false,club:false,
+     desc:'6km easy @ 5:40–5:50/km.'},
+    {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — log after.'},
+    {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'5–6',flex:false,club:false,
+     desc:'75min. 45min easy @ 5:40 then 30min @ MP (4:55). ~13.5km. Last run where you push. Trust everything you’ve built over 15 weeks.'},
+   ]},
+  {id:'mbrw1',wk:'Race Week 1 (Sep 22–28)',vol:'~30km',tag:'',
+   note:'Volume drops sharply. Legs should feel fresh and slightly restless by midweek — that’s the taper working. Let it happen.',
+   sessions:[
+    {id:'flex',day:'Mon / Fri / Sat',t:'Easy + strides',c:'te',rpe:'2–3',flex:true,club:false,
+     desc:'35min easy @ 5:40–5:50 + 4\xd720s strides. ~6.5km. Legs should feel good. Resist the urge to do more.'},
+    {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — light. Log after.'},
+    {id:'wed',day:'Wed',t:'Easy',c:'te',rpe:'2',flex:false,club:false,
+     desc:'25min very easy @ 5:40–5:50/km.'},
+    {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session — light. Log after.'},
+    {id:'long',day:'Sun',t:'Easy run',c:'te',rpe:'2',flex:false,club:false,
+     desc:'40min very easy @ 5:45–5:55/km. Just legs moving. HR <135.'},
+   ]},
+  {id:'mbrw2',wk:'RACE WEEK (Sep 29–Oct 4)',vol:'Race',tag:'RACE WEEK',
+   note:'Kit is ready. Number is pinned. Trust the 18 weeks. Your only job this week is to arrive at the start line healthy, rested, and hungry.',
+   sessions:[
+    {id:'mon',day:'Mon',t:'Easy + strides',c:'te',rpe:'2',flex:false,club:false,
+     desc:'25min easy @ 5:40 + 4\xd720s strides. Legs moving.'},
+    {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Tell Fernando it’s race week. Easy only — 30min max.'},
+    {id:'wed',day:'Wed',t:'Easy',c:'te',rpe:'2',flex:false,club:false,
+     desc:'20min very easy + mobility. Nothing more.'},
+    {id:'thu',day:'Thu',t:'Rest',c:'tr2',rpe:null,flex:false,club:false,
+     desc:'Rest or 15min walk. Kit prep.'},
+    {id:'fri',day:'Fri',t:'Rest',c:'tr2',rpe:null,flex:false,club:false,
+     desc:'Full rest. Pin bib. Lay everything out. Early night.'},
+    {id:'sat',day:'Sat',t:'Shakeout',c:'te',rpe:'2',flex:false,club:false,
+     desc:'15min easy + 4\xd7100m strides. Hydrate, carb load, sleep early.'},
+    {id:'race',day:'Sun',t:'MARATHON',c:'tx',rpe:null,flex:false,club:false,
+     desc:'KÖLN MARATHON. Target 3:28–3:30. Start 4:58/km, settle to 4:55 by km 5. Gel every 30min. Trust the work.'},
+   ]},
+ ]},
 ];
 
 // ===== PACE TREND (rolling 4-week avg) =====
@@ -5660,49 +5965,179 @@ document.getElementById('pg-intervals').addEventListener('click', function(e) {
 });
 
 // ===== PLAN =====
-// Parse week date ranges from "Week N (Mon D–D)" strings → {start, end} Date objects
 var planMonths = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
 function parsePlanWeekDates(wk) {
-  // Match patterns: "(Apr 3–6)", "(Sep 29–Oct 4)", "(Jul 1–13)"
-  var m = wk.match(/\((\w+)\s+(\d+)\s*[\u2013\-]\s*(?:(\w+)\s+)?(\d+)\)/);
+  var m = wk.match(/\((\w+)\s+(\d+)\s*[–\-]\s*(?:(\w+)\s+)?(\d+)\)/);
   if (!m) return null;
   var sm = planMonths[m[1]], sd = parseInt(m[2]);
   var em = m[3] ? planMonths[m[3]] : sm, ed = parseInt(m[4]);
-  var yr = 2026;
-  return { start: new Date(yr, sm, sd), end: new Date(yr, em, ed, 23, 59, 59) };
+  return { start: new Date(2026, sm, sd), end: new Date(2026, em, ed, 23, 59, 59) };
 }
 
-// Load checkbox state from localStorage
 var planChecks = {};
 try { planChecks = JSON.parse(localStorage.getItem('planChecks') || '{}'); } catch(e) {}
 function savePlanChecks() { localStorage.setItem('planChecks', JSON.stringify(planChecks)); }
 
+var mbLogs = {};
+try { mbLogs = JSON.parse(localStorage.getItem('mbLogs') || '{}'); } catch(e) {}
+function saveMbLogs() { localStorage.setItem('mbLogs', JSON.stringify(mbLogs)); }
+
 var planWkIdx = 0;
 var todayDate = new Date(); todayDate.setHours(0,0,0,0);
-document.getElementById('pg-plan').innerHTML = plan.map(function(p) {
-  return '<div class="plan-phase"><div class="phase-h ' + p.cls + '">' + p.label + '</div>' +
-    (planNotes[p.phase] ? '<div class="plan-phase-note">' + planNotes[p.phase] + '</div>' : '') +
-    p.weeks.map(function(w) {
-      var wi = planWkIdx++;
-      var dates = parsePlanWeekDates(w.wk);
-      var isPast = dates && todayDate > dates.end;
-      var isCurrent = dates && todayDate >= dates.start && todayDate <= dates.end;
-      var cls = 'pw' + (isPast ? ' pw-past' : '') + (isCurrent ? ' pw-current open' : '');
-      var badge = isCurrent ? '<span class="pw-now-badge">This week</span>' : '';
-      // Progress: count completed days
-      var totalDays = w.days.filter(function(d){ return d.desc; }).length;
-      var doneDays = w.days.reduce(function(n, d, di) { return n + (planChecks[wi + '-' + di] ? 1 : 0); }, 0);
-      var pct = totalDays > 0 ? Math.round(doneDays / totalDays * 100) : 0;
-      var progressHtml = totalDays > 0 ? '<div class="pw-progress"><div class="pw-progress-fill" style="width:' + pct + '%"></div></div>' : '';
-      return '<div class="' + cls + '" data-pwi="' + wi + '"><div class="pw-head"><span class="pw-label">' + w.wk + badge + '</span><span class="pw-vol">' + progressHtml + w.vol + '</span></div>' +
-        '<div class="pw-body">' + w.days.map(function(d, di) {
-          var chkKey = wi + '-' + di;
-          var done = planChecks[chkKey];
-          return '<div class="pd"><div class="pd-chk' + (done ? ' done' : '') + '" data-chk="' + chkKey + '"></div><span class="pd-d">' + d.d + '</span><span class="pd-t ' + d.c + '">' + d.t + '</span><span class="pd-desc">' + (done ? '<s>' + d.desc + '</s>' : d.desc) + '</span></div>';
-        }).join('') + '</div></div>';
+
+// Build pace zones key
+function buildPaceZonesKey() {
+  return '<div class="pz-key">' +
+    '<div class="pz-key-title">Your training zones — VDOT 56 / Max HR 205 / LT2 177bpm</div>' +
+    '<div class="pz-grid">' +
+    PACE_ZONES.map(function(z) {
+      return '<div class="pz-zone" style="background:' + z.bg + ';border:1px solid ' + z.fg + '22">' +
+        '<div class="pz-zone-name" style="color:' + z.fg + '">' + z.id + ' — ' + z.name + '</div>' +
+        '<div class="pz-zone-pace" style="color:' + z.fg + '">' + z.pace + '/km</div>' +
+        '<div class="pz-zone-sub">HR ' + z.hr + ' · RPE ' + z.rpe + '</div>' +
+      '</div>';
     }).join('') +
+    '</div></div>';
+}
+
+// Render Phase 1 (old format)
+function renderPhase1() {
+  return plan.map(function(p) {
+    return '<div class="plan-phase"><div class="phase-h ' + p.cls + '">' + p.label + '</div>' +
+      (planNotes[p.phase] ? '<div class="plan-phase-note">' + planNotes[p.phase] + '</div>' : '') +
+      p.weeks.map(function(w) {
+        var wi = planWkIdx++;
+        var dates = parsePlanWeekDates(w.wk);
+        var isPast = dates && todayDate > dates.end;
+        var isCurrent = dates && todayDate >= dates.start && todayDate <= dates.end;
+        var cls = 'pw' + (isPast ? ' pw-past' : '') + (isCurrent ? ' pw-current open' : '');
+        var badge = isCurrent ? '<span class="pw-now-badge">This week</span>' : '';
+        var totalDays = w.days.filter(function(d){ return d.desc; }).length;
+        var doneDays = w.days.reduce(function(n, d, di) { return n + (planChecks[wi + '-' + di] ? 1 : 0); }, 0);
+        var pct = totalDays > 0 ? Math.round(doneDays / totalDays * 100) : 0;
+        var progressHtml = totalDays > 0 ? '<div class="pw-progress"><div class="pw-progress-fill" style="width:' + pct + '%"></div></div>' : '';
+        return '<div class="' + cls + '" data-pwi="' + wi + '"><div class="pw-head"><span class="pw-label">' + w.wk + badge + '</span><span class="pw-vol">' + progressHtml + w.vol + '</span></div>' +
+          '<div class="pw-body">' + w.days.map(function(d, di) {
+            var chkKey = wi + '-' + di;
+            var done = planChecks[chkKey];
+            return '<div class="pd"><div class="pd-chk' + (done ? ' done' : '') + '" data-chk="' + chkKey + '"></div><span class="pd-d">' + d.d + '</span><span class="pd-t ' + d.c + '">' + d.t + '</span><span class="pd-desc">' + (done ? '<s>' + d.desc + '</s>' : d.desc) + '</span></div>';
+          }).join('') + '</div></div>';
+      }).join('') + '</div>';
+  }).join('');
+}
+
+// Render a logged entry
+function renderLogEntry(key) {
+  var entry = mbLogs[key];
+  if (!entry) return '';
+  var parts = [];
+  if (entry.date) parts.push(entry.date);
+  if (entry.km)   parts.push('<span class="mb-logged-val">' + entry.km + 'km</span>');
+  if (entry.pace) parts.push('<span class="mb-logged-val">' + entry.pace + '/km</span>');
+  if (entry.rpe)  parts.push('RPE <span class="mb-logged-val">' + entry.rpe + '</span>');
+  if (entry.notes) parts.push('<span class="mb-logged-note">' + entry.notes + '</span>');
+  return '<div class="mb-logged-entry" data-logkey="' + key + '">' + parts.join(' · ') + '</div>';
+}
+
+// Render log form
+function renderLogForm(key) {
+  return '<div class="mb-log-form" id="lf-' + key + '">' +
+    '<div class="mb-log-row">' +
+      '<div class="mb-log-field"><label class="mb-log-label">Date</label><input class="mb-log-input" type="date" id="lf-date-' + key + '" value="' + new Date().toISOString().slice(0,10) + '"></div>' +
+      '<div class="mb-log-field"><label class="mb-log-label">Distance (km)</label><input class="mb-log-input" type="text" placeholder="12.5" id="lf-km-' + key + '"></div>' +
+      '<div class="mb-log-field"><label class="mb-log-label">Avg pace</label><input class="mb-log-input" type="text" placeholder="4:55" id="lf-pace-' + key + '"></div>' +
+      '<div class="mb-log-field"><label class="mb-log-label">RPE (1-10)</label><input class="mb-log-input" type="number" min="1" max="10" placeholder="7" id="lf-rpe-' + key + '"></div>' +
+    '</div>' +
+    '<input class="mb-log-input mb-log-notes" type="text" placeholder="Notes (optional)" id="lf-notes-' + key + '">' +
+    '<div style="margin-top:8px"><button class="mb-log-save" data-savekey="' + key + '">Save</button><button class="mb-log-cancel" data-cancelkey="' + key + '">Cancel</button></div>' +
   '</div>';
-}).join('');
+}
+
+// Render marathon block
+function renderMarathonBlock() {
+  return planMB.map(function(phase) {
+    return '<div class="plan-phase">' +
+      '<div class="phase-h ' + phase.cls + '">' + phase.label + '</div>' +
+      (phase.pnote ? '<div class="plan-phase-note">' + phase.pnote + '</div>' : '') +
+      phase.weeks.map(function(w) {
+        var dates = parsePlanWeekDates(w.wk);
+        var isPast = dates && todayDate > dates.end;
+        var isCurrent = dates && todayDate >= dates.start && todayDate <= dates.end;
+        var cls = 'mb-week' + (isPast ? ' mb-past' : '') + (isCurrent ? ' mb-current open' : '');
+        var nowBadge = isCurrent ? '<span class="pw-now-badge">This week</span>' : '';
+        var tagBadge = w.tag ? '<span style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;background:var(--orgGlow);color:var(--org);padding:2px 8px;border-radius:4px;margin-left:8px">' + w.tag + '</span>' : '';
+        // Count logged sessions for progress
+        var loggedCount = w.sessions.filter(function(s){ return mbLogs[w.id + '_' + s.id]; }).length;
+        var totalLoggable = w.sessions.length;
+        var pct = totalLoggable > 0 ? Math.round(loggedCount / totalLoggable * 100) : 0;
+        var progressHtml = '<div class="pw-progress"><div class="pw-progress-fill" style="width:' + pct + '%"></div></div>';
+        var sessionsHtml = w.sessions.map(function(s) {
+          var logKey = w.id + '_' + s.id;
+          var logged = !!mbLogs[logKey];
+          var logBtnHtml = '<button class="mb-log-btn' + (logged ? ' logged' : '') + '" data-logopen="' + logKey + '">' + (logged ? '✓ Logged' : '+ Log') + '</button>';
+          var existingLog = renderLogEntry(logKey);
+          var logForm = renderLogForm(logKey);
+          var dayClass = s.flex ? 'mb-sess-day flex-day' : 'mb-sess-day';
+          var flexBadge = s.flex ? '<span class="mb-flex-badge">Flexible</span>' : '';
+          var clubBadge = s.club ? '<span class="mb-club-badge">Club TBD</span>' : '';
+          var rpeBadge = s.rpe ? '<span class="mb-rpe">RPE ' + s.rpe + '</span>' : '';
+          return '<div class="mb-sess">' +
+            '<div class="' + dayClass + '">' + s.day + '</div>' +
+            '<div class="mb-sess-main">' +
+              '<div class="mb-sess-head"><span class="pd-t ' + s.c + '" style="min-width:auto;padding:3px 10px">' + s.t + '</span>' + flexBadge + clubBadge + rpeBadge + '</div>' +
+              '<div class="mb-sess-desc">' + s.desc + '</div>' +
+              existingLog + logForm +
+            '</div>' +
+            '<div>' + logBtnHtml + '</div>' +
+          '</div>';
+        }).join('');
+        return '<div class="' + cls + '" data-wid="' + w.id + '">' +
+          '<div class="mb-head"><span class="mb-label">' + w.wk + nowBadge + tagBadge + '</span>' +
+          '<span class="mb-vol">' + progressHtml + w.vol + '</span></div>' +
+          '<div class="mb-body">' +
+            (w.note ? '<div class="mb-note">' + w.note + '</div>' : '') +
+            '<div>' + sessionsHtml + '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+  }).join('');
+}
+
+// Render block log summary (all logged sessions)
+function renderBlockLog() {
+  var rows = [];
+  planMB.forEach(function(phase) {
+    phase.weeks.forEach(function(w) {
+      w.sessions.forEach(function(s) {
+        var key = w.id + '_' + s.id;
+        var entry = mbLogs[key];
+        if (entry) {
+          rows.push({wk: w.wk, sess: s.t, day: s.day, entry: entry});
+        }
+      });
+    });
+  });
+  if (rows.length === 0) return '<div style="padding:20px;text-align:center;color:var(--t3);font-size:13px">No sessions logged yet. Log sessions above to track your block progression.</div>';
+  return '<table class="mb-log-table"><thead><tr><th>Week</th><th>Session</th><th>Date</th><th>Distance</th><th>Pace</th><th>RPE</th><th>Notes</th></tr></thead><tbody>' +
+    rows.map(function(r) {
+      var e = r.entry;
+      return '<tr><td>' + r.wk.split('(')[0].trim() + '</td><td>' + r.sess + '</td>' +
+        '<td>' + (e.date||'') + '</td>' +
+        '<td><span class="mono">' + (e.km||'') + '</span></td>' +
+        '<td><span class="mono">' + (e.pace||'') + '</span></td>' +
+        '<td><span class="mono">' + (e.rpe||'') + '</span></td>' +
+        '<td style="color:var(--t3)">' + (e.notes||'') + '</td></tr>';
+    }).join('') + '</tbody></table>';
+}
+
+// Build the full page
+document.getElementById('pg-plan').innerHTML =
+  buildPaceZonesKey() +
+  renderPhase1() +
+  renderMarathonBlock() +
+  '<div class="mb-log-summary"><div class="mb-log-summary-h">Block log — all sessions</div>' + renderBlockLog() + '</div>';
+
 
 // ===== COACH TAB =====
 (function() {
@@ -6622,7 +7057,7 @@ document.getElementById('pg-plan').innerHTML = plan.map(function(p) {
 })();
 
 document.getElementById('pg-plan').addEventListener('click', function(e) {
-  // Checkbox toggle
+  // Phase 1 checkbox toggle
   var chk = e.target.closest('.pd-chk');
   if (chk) {
     var key = chk.dataset.chk;
@@ -6632,19 +7067,57 @@ document.getElementById('pg-plan').addEventListener('click', function(e) {
     var desc = chk.closest('.pd').querySelector('.pd-desc');
     var raw = desc.textContent;
     desc.innerHTML = planChecks[key] ? '<s>' + raw + '</s>' : raw;
-    // Update progress bar
     var pwEl = chk.closest('.pw');
     var allChks = pwEl.querySelectorAll('.pd-chk');
     var doneCount = pwEl.querySelectorAll('.pd-chk.done').length;
-    var total = allChks.length;
     var bar = pwEl.querySelector('.pw-progress-fill');
-    if (bar) bar.style.width = Math.round(doneCount / total * 100) + '%';
-    e.stopPropagation();
-    return;
+    if (bar) bar.style.width = Math.round(doneCount / allChks.length * 100) + '%';
+    e.stopPropagation(); return;
   }
+  // MB week expand/collapse
+  var mbH = e.target.closest('.mb-head');
+  if (mbH) { mbH.closest('.mb-week').classList.toggle('open'); return; }
+  // Phase 1 week expand/collapse
   var pw = e.target.closest('.pw');
-  if (pw) pw.classList.toggle('open');
+  if (pw && !e.target.closest('.pw-body')) { pw.classList.toggle('open'); return; }
+  // Log button: open/close form
+  var logBtn = e.target.closest('[data-logopen]');
+  if (logBtn) {
+    var key = logBtn.dataset.logopen;
+    var form = document.getElementById('lf-' + key);
+    if (form) { form.classList.toggle('open'); }
+    e.stopPropagation(); return;
+  }
+  // Save log
+  var saveBtn = e.target.closest('[data-savekey]');
+  if (saveBtn) {
+    var key = saveBtn.dataset.savekey;
+    var entry = {
+      date:  document.getElementById('lf-date-' + key)  ? document.getElementById('lf-date-' + key).value  : '',
+      km:    document.getElementById('lf-km-' + key)    ? document.getElementById('lf-km-' + key).value    : '',
+      pace:  document.getElementById('lf-pace-' + key)  ? document.getElementById('lf-pace-' + key).value  : '',
+      rpe:   document.getElementById('lf-rpe-' + key)   ? document.getElementById('lf-rpe-' + key).value   : '',
+      notes: document.getElementById('lf-notes-' + key) ? document.getElementById('lf-notes-' + key).value : '',
+    };
+    mbLogs[key] = entry;
+    saveMbLogs();
+    // Refresh the plan tab
+    document.getElementById('pg-plan').innerHTML =
+      buildPaceZonesKey() +
+      renderPhase1() +
+      renderMarathonBlock() +
+      '<div class="mb-log-summary"><div class="mb-log-summary-h">Block log — all sessions</div>' + renderBlockLog() + '</div>';
+    e.stopPropagation(); return;
+  }
+  // Cancel log
+  var cancelBtn = e.target.closest('[data-cancelkey]');
+  if (cancelBtn) {
+    var form = document.getElementById('lf-' + cancelBtn.dataset.cancelkey);
+    if (form) form.classList.remove('open');
+    e.stopPropagation(); return;
+  }
 });
+
 
 // ===== ALL RUNS FEED =====
 function renderAllRunsTab() {
