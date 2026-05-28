@@ -6107,37 +6107,55 @@ function rpeBar(rpeStr) {
 
 function buildSessModalContent(sess, wk) {
   var d = sess.desc || '';
-  var sections = [];
-  var wuM = d.match(/WU:\s*([\s\S]*?)(?=\s*Main:|$)/i);
-  var mainM = d.match(/Main:\s*([\s\S]*?)(?=\s*CD:|GUT:|GEL TEST:|GEL:|$)/i);
-  var cdM = d.match(/CD:\s*([\s\S]*?)(?=\s*GUT:|GEL TEST:|GEL:|Should feel|If you|Monitor|Notice|RPE|$)/i);
+
+  // Extract main set line for overview
+  var mainM = d.match(/Main:\s*([\s\S]*?)(?=\s*CD:|GUT:|GEL|$)/i);
+  var mainText = mainM ? mainM[1].trim() : d.split(/GUT:|GEL/)[0].trim();
   var gutM = d.match(/(?:GUT|GEL TEST|GEL):\s*([\s\S]*?)(?=\.|$)/i);
-  var noteM = d.match(/(?:Should feel|Notice how|Monitor|If you|Log it|RPE should|Controlled effort)[^.]*\./g);
-  if (wuM && wuM[1].trim()) sections.push({cls:'sd-wu', label:'Warm-up', text: wuM[1].trim()});
-  if (mainM && mainM[1].trim()) {
-    sections.push({cls:'sd-main', label:'Main set', text: mainM[1].trim()});
-  } else if (!wuM) {
-    sections.push({cls:'sd-main', label:'Session', text: d.split(/GUT:|GEL/)[0].trim()});
-  }
-  if (cdM && cdM[1].trim()) sections.push({cls:'sd-cd', label:'Cool-down', text: cdM[1].trim()});
-  if (gutM && gutM[1].trim()) sections.push({cls:'sd-gut', label:'Nutrition', text: gutM[1].trim()});
-  if (noteM && noteM.length) sections.push({cls:'sd-note', label:'Notes', text: noteM.join(' ')});
-  var html = '';
-  sections.forEach(function(s) {
-    var clean = s.text.replace(/\s+/g,' ').trim();
-    html += '<div class="sd-section ' + s.cls + '">' +
-      '<div class="sd-sec-label">' + s.label + '</div>' +
-      '<div class="sd-sec-body">' + clean + '</div>' +
-      renderSessChips(clean) +
-    '</div>';
-  });
   var totalKm = d.match(/~([\d.]+)km/);
-  var rpeVal = sess.rpe || (d.match(/RPE\s*([–\d\-]+)/i) || [])[1];
+  var rpeVal = sess.rpe || (d.match(/RPE\s*([\d–\-]+)/i) || [])[1];
+
+  // Overview: chips from main set only
+  var overviewChips = renderSessChips(mainText + ' ' + (sess.rpe ? 'RPE '+sess.rpe : ''));
+
+  var html = '<div class="sd-section sd-main">' +
+    '<div class="sd-sec-label">' + (mainM ? 'Main set' : 'Session') + '</div>' +
+    '<div class="sd-sec-body">' + mainText.replace(/\s+/g,' ').trim() + '</div>' +
+    overviewChips +
+  '</div>';
+
+  if (gutM && gutM[1].trim()) {
+    html += '<div class="sd-section sd-gut"><div class="sd-sec-label">Nutrition</div><div class="sd-sec-body">' + gutM[1].trim().replace(/\s+/g,' ') + '</div></div>';
+  }
+
+  // Footer
   html += '<div class="sd-foot">';
-  if (totalKm) html += '<div class="sd-foot-stat"><strong>' + totalKm[0] + '</strong> total</div>';
+  if (totalKm) html += '<div class="sd-foot-stat"><strong>' + totalKm[0] + '</strong></div>';
   if (rpeVal) html += '<div class="sd-foot-stat">RPE <strong>' + rpeVal + '</strong>' + rpeBar(String(rpeVal)) + '</div>';
   if (sess.club) html += '<div class="sd-foot-stat" style="color:var(--t3)">Fernando session - log after</div>';
   html += '</div>';
+
+  // Full details toggle
+  var wuM = d.match(/WU:\s*([\s\S]*?)(?=\s*Main:|$)/i);
+  var cdM = d.match(/CD:\s*([\s\S]*?)(?=\s*GUT:|GEL|Should feel|If you|Monitor|Notice|RPE|$)/i);
+  var noteM = d.match(/(?:Should feel|Notice how|Monitor|If you|Log it|RPE should|Controlled effort)[^.]*\./g);
+  if (wuM || cdM || noteM) {
+    html += '<div style="padding:10px 20px;border-top:1px solid var(--bdr2)">' +
+      '<button id="sd-expand-btn" style="background:none;border:none;font-size:11px;font-weight:700;color:var(--t3);cursor:pointer;padding:0;letter-spacing:.3px" onclick="var el=document.getElementById(\'sd-full\');var open=el.style.display!==\'none\';el.style.display=open?\'none\':\'block\';this.textContent=open?\'Full details ▾\':\'Hide ▴\'">Full details &#9662;</button>' +
+    '</div>';
+    html += '<div id="sd-full" style="display:none">';
+    if (wuM && wuM[1].trim()) {
+      html += '<div class="sd-section sd-wu"><div class="sd-sec-label">Warm-up</div><div class="sd-sec-body">' + wuM[1].trim().replace(/\s+/g,' ') + '</div>' + renderSessChips(wuM[1]) + '</div>';
+    }
+    if (cdM && cdM[1].trim()) {
+      html += '<div class="sd-section sd-cd"><div class="sd-sec-label">Cool-down</div><div class="sd-sec-body">' + cdM[1].trim().replace(/\s+/g,' ') + '</div></div>';
+    }
+    if (noteM && noteM.length) {
+      html += '<div class="sd-section sd-note"><div class="sd-sec-label">Coach notes</div><div class="sd-sec-body">' + noteM.join(' ') + '</div></div>';
+    }
+    html += '</div>';
+  }
+
   return html;
 }
 
@@ -6234,19 +6252,19 @@ function renderMarathonBlock() {
         var sessionsHtml = w.sessions.map(function(s) {
           var logKey = w.id + '_' + s.id;
           var logged = !!mbLogs[logKey];
-          var logBtnHtml = '<button class="mb-log-btn' + (logged ? ' logged' : '') + '" data-logopen="' + logKey + '">' + (logged ? '✓ Logged' : '+ Log') + '</button>' +
-            (!s.club ? '<button class="mb-sess-detail-btn" data-sessdetail="' + logKey + '" data-wid2="' + w.id + '" data-sid="' + s.id + '">Details</button>' : '');
+          var logBtnHtml = '<button class="mb-log-btn' + (logged ? ' logged' : '') + '" data-logopen="' + logKey + '">' + (logged ? '✓ Logged' : '+ Log') + '</button>';
           var existingLog = renderLogEntry(logKey);
           var logForm = renderLogForm(logKey);
           var dayClass = s.flex ? 'mb-sess-day flex-day' : 'mb-sess-day';
           var flexBadge = s.flex ? '<span class="mb-flex-badge">Flexible</span>' : '';
           var clubBadge = s.club ? '<span class="mb-club-badge">Club TBD</span>' : '';
           var rpeBadge = s.rpe ? '<span class="mb-rpe">RPE ' + s.rpe + '</span>' : '';
-          return '<div class="mb-sess">' +
+          var sessAttrs = ' data-sessdetail="' + logKey + '" data-wid2="' + w.id + '" data-sid="' + s.id + '" style="cursor:pointer"';
+          return '<div class="mb-sess"' + sessAttrs + '>' +
             '<div class="' + dayClass + '">' + s.day + '</div>' +
             '<div class="mb-sess-main">' +
               '<div class="mb-sess-head"><span class="pd-t ' + s.c + '" style="min-width:auto;padding:3px 10px">' + s.t + '</span>' + flexBadge + clubBadge + rpeBadge + '</div>' +
-              '<div class="mb-sess-desc" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + s.desc + '</div>' +
+              '<div class="mb-sess-desc" style="display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;color:var(--t3);font-size:12px">' + s.desc + '</div>' +
               existingLog + logForm +
             '</div>' +
             '<div>' + logBtnHtml + '</div>' +
@@ -7287,11 +7305,11 @@ document.getElementById('pg-plan').addEventListener('click', function(e) {
     if (form) form.classList.remove('open');
     e.stopPropagation(); return;
   }
-  // Session detail modal
-  var detailBtn = e.target.closest('[data-sessdetail]');
-  if (detailBtn) {
-    var wid = detailBtn.dataset.wid2;
-    var sid = detailBtn.dataset.sid;
+  // Session card click - open detail modal (but not if clicking log/delete buttons)
+  var sessCard = e.target.closest('[data-sessdetail]');
+  if (sessCard && !e.target.closest('button') && !e.target.closest('input') && !e.target.closest('.mb-log-form')) {
+    var wid = sessCard.dataset.wid2;
+    var sid = sessCard.dataset.sid;
     var foundWk = null, foundSess = null;
     planMB.forEach(function(ph){ ph.weeks.forEach(function(w){ if(w.id===wid){ foundWk=w; w.sessions.forEach(function(s){ if(s.id===sid) foundSess=s; }); } }); });
     if (foundSess && foundWk) openSessModal(foundSess, foundWk.wk);
