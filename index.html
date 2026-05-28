@@ -6235,7 +6235,7 @@ function renderMarathonBlock() {
           var logKey = w.id + '_' + s.id;
           var logged = !!mbLogs[logKey];
           var logBtnHtml = '<button class="mb-log-btn' + (logged ? ' logged' : '') + '" data-logopen="' + logKey + '">' + (logged ? '✓ Logged' : '+ Log') + '</button>' +
-            (!sess.club ? '<button class="mb-sess-detail-btn" data-sessdetail="' + logKey + '" data-wid2="' + w.id + '" data-sid="' + sess.id + '">Details</button>' : '');
+            (!s.club ? '<button class="mb-sess-detail-btn" data-sessdetail="' + logKey + '" data-wid2="' + w.id + '" data-sid="' + s.id + '">Details</button>' : '');
           var existingLog = renderLogEntry(logKey);
           var logForm = renderLogForm(logKey);
           var dayClass = s.flex ? 'mb-sess-day flex-day' : 'mb-sess-day';
