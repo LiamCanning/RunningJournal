@@ -2382,16 +2382,17 @@ ints.forEach(function(iv) {
 //   Jun 14 - Carrera a Runners Ciutat (5K)
 //   Sep 26 - 15K Nocturna
 //   Oct 4  - K\u00F6ln Marathon (42K)
-var MY_VAM_KMH = 16.3; // km/h — estimated from 1km rep capacity (3:35–3:40). Update after track test or new PB
+var MY_VAM_KMH = 16.3; // km/h — from 1km rep capacity (3:35–3:40). Update after track test or new race PB
 var VAM_PCT = [
-  {pct:65,  zone:'Easy',       pace:'5:39', hr:'<140',    rpe:'2–3', use:'Recovery / warm-up'},
-  {pct:70,  zone:'Easy',       pace:'5:15', hr:'140–148', rpe:'3',    use:'Aerobic base, easy runs'},
-  {pct:75,  zone:'LT1',        pace:'4:54', hr:'148–158', rpe:'3–4', use:'Long run effort'},
-  {pct:80,  zone:'Mara pace',  pace:'4:36', hr:'163–172', rpe:'5–6', use:'Marathon race day'},
-  {pct:85,  zone:'Tempo',      pace:'4:19', hr:'165–175', rpe:'6–7', use:'Tempo / fartlek vivid'},
-  {pct:90,  zone:'Threshold',  pace:'4:05', hr:'172–177', rpe:'7–8', use:'LT2 / threshold sessions'},
-  {pct:95,  zone:'Intervals',  pace:'3:52', hr:'180–190', rpe:'8–9', use:'VO2max reps'},
-  {pct:100, zone:'VAM',        pace:'3:40', hr:'190+',    rpe:'9–10', use:'1km max rep / track effort'},
+  {pct:65,   zone:'Easy',           pace:'5:39', hr:'<140',    rpe:'2–3',   use:'Recovery / warm-up'},
+  {pct:70,   zone:'Easy',           pace:'5:15', hr:'140–148', rpe:'3',     use:'Aerobic base, easy runs'},
+  {pct:'74', zone:'A Goal (MP)',    pace:'4:58', hr:'160–168', rpe:'5–6',   use:'Sub-3:30 Cologne race pace'},
+  {pct:75,   zone:'LT1',            pace:'4:54', hr:'148–158', rpe:'3–4',   use:'Long run effort'},
+  {pct:80,   zone:'Steady',         pace:'4:36', hr:'163–172', rpe:'5–6',   use:'Aerobic cruise — future MP (marathon 2)'},
+  {pct:85,   zone:'Tempo (T)',      pace:'4:19', hr:'165–175', rpe:'6–7',   use:'Fernando tempo / fartlek vivo — plan uses VDOT: 4:28–4:38'},
+  {pct:90,   zone:'Threshold (LT2)',pace:'4:05', hr:'172–177', rpe:'7–8',   use:'LT2 / threshold sessions'},
+  {pct:95,   zone:'Intervals (I)',  pace:'3:52', hr:'180–190', rpe:'8–9',   use:'VO2max reps'},
+  {pct:100,  zone:'VAM',            pace:'3:40', hr:'190+',    rpe:'9–10',  use:'1km max rep / track effort'},
 ];
 var planNotes = {
   'base': 'Race-season sharpening. Sub-19 5K window closes Jun 14 \u2014 that\'s the last speed race before marathon block absorbs everything. Your 5K PR is 19:19 and your VO2max is 55 \u2014 you have the engine for sub-19, it\'s just about executing on race day.',
@@ -6048,7 +6049,20 @@ function buildPaceZonesKey() {
         '<th style="padding:7px 12px;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);text-align:left">Use for</th>' +
       '</tr></thead>' +
       '<tbody>' + rows + '</tbody>' +
-    '</table></div></div>';
+    '</table>' +
+    '<div style="padding:10px 16px 12px;border-top:1px solid var(--bdr)">' +
+      '<div style="font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);margin-bottom:6px">Abbreviations</div>' +
+      '<div style="font-size:11px;color:var(--t2);line-height:2">' +
+        '<b>E</b> Easy &nbsp;&nbsp; ' +
+        '<b>MP</b> Marathon Pace 4:58/km &nbsp;&nbsp; ' +
+        '<b>LT1</b> Lactate Threshold 1 - aerobic limit &nbsp;&nbsp; ' +
+        '<b>T</b> Tempo - plan uses VDOT (4:28-4:38/km); Fernando = 4:19/km (85% VAM) &nbsp;&nbsp; ' +
+        '<b>LT2</b> Lactate Threshold 2 - max sustainable &nbsp;&nbsp; ' +
+        '<b>I</b> Intervals / VO2max &nbsp;&nbsp; ' +
+        '<b>WU</b> Warm-Up &nbsp;&nbsp; <b>CD</b> Cool-Down' +
+      '</div>' +
+    '</div>' +
+    '</div>';
 }
 
 // Render Phase 1 (old format)
