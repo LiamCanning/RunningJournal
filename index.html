@@ -477,7 +477,7 @@ body{font-family:'Geist',system-ui,-apple-system,sans-serif;color:var(--t1);back
 .mb-logged-val{font-family:'Geist Mono';font-weight:700}
 .mb-logged-note{color:var(--t2);font-style:italic}
 /* BLOCK LOG SUMMARY */
-.mb-log-delete{background:none;border:none;cursor:pointer;color:var(--t3);font-size:11px;padding:0 0 0 8px;flex-shrink:0;line-height:1}.mb-log-delete:hover{color:var(--red)}.mb-wk-logged-km{font-size:10px;font-weight:700;color:var(--grn);font-family:'Geist Mono';margin-right:6px;opacity:.85}.rep-rest-row{display:grid;grid-template-columns:60px 1fr 100px 100px;gap:16px;align-items:center;padding:2px 0 10px 22px;font-size:11px;color:var(--t3);border-bottom:1px dashed var(--bdr2)}.rep-rest-label{font-size:10px;font-weight:600;opacity:.6;letter-spacing:.3px}.mb-log-summary{margin-top:24px}
+.mb-log-delete{background:none;border:none;cursor:pointer;color:var(--t3);font-size:11px;padding:0 0 0 8px;flex-shrink:0;line-height:1}.mb-log-delete:hover{color:var(--red)}.mb-wk-logged-km{font-size:10px;font-weight:700;color:var(--grn);font-family:'Geist Mono';margin-right:6px;opacity:.85}.rep-rest-row{display:grid;grid-template-columns:60px 1fr 100px 100px;gap:16px;align-items:center;padding:2px 0 10px 22px;font-size:11px;color:var(--t3);border-bottom:1px dashed var(--bdr2)}.rep-rest-label{font-size:10px;font-weight:600;opacity:.6;letter-spacing:.3px}.sd-section{padding:14px 20px;border-left:3px solid var(--bdr2)}.sd-section.sd-wu{border-left-color:var(--blu)}.sd-section.sd-main{border-left-color:var(--grn)}.sd-section.sd-cd{border-left-color:var(--blu)}.sd-section.sd-gut{border-left-color:var(--org)}.sd-section.sd-note{border-left-color:var(--prp,#6a4ec8)}.sd-section+.sd-section{border-top:1px solid var(--bdr2)}.sd-sec-label{font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px;opacity:.6}.sd-sec-body{font-size:13px;color:var(--t1);line-height:1.6}.sd-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.sd-chip{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;font-family:'Geist Mono'}.sd-chip.pace{background:rgba(34,201,122,.1);color:var(--grn);border:1px solid rgba(34,201,122,.2)}.sd-chip.hr{background:rgba(239,68,68,.08);color:var(--red,#ef4444);border:1px solid rgba(239,68,68,.15)}.sd-chip.zone{background:var(--card2);color:var(--t1);border:1px solid var(--bdr2)}.sd-chip.rpe{background:rgba(255,165,0,.1);color:var(--org);border:1px solid rgba(255,165,0,.2)}.sd-foot{padding:14px 20px;background:var(--bg2);border-top:1px solid var(--bdr);display:flex;gap:16px;flex-wrap:wrap;align-items:center}.sd-foot-stat{font-size:12px;color:var(--t2)}.sd-foot-stat strong{color:var(--t1)}.sd-rpe-bar{display:flex;gap:3px;margin-left:4px}.sd-rpe-dot{width:8px;height:8px;border-radius:50%;background:var(--bdr)}.sd-rpe-dot.filled{background:var(--org)}.mb-sess-detail-btn{font-size:10px;font-weight:700;color:var(--t3);background:none;border:1px solid var(--bdr2);border-radius:5px;padding:2px 8px;cursor:pointer;margin-top:4px;letter-spacing:.3px}.mb-sess-detail-btn:hover{color:var(--t1);background:var(--card2)}.mb-log-summary{margin-top:24px}
 .mb-log-summary-h{font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3);margin-bottom:12px}
 .mb-log-table{width:100%;border-collapse:collapse;font-size:12px}
 .mb-log-table th{text-align:left;padding:6px 10px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--t3);border-bottom:2px solid var(--bdr)}
@@ -1448,6 +1448,16 @@ textarea.race-modal-inp{resize:vertical;min-height:56px}
 <div class="drop-zone" id="drop-zone"><div class="drop-zone-inner">Drop Garmin CSV to update data</div></div>
 
 <!-- PER-REP COMPARISON MODAL -->
+<div class="modal" id="sess-modal">
+<div class="modal-overlay" id="sess-modal-overlay"></div>
+<div class="modal-box" style="max-width:520px">
+<div class="modal-header">
+<h2 id="sess-modal-title">Session</h2>
+<button class="modal-close" id="sess-modal-close">&#x2715;</button>
+</div>
+<div class="modal-content" id="sess-modal-content" style="padding:0"></div>
+</div>
+</div>
 <div class="modal" id="rep-modal">
 <div class="modal-overlay" id="rep-modal-overlay"></div>
 <div class="modal-box">
@@ -6065,6 +6075,79 @@ function buildPaceZonesKey() {
     '</div>';
 }
 
+// ===== SESSION DETAIL MODAL =====
+function extractSessChips(text) {
+  var chips = [];
+  var paces = text.match(/[\d]:[\d]{2}[–\-][\d]:[\d]{2}\/km|[\d]:[\d]{2}\/km/g) || [];
+  paces.forEach(function(p){ chips.push({t:'pace', v:p}); });
+  var hrs = text.match(/HR\s*[<>]?[\d]+(?:[–\-][\d]+)?/g) || [];
+  hrs.forEach(function(h){ chips.push({t:'hr', v:h}); });
+  var zones = text.match(/\b(LT1|LT2|T pace|MP|VAM|Easy|Marathon pace|Threshold|Tempo|Intervals?)\b/g) || [];
+  var seen = {};
+  zones.forEach(function(z){ if(!seen[z]){seen[z]=1; chips.push({t:'zone', v:z});} });
+  return chips;
+}
+
+function renderSessChips(text) {
+  var chips = extractSessChips(text);
+  if (!chips.length) return '';
+  return '<div class="sd-chips">' + chips.map(function(c){
+    return '<span class="sd-chip ' + c.t + '">' + c.v + '</span>';
+  }).join('') + '</div>';
+}
+
+function rpeBar(rpeStr) {
+  if (!rpeStr) return '';
+  var num = parseInt(rpeStr);
+  if (!num) { var m = rpeStr.match(/(\d)/); num = m ? parseInt(m[1]) : 5; }
+  var dots = '';
+  for (var i=1;i<=10;i++) dots += '<span class="sd-rpe-dot' + (i<=num?' filled':'') + '"></span>';
+  return '<span class="sd-rpe-bar">' + dots + '</span>';
+}
+
+function buildSessModalContent(sess, wk) {
+  var d = sess.desc || '';
+  var sections = [];
+  var wuM = d.match(/WU:\s*([\s\S]*?)(?=\s*Main:|$)/i);
+  var mainM = d.match(/Main:\s*([\s\S]*?)(?=\s*CD:|GUT:|GEL TEST:|GEL:|$)/i);
+  var cdM = d.match(/CD:\s*([\s\S]*?)(?=\s*GUT:|GEL TEST:|GEL:|Should feel|If you|Monitor|Notice|RPE|$)/i);
+  var gutM = d.match(/(?:GUT|GEL TEST|GEL):\s*([\s\S]*?)(?=\.|$)/i);
+  var noteM = d.match(/(?:Should feel|Notice how|Monitor|If you|Log it|RPE should|Controlled effort)[^.]*\./g);
+  if (wuM && wuM[1].trim()) sections.push({cls:'sd-wu', label:'Warm-up', text: wuM[1].trim()});
+  if (mainM && mainM[1].trim()) {
+    sections.push({cls:'sd-main', label:'Main set', text: mainM[1].trim()});
+  } else if (!wuM) {
+    sections.push({cls:'sd-main', label:'Session', text: d.split(/GUT:|GEL/)[0].trim()});
+  }
+  if (cdM && cdM[1].trim()) sections.push({cls:'sd-cd', label:'Cool-down', text: cdM[1].trim()});
+  if (gutM && gutM[1].trim()) sections.push({cls:'sd-gut', label:'Nutrition', text: gutM[1].trim()});
+  if (noteM && noteM.length) sections.push({cls:'sd-note', label:'Notes', text: noteM.join(' ')});
+  var html = '';
+  sections.forEach(function(s) {
+    var clean = s.text.replace(/\s+/g,' ').trim();
+    html += '<div class="sd-section ' + s.cls + '">' +
+      '<div class="sd-sec-label">' + s.label + '</div>' +
+      '<div class="sd-sec-body">' + clean + '</div>' +
+      renderSessChips(clean) +
+    '</div>';
+  });
+  var totalKm = d.match(/~([\d.]+)km/);
+  var rpeVal = sess.rpe || (d.match(/RPE\s*([–\d\-]+)/i) || [])[1];
+  html += '<div class="sd-foot">';
+  if (totalKm) html += '<div class="sd-foot-stat"><strong>' + totalKm[0] + '</strong> total</div>';
+  if (rpeVal) html += '<div class="sd-foot-stat">RPE <strong>' + rpeVal + '</strong>' + rpeBar(String(rpeVal)) + '</div>';
+  if (sess.club) html += '<div class="sd-foot-stat" style="color:var(--t3)">Fernando session - log after</div>';
+  html += '</div>';
+  return html;
+}
+
+function openSessModal(sess, wk) {
+  var title = wk + ' · ' + sess.day + ' · ' + sess.t;
+  document.getElementById('sess-modal-title').textContent = title;
+  document.getElementById('sess-modal-content').innerHTML = buildSessModalContent(sess, wk);
+  document.getElementById('sess-modal').classList.add('show');
+}
+
 // Render Phase 1 (old format) - wrapped in collapsible archive
 function renderPhase1() {
   var inner = plan.map(function(p) {
@@ -6151,7 +6234,8 @@ function renderMarathonBlock() {
         var sessionsHtml = w.sessions.map(function(s) {
           var logKey = w.id + '_' + s.id;
           var logged = !!mbLogs[logKey];
-          var logBtnHtml = '<button class="mb-log-btn' + (logged ? ' logged' : '') + '" data-logopen="' + logKey + '">' + (logged ? '✓ Logged' : '+ Log') + '</button>';
+          var logBtnHtml = '<button class="mb-log-btn' + (logged ? ' logged' : '') + '" data-logopen="' + logKey + '">' + (logged ? '✓ Logged' : '+ Log') + '</button>' +
+            (!sess.club ? '<button class="mb-sess-detail-btn" data-sessdetail="' + logKey + '" data-wid2="' + w.id + '" data-sid="' + sess.id + '">Details</button>' : '');
           var existingLog = renderLogEntry(logKey);
           var logForm = renderLogForm(logKey);
           var dayClass = s.flex ? 'mb-sess-day flex-day' : 'mb-sess-day';
@@ -6162,7 +6246,7 @@ function renderMarathonBlock() {
             '<div class="' + dayClass + '">' + s.day + '</div>' +
             '<div class="mb-sess-main">' +
               '<div class="mb-sess-head"><span class="pd-t ' + s.c + '" style="min-width:auto;padding:3px 10px">' + s.t + '</span>' + flexBadge + clubBadge + rpeBadge + '</div>' +
-              '<div class="mb-sess-desc">' + s.desc + '</div>' +
+              '<div class="mb-sess-desc" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + s.desc + '</div>' +
               existingLog + logForm +
             '</div>' +
             '<div>' + logBtnHtml + '</div>' +
@@ -7203,6 +7287,17 @@ document.getElementById('pg-plan').addEventListener('click', function(e) {
     if (form) form.classList.remove('open');
     e.stopPropagation(); return;
   }
+  // Session detail modal
+  var detailBtn = e.target.closest('[data-sessdetail]');
+  if (detailBtn) {
+    var wid = detailBtn.dataset.wid2;
+    var sid = detailBtn.dataset.sid;
+    var foundWk = null, foundSess = null;
+    planMB.forEach(function(ph){ ph.weeks.forEach(function(w){ if(w.id===wid){ foundWk=w; w.sessions.forEach(function(s){ if(s.id===sid) foundSess=s; }); } }); });
+    if (foundSess && foundWk) openSessModal(foundSess, foundWk.wk);
+    e.stopPropagation(); return;
+  }
+
   // Delete log entry
   var delBtn = e.target.closest('[data-deletekey]');
   if (delBtn) {
@@ -7839,6 +7934,12 @@ function showRunDetailsModal(runId) {
 
 
 // Modal close handlers
+document.getElementById('sess-modal-overlay').onclick = function() {
+  document.getElementById('sess-modal').classList.remove('show');
+};
+document.getElementById('sess-modal-close').onclick = function() {
+  document.getElementById('sess-modal').classList.remove('show');
+};
 document.getElementById('rep-modal-overlay').onclick = function() {
   document.getElementById('rep-modal').classList.remove('show');
 };
@@ -7855,6 +7956,7 @@ document.getElementById('run-details-close').onclick = function() {
 // ESC key closes modals
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') {
+    document.getElementById('sess-modal').classList.remove('show');
     document.getElementById('rep-modal').classList.remove('show');
     document.getElementById('run-details-modal').classList.remove('show');
   }
