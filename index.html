@@ -2382,6 +2382,17 @@ ints.forEach(function(iv) {
 //   Jun 14 - Carrera a Runners Ciutat (5K)
 //   Sep 26 - 15K Nocturna
 //   Oct 4  - K\u00F6ln Marathon (42K)
+var MY_VAM_KMH = 15.5; // km/h — derived from 19:19 5K + 41:27 10K, update after next race
+var VAM_PCT = [
+  {pct:65,  zone:'Easy',       pace:'5:57', hr:'<140',    rpe:'2–3', use:'Recovery / warm-up'},
+  {pct:70,  zone:'Easy',       pace:'5:32', hr:'140–148', rpe:'3',    use:'Aerobic base, easy runs'},
+  {pct:75,  zone:'LT1',        pace:'5:09', hr:'148–158', rpe:'3–4', use:'Long run effort'},
+  {pct:80,  zone:'Mara pace',  pace:'4:50', hr:'163–172', rpe:'5–6', use:'Marathon race day'},
+  {pct:85,  zone:'Tempo',      pace:'4:33', hr:'165–175', rpe:'6–7', use:'Tempo / fartlek vivid'},
+  {pct:90,  zone:'Threshold',  pace:'4:18', hr:'172–177', rpe:'7–8', use:'LT2 / threshold sessions'},
+  {pct:95,  zone:'Intervals',  pace:'4:05', hr:'180–190', rpe:'8–9', use:'VO2max reps'},
+  {pct:100, zone:'VAM',        pace:'3:52', hr:'190+',    rpe:'9–10', use:'Track reps / 100% efforts'},
+];
 var planNotes = {
   'base': 'Race-season sharpening. Sub-19 5K window closes Jun 14 \u2014 that\'s the last speed race before marathon block absorbs everything. Your 5K PR is 19:19 and your VO2max is 55 \u2014 you have the engine for sub-19, it\'s just about executing on race day.',
   'base-m': 'Holiday week (MB W3) is only 15km \u2014 treat MB W4 as a re-entry week, not a full 52km load. Valencia heat arrives in July: run by HR not pace. Your aerobic base from the race season carries straight into this block \u2014 nothing is wasted.',
@@ -2397,7 +2408,7 @@ var plan = [
     {wk:'Week 2 (Apr 7\u201313) - 10K RACE',vol:'40 km',days:[{d:'Mon',t:'Rest',c:'tr2',desc:''},{d:'Tue',t:'Club',c:'tq',desc:'Club intervals - keep short & sharp'},{d:'Wed',t:'Easy',c:'te',desc:'Easy 6km'},{d:'Thu',t:'Easy',c:'te',desc:'Easy 5km + strides - pre-race shakeout'},{d:'Fri',t:'Rest',c:'tr2',desc:'Full rest'},{d:'Sat',t:'RACE',c:'tx',desc:'\u{1F3C6} Carrera de Empresas 10K - Target 41:00'},{d:'Sun',t:'Recovery',c:'te',desc:'Easy 6km recovery jog'}]},
     {wk:'Week 3 (Apr 14\u201320)',vol:'42 km',days:[{d:'Mon',t:'Rest',c:'tr2',desc:''},{d:'Tue',t:'Club',c:'tq',desc:'Club intervals session'},{d:'Wed',t:'Easy',c:'te',desc:'Easy 7km'},{d:'Thu',t:'Moderate',c:'te',desc:'8km moderate @ 5:00/km'},{d:'Fri',t:'Strength',c:'tr2',desc:'Strength: lunges, calf raises, core'},{d:'Sat',t:'Easy',c:'te',desc:'Easy 5km + strides'},{d:'Sun',t:'Long run',c:'tl',desc:'16km @ 5:40-5:50'}]},
     {wk:'Week 4 (Apr 21\u201327) - 5K RACE',vol:'38 km',days:[{d:'Mon',t:'Rest',c:'tr2',desc:''},{d:'Tue',t:'Club',c:'tq',desc:'Club intervals - short reps (400/200m)'},{d:'Wed',t:'Easy',c:'te',desc:'Easy 6km'},{d:'Thu',t:'Easy',c:'te',desc:'Easy 5km + strides'},{d:'Fri',t:'Rest',c:'tr2',desc:'Full rest'},{d:'Sat',t:'RACE',c:'tx',desc:'\u{1F3C6} Volta a Peu 5K - Target sub 19:15'},{d:'Sun',t:'Long run',c:'tl',desc:'14km easy'}]},
-    {wk:'Week 5 (Apr 28\u2013May 4)',vol:'42 km',days:[{d:'Mon',t:'Rest',c:'tr2',desc:''},{d:'Tue',t:'Club',c:'tq',desc:'Club intervals'},{d:'Wed',t:'Easy',c:'te',desc:'Easy 7km'},{d:'Thu',t:'Tempo',c:'tq',desc:'8km w/ 4km @ 4:35/km'},{d:'Fri',t:'Strength',c:'tr2',desc:'Strength session'},{d:'Sat',t:'Easy',c:'te',desc:'Easy 5km + strides'},{d:'Sun',t:'Long run',c:'tl',desc:'16km @ 5:35-5:45'}]},
+    {wk:'Week 5 (Apr 28\u2013May 4)',vol:'42 km',days:[{d:'Mon',t:'Rest',c:'tr2',desc:''},{d:'Tue',t:'Club',c:'tq',desc:'40\u2019 @ 65\u201370% VAM (5:32\u20135:57/km, HR <150) \u2014 fartlek 8\xd730\u2033 @ 85\u201390% VAM (4:18\u20134:33/km) rec 1\u2019 trote suave \u2014 Movilidad. RPE 5\u20136.'},{d:'Wed',t:'Easy',c:'te',desc:'Easy 7km'},{d:'Thu',t:'Tempo',c:'tq',desc:'8km w/ 4km @ 4:35/km'},{d:'Fri',t:'Strength',c:'tr2',desc:'Strength session'},{d:'Sat',t:'Easy',c:'te',desc:'Easy 5km + strides'},{d:'Sun',t:'Long run',c:'tl',desc:'16km @ 5:35-5:45'}]},
     {wk:'Week 6 (May 5\u201311)',vol:'38 km',days:[{d:'Mon',t:'Rest',c:'tr2',desc:''},{d:'Tue',t:'Club',c:'tq',desc:'Club intervals - 6x400m fast'},{d:'Wed',t:'Easy',c:'te',desc:'Easy 6km'},{d:'Thu',t:'Easy',c:'te',desc:'Easy 5km + strides'},{d:'Fri',t:'Track',c:'tq',desc:'6x1km @ 3:50\u20133:55/km, 90s standing recovery. WU: 2km easy (5:30+) + drills (leg swings x10, A-skips x20m x2, high knees x20m x2, ankle rolls) + 4x100m strides building to race pace. Main set: rep 1 @ 3:55, rep 2 @ 3:53, rep 3 @ 3:52, rep 4 @ 3:51, rep 5 @ 3:50, rep 6 @ 3:48\u20133:50 \u2014 empty it. Stop at 5 if HR not recovering below ~140bpm in the 90s window by rep 4. CD: 1.5km easy jog. ~12km total.'},{d:'Sat',t:'Rest',c:'tr2',desc:'Full rest \u2014 Redolat race cancelled'},{d:'Sun',t:'Recovery',c:'te',desc:'Easy 6km recovery'}]},
     {wk:'Week 7 (May 12\u201318)',vol:'45 km',days:[{d:'Mon',t:'Rest',c:'tr2',desc:''},{d:'Tue',t:'Club',c:'tq',desc:'Club intervals'},{d:'Wed',t:'Easy',c:'te',desc:'Easy 8km'},{d:'Thu',t:'Tempo',c:'tq',desc:'10km w/ 6km @ 4:40/km'},{d:'Fri',t:'Strength',c:'tr2',desc:'Strength'},{d:'Sat',t:'Easy',c:'te',desc:'Easy 5km'},{d:'Sun',t:'Long run',c:'tl',desc:'18km @ 5:35-5:45'}]},
     {wk:'Week 8 (May 19\u201325) - 5K RACE',vol:'38 km',days:[{d:'Mon',t:'Rest',c:'tr2',desc:''},{d:'Tue',t:'Club',c:'tq',desc:'Club intervals - keep sharp'},{d:'Wed',t:'Easy',c:'te',desc:'Easy 6km'},{d:'Thu',t:'Easy',c:'te',desc:'Easy 5km + strides'},{d:'Fri',t:'Rest',c:'tr2',desc:'Full rest'},{d:'Sat',t:'RACE',c:'tx',desc:'\u{1F3C6} Carrera a Marta 5K'},{d:'Sun',t:'Long run',c:'tl',desc:'14km easy'}]},
@@ -6010,17 +6021,34 @@ var todayDate = new Date(); todayDate.setHours(0,0,0,0);
 
 // Build pace zones key
 function buildPaceZonesKey() {
-  return '<div class="pz-key">' +
-    '<div class="pz-key-title">Your training zones — VDOT 56 / Max HR 205 / LT2 177bpm</div>' +
-    '<div class="pz-grid">' +
-    PACE_ZONES.map(function(z) {
-      return '<div class="pz-zone" style="background:' + z.bg + ';border:1px solid ' + z.fg + '22">' +
-        '<div class="pz-zone-name" style="color:' + z.fg + '">' + z.id + ' — ' + z.name + '</div>' +
-        '<div class="pz-zone-pace" style="color:' + z.fg + '">' + z.pace + '/km</div>' +
-        '<div class="pz-zone-sub">HR ' + z.hr + ' · RPE ' + z.rpe + '</div>' +
-      '</div>';
-    }).join('') +
-    '</div></div>';
+  var rows = VAM_PCT.map(function(z, i) {
+    var bg = i % 2 === 0 ? 'background:var(--bg2)' : 'background:var(--card)';
+    return '<tr style="' + bg + '">' +
+      '<td style="padding:7px 12px;font-weight:700;font-size:12px;color:var(--t1);white-space:nowrap">' + z.pct + '%</td>' +
+      '<td style="padding:7px 12px;font-family:\'Geist Mono\';font-size:13px;font-weight:700;color:var(--grn)">' + z.pace + '</td>' +
+      '<td style="padding:7px 12px;font-size:12px;color:var(--t1);font-weight:600">' + z.zone + '</td>' +
+      '<td style="padding:7px 12px;font-size:11px;color:var(--t2);font-family:\'Geist Mono\'">' + z.hr + '</td>' +
+      '<td style="padding:7px 12px;font-size:11px;color:var(--t2)">' + z.rpe + '</td>' +
+      '<td style="padding:7px 12px;font-size:11px;color:var(--t3)">' + z.use + '</td>' +
+    '</tr>';
+  }).join('');
+  return '<div style="background:var(--card);border-radius:12px;border:1px solid var(--bdr);margin-bottom:24px;overflow:hidden">' +
+    '<div style="padding:14px 16px 10px;border-bottom:1px solid var(--bdr)">' +
+      '<span style="font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3)">Training zones</span>' +
+      '<span style="font-size:11px;color:var(--t3);margin-left:12px">VAM 15.5 km/h · VDOT 56 · Max HR 205 · LT2 177bpm — update paces after a new race PB</span>' +
+    '</div>' +
+    '<div style="overflow-x:auto">' +
+    '<table style="width:100%;border-collapse:collapse;font-size:13px">' +
+      '<thead><tr style="background:var(--bg2)">' +
+        '<th style="padding:7px 12px;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);text-align:left">% VAM</th>' +
+        '<th style="padding:7px 12px;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);text-align:left">Pace /km</th>' +
+        '<th style="padding:7px 12px;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);text-align:left">Zone</th>' +
+        '<th style="padding:7px 12px;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);text-align:left">HR bpm</th>' +
+        '<th style="padding:7px 12px;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);text-align:left">RPE</th>' +
+        '<th style="padding:7px 12px;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);text-align:left">Use for</th>' +
+      '</tr></thead>' +
+      '<tbody>' + rows + '</tbody>' +
+    '</table></div></div>';
 }
 
 // Render Phase 1 (old format)
