@@ -2433,7 +2433,7 @@ var PACE_ZONES = [
 // Sessions: id, day, t (label), c (badge class), rpe, desc, flex (bool), club (bool)
 var planMB = [
  {phase:'base-m',label:'Marathon Block – Base (Jun 2–Jun 28)',cls:'base',pnote:'First four weeks establish the rhythm. The holiday week is a free pass. The only sessions that matter in this phase are the Sunday long runs  -  get those done and everything else is a bonus. Gut training starts in week 1: every long run over 45min takes a gel.',weeks:[
-  {id:'mbw1',wk:'MB W1 (Jun 2–8)',vol:'~50km',tag:'',
+  {id:'mbw1',wk:'MB W1 (Jun 2–8)',vol:'~47km',tag:'',
    note:'First week of the marathon block. Let the club sessions settle before pushing quality on Monday. This week is about establishing pattern, not breaking records.',
    sessions:[
     {id:'flex',day:'Mon / Fri / Sat',t:'Quality',c:'tq',rpe:'4',flex:true,club:false,
@@ -2447,7 +2447,7 @@ var planMB = [
     {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'3',flex:false,club:false,
      desc:'60min easy @ 5:40–5:50/km. ~10.5km. HR <145. GEL TEST: 1 gel at 30min, water only. Note brand, flavour, and stomach response. This is the start of your gut-training protocol  -  every long run from here takes gels.'},
    ]},
-  {id:'mbw2',wk:'MB W2 (Jun 9–15)',vol:'~53km',tag:'',
+  {id:'mbw2',wk:'MB W2 (Jun 9–15)',vol:'~50km',tag:'',
    note:'Add a rep to Monday. The long run extends to 70min  -  first run where two gels are needed.',
    sessions:[
     {id:'flex',day:'Mon / Fri / Sat',t:'Quality',c:'tq',rpe:'4–5',flex:true,club:false,
@@ -2469,7 +2469,7 @@ var planMB = [
     {id:'easy2',day:'Fri or Sat',t:'Easy',c:'te',rpe:'2–3',flex:true,club:false,
      desc:'4–5km very easy @ 5:45–6:00/km. Stay loose.'},
    ]},
-  {id:'mbw4',wk:'MB W4 (Jun 23–29) – RE-ENTRY',vol:'~50km',tag:'RE-ENTRY',
+  {id:'mbw4',wk:'MB W4 (Jun 23–29) – RE-ENTRY',vol:'~44km',tag:'RE-ENTRY',
    note:'Back from holiday. Legs need re-waking, not punishing. Monday is easy  -  no quality. The long run is the anchor for the week.',
    sessions:[
     {id:'flex',day:'Mon / Fri / Sat',t:'Easy + strides',c:'te',rpe:'3',flex:true,club:false,
@@ -2485,7 +2485,7 @@ var planMB = [
    ]},
  ]},
  {phase:'threshold',label:'Marathon Block – Threshold (Jun 30–Jul 27)',cls:'threshold',pnote:'Four weeks of proper quality. Monday becomes a real session. Long runs extend to 100min with gut training continuing weekly. The deload in W8 is not optional  -  legs need it before the specificity block.',weeks:[
-  {id:'mbw5',wk:'MB W5 (Jun 30–Jul 6)',vol:'~58km',tag:'',
+  {id:'mbw5',wk:'MB W5 (Jun 30–Jul 6)',vol:'~53km',tag:'',
    note:'First proper threshold Monday. 5 reps at T-pace. If 4:28 feels impossible, run 4:35–4:38 for all reps  -  do not chase splits at the cost of form.',
    sessions:[
     {id:'flex',day:'Mon / Fri / Sat',t:'T-pace intervals',c:'tq',rpe:'7',flex:true,club:false,
@@ -2499,7 +2499,7 @@ var planMB = [
     {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'3–4',flex:false,club:false,
      desc:'80min easy @ 5:40–5:50/km. ~14km. GUT: 2 gels (30/60min). First proper long run of the threshold block. Run this strictly easy  -  save the effort for Monday.'},
    ]},
-  {id:'mbw6',wk:'MB W6 (Jul 7–13)',vol:'~60km',tag:'',
+  {id:'mbw6',wk:'MB W6 (Jul 7–13)',vol:'~56km',tag:'',
    note:'MP blocks added to Monday alongside threshold. This combination starts training your body to recognise marathon race effort.',
    sessions:[
     {id:'flex',day:'Mon / Fri / Sat',t:'MP + Threshold',c:'tq',rpe:'6–7',flex:true,club:false,
@@ -2513,7 +2513,7 @@ var planMB = [
     {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'4',flex:false,club:false,
      desc:'90min easy @ 5:40–5:50/km. ~16km. GUT: 3 gels (30/60/90min). First run long enough to replicate the volume of gels needed for the first half of Cologne.'},
    ]},
-  {id:'mbw7',wk:'MB W7 (Jul 14–20)',vol:'~63km',tag:'',
+  {id:'mbw7',wk:'MB W7 (Jul 14–20)',vol:'~60km',tag:'',
    note:'Hardest Monday of the threshold block. Six T-pace reps is full threshold stimulation. Expect discomfort from rep 4.',
    sessions:[
     {id:'flex',day:'Mon / Fri / Sat',t:'T-pace intervals',c:'tq',rpe:'7–8',flex:true,club:false,
@@ -2543,7 +2543,7 @@ var planMB = [
    ]},
  ]},
  {phase:'specificity',label:'Marathon Block – Specificity (Jul 28–Aug 24)',cls:'specificity',pnote:'Long runs get serious. MP work appears in both Monday and Sunday sessions. Every Sunday from W9 is a significant training stimulus. Gut and caffeine protocols are tested here  -  W11 is the first double-caffeine-gel run, exactly as race day.',weeks:[
-  {id:'mbw9',wk:'MB W9 (Jul 28–Aug 3)',vol:'~62km',tag:'',
+  {id:'mbw9',wk:'MB W9 (Jul 28–Aug 3)',vol:'~60km',tag:'',
    note:'Back into quality after deload. Longer reps on Monday (12min vs 8min). Sunday adds a 30min MP block after 80min easy  -  first taste of running MP on tired legs.',
    sessions:[
     {id:'flex',day:'Mon / Fri / Sat',t:'T-pace long reps',c:'tq',rpe:'7',flex:true,club:false,
@@ -2557,7 +2557,7 @@ var planMB = [
     {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'5–6',flex:false,club:false,
      desc:'110min. 80min easy @ 5:40 then 30min @ MP (4:55/km). ~20km. GUT: 4 gels (30/60/90/105min). Notice how MP feels after 80min easy  -  HR will be 163–172, effort should feel like a 6. That’s your marathon effort.'},
    ]},
-  {id:'mbw10',wk:'MB W10 (Aug 4–10)',vol:'~65km',tag:'',
+  {id:'mbw10',wk:'MB W10 (Aug 4–10)',vol:'~63km',tag:'',
    note:'Double MP blocks on Monday. Long run extends to 125min with caffeine gel test. The caffeine simulation is critical  -  log how you feel precisely.',
    sessions:[
     {id:'flex',day:'Mon / Fri / Sat',t:'Double MP blocks',c:'tq',rpe:'6–7',flex:true,club:false,
@@ -2571,7 +2571,7 @@ var planMB = [
     {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'6',flex:false,club:false,
      desc:'125min. 90min easy @ 5:40 then 35min @ MP (4:55). ~22.5km. GUT + CAFFEINE TEST: gels at 30/60min (non-caf), caffeinated gel at 90min, non-caf at 120min. First caffeine gel in training. Note any jitteriness, palpitations, or GI change in the final 35min. Log it precisely  -  this data shapes your race-day plan.'},
    ]},
-  {id:'mbw11',wk:'MB W11 (Aug 11–17)',vol:'~68km',tag:'',
+  {id:'mbw11',wk:'MB W11 (Aug 11–17)',vol:'~65km',tag:'',
    note:'Hardest week of the specificity block. 40 total minutes at T-pace on Monday. Sunday is 140min with a 50min MP finale and full double-caffeine protocol  -  exactly as Cologne.',
    sessions:[
     {id:'flex',day:'Mon / Fri / Sat',t:'T-pace high vol',c:'tq',rpe:'7–8',flex:true,club:false,
@@ -2601,7 +2601,7 @@ var planMB = [
    ]},
  ]},
  {phase:'consolidation',label:'Marathon Block – Consolidation (Aug 25–Sep 14)',cls:'consolidation',pnote:'Peak volume. W13 Sunday is the defining session of the entire block: 30km with exact race-day nutrition. W15 Sunday is the peak long run: 32km. Between them, W14 is a recovery week. Do not skip it.',weeks:[
-  {id:'mbw13',wk:'MB W13 (Aug 25–31)',vol:'~70km',tag:'',
+  {id:'mbw13',wk:'MB W13 (Aug 25–31)',vol:'~66km',tag:'',
    note:'The hardest week of the block. Monday is 50 total minutes at T-pace. Sunday is the defining session  -  30km with exact race-day gel protocol. Get both done and the marathon is within reach.',
    sessions:[
     {id:'flex',day:'Mon / Fri / Sat',t:'T-pace peak session',c:'tq',rpe:'8',flex:true,club:false,
@@ -2615,7 +2615,7 @@ var planMB = [
     {id:'long',day:'Sun',t:'KEY LONG RUN',c:'tl',rpe:'8',flex:false,club:false,
      desc:'2h45. 30min easy → 30min @ LT1 (5:00–5:10/km) → 4\xd720min @ MP (4:55/km) rec 5min easy jog. ~30km. GEL REHEARSAL: use your exact race-day plan  -  gel at 30/60/90/105/120/135min, water at every simulated station (every 2km). This is the defining session of the 18 weeks. It will be hard. Do it anyway.'},
    ]},
-  {id:'mbw14',wk:'MB W14 (Sep 1–7) – RECOVERY',vol:'~58km',tag:'',
+  {id:'mbw14',wk:'MB W14 (Sep 1–7) – RECOVERY',vol:'~55km',tag:'',
    note:'Recovery week after W13 peak. Monday is easy  -  no quality. Legs need it. Sunday is a solid session but nothing like last week.',
    sessions:[
     {id:'flex',day:'Mon / Fri / Sat',t:'Easy recovery',c:'te',rpe:'3',flex:true,club:false,
@@ -2629,7 +2629,7 @@ var planMB = [
     {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'6–7',flex:false,club:false,
      desc:'1h50. 60min easy @ 5:40 → 40min @ MP (4:55) → 10min easy. ~21km. GUT: maintain gel protocol. If MP feels hard today, you haven’t recovered from W13  -  run the MP section at LT1 instead.'},
    ]},
-  {id:'mbw15',wk:'MB W15 (Sep 8–14) – PEAK WEEK',vol:'~72km',tag:'PEAK',
+  {id:'mbw15',wk:'MB W15 (Sep 8–14) – PEAK WEEK',vol:'~68km',tag:'PEAK',
    note:'The peak. Monday is controlled MP work  -  not a hard session. Sunday is 32km full race rehearsal. After this week the taper begins and fitness is locked in.',
    sessions:[
     {id:'flex',day:'Mon / Fri / Sat',t:'MP rehearsal',c:'tq',rpe:'6–7',flex:true,club:false,
@@ -6146,7 +6146,7 @@ function renderMarathonBlock() {
           return sum + (e && e.km ? parseFloat(e.km) || 0 : 0);
         }, 0);
         var pct = totalLoggable > 0 ? Math.round(loggedCount / totalLoggable * 100) : 0;
-        var kmTag = weekLoggedKm > 0 ? '<span class="mb-wk-logged-km">' + weekLoggedKm.toFixed(1) + '\u202fkm</span>' : '';
+        var volDisplay = weekLoggedKm > 0 ? weekLoggedKm.toFixed(1) + '\u202fkm' : w.vol;
         var progressHtml = '<div class="pw-progress"><div class="pw-progress-fill" style="width:' + pct + '%"></div></div>';
         var sessionsHtml = w.sessions.map(function(s) {
           var logKey = w.id + '_' + s.id;
@@ -6170,7 +6170,7 @@ function renderMarathonBlock() {
         }).join('');
         return '<div class="' + cls + '" data-wid="' + w.id + '">' +
           '<div class="mb-head"><span class="mb-label">' + w.wk + nowBadge + tagBadge + '</span>' +
-          '<span class="mb-vol">' + progressHtml + kmTag + w.vol + '</span></div>' +
+          '<span class="mb-vol">' + progressHtml + volDisplay + '</span></div>' +
           '<div class="mb-body">' +
             (w.note ? '<div class="mb-note">' + w.note + '</div>' : '') +
             '<div>' + sessionsHtml + '</div>' +
