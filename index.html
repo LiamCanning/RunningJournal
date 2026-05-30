@@ -3441,10 +3441,26 @@ document.getElementById('pg-dash').innerHTML =
     '<div class="act-feed">' +
       recentRuns.slice(0, 7).map(function(r) {
         var ps = paceToSecs(r.pace);
-        var dotColor = r.type === 'Race' ? CC_RACE : ps != null && ps < 270 ? CC_TEMPO : ps != null && ps < 315 ? CC_ITVL : CC_EASY;
+        // Classify by pace + title keywords
+        var isGeneric = /^(valencia\s+)?carrera$/i.test(r.title.trim()) || /^(morning|afternoon|evening|lunch|night)\s+run$/i.test(r.title.trim());
+        var bc, bl, displayTitle;
+        if (/race|parkrun/i.test(r.title)) { bc='race'; bl='Race'; }
+        else if (/interval|fartlek|x\d|\dx|hill rep/i.test(r.title) || r.type === 'Entrenamiento en pista') { bc='intervals'; bl='Intervals'; }
+        else if (/tempo|threshold|progressive/i.test(r.title)) { bc='tempo'; bl='Tempo'; }
+        else if (/long run/i.test(r.title) || r.dist > 16) { bc='long'; bl='Long'; }
+        else if (/recovery/i.test(r.title)) { bc='recovery'; bl='Recovery'; }
+        else if (ps && ps < 265) { bc='intervals'; bl='Intervals'; }
+        else if (ps && ps < 300) { bc='tempo'; bl='Tempo'; }
+        else { bc='easy'; bl='Easy'; }
+        if (isGeneric) {
+          displayTitle = bl + ' run';
+        } else {
+          // Strip leading "Easy Run – ", "Intervals – " prefixes that duplicate the badge
+          displayTitle = r.title.replace(/^(easy run|intervals?|tempo run|recovery run|long run|race|moderate run|progressive run)\s*[–\-]\s*/i, '') || r.title;
+        }
         return '<div class="act-row" data-run-id="' + r.id + '">' +
-          '<div class="act-dot" style="background:' + dotColor + '"></div>' +
-          '<div class="act-title">' + r.title + '</div>' +
+          '<span class="rfi-badge ' + bc + '" style="flex-shrink:0">' + bl + '</span>' +
+          '<div class="act-title">' + displayTitle + '</div>' +
           '<div class="act-date">' + relDate(r.ds) + '</div>' +
           '<div class="act-dist">' + r.dist.toFixed(1) + 'km</div>' +
           '<div class="act-pace">' + (r.pace || '--') + '</div>' +
