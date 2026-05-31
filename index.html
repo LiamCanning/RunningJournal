@@ -6343,8 +6343,20 @@ function renderMarathonBlock() {
           var e = mbLogs[w.id + '_' + s.id];
           return sum + (e && e.km ? parseFloat(e.km) || 0 : 0);
         }, 0);
+        // Sum km from Strava-synced runs within this week's date range
+        var wkDates = parsePlanWeekDates(w.wk);
+        var stravaKm = 0;
+        if (wkDates) {
+          allRuns.forEach(function(r) {
+            var rd = new Date(r.ds);
+            if (rd >= wkDates.start && rd <= wkDates.end) stravaKm += (r.dist || 0);
+          });
+        }
+        stravaKm = Math.round(stravaKm * 10) / 10;
+        // Progress bar uses session log count; vol uses Strava actual > manual logged > target
         var pct = totalLoggable > 0 ? Math.round(loggedCount / totalLoggable * 100) : 0;
-        var volDisplay = weekLoggedKm > 0 ? weekLoggedKm.toFixed(1) + '\u202fkm' : w.vol;
+        var volDisplay = stravaKm > 0 ? stravaKm.toFixed(1) + '\u202fkm' :
+                         weekLoggedKm > 0 ? weekLoggedKm.toFixed(1) + '\u202fkm' : w.vol;
         var progressHtml = '<div class="pw-progress"><div class="pw-progress-fill" style="width:' + pct + '%"></div></div>';
         var sessionsHtml = w.sessions.map(function(s) {
           var logKey = w.id + '_' + s.id;
