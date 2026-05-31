@@ -4358,14 +4358,27 @@ document.getElementById('pg-volume').innerHTML =
           var dayStr = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()];
           var km = r.dist ? (Math.round(r.dist*10)/10) + ' km' : '--';
           var pace = r.pace && r.pace !== '--' ? r.pace + '/km' : '';
-          var label = r.name || r.type || 'Run';
-          if (label.length > 28) label = label.substring(0, 27) + '…';
-          var typeColors = {'Race':'var(--c-race)','Intervals':'var(--c-intervals)','Tempo Run':'var(--c-tempo)','Long Run':'var(--c-long)'};
-          var tc = typeColors[r.type] || 'var(--t3)';
+          var ps = paceToSecs(r.pace);
+          var isGeneric = /^(valencia\s+)?carrera$/i.test((r.title||'').trim());
+          var bc, bl;
+          if (/race|parkrun/i.test(r.title)) { bc='race'; bl='Race'; }
+          else if (/interval|fartlek|x\d|\dx|hill rep/i.test(r.title) || r.type === 'Entrenamiento en pista') { bc='intervals'; bl='Intervals'; }
+          else if (/tempo|threshold|progressive/i.test(r.title)) { bc='tempo'; bl='Tempo'; }
+          else if (/long run/i.test(r.title) || r.dist > 16) { bc='long'; bl='Long'; }
+          else if (/recovery/i.test(r.title)) { bc='recovery'; bl='Recovery'; }
+          else if (ps && ps < 265) { bc='intervals'; bl='Intervals'; }
+          else if (ps && ps < 300) { bc='tempo'; bl='Tempo'; }
+          else { bc='easy'; bl='Easy'; }
+          var label = isGeneric ? bl + ' run' :
+            (r.title||'').replace(/^(easy run|intervals?|tempo run|recovery run|long run|race|moderate run|progressive run)\s*[–\-]\s*/i,'') || r.title;
+          if (label.length > 30) label = label.substring(0, 29) + '…';
+          var tcMap = {race:'var(--c-race)',intervals:'var(--c-intervals)',tempo:'var(--c-tempo)',long:'var(--c-long)',recovery:'var(--grn)',easy:'var(--c-easy)'};
+          var tc = tcMap[bc] || 'var(--t3)';
           return '<div style="display:flex;align-items:center;gap:16px;padding:10px 0;border-bottom:1px solid var(--bdr)">' +
             '<div style="font-family:\'Geist Mono\',monospace;font-size:10px;color:var(--t3);min-width:28px">' + dayStr + '</div>' +
-            '<div style="width:3px;height:16px;background:'+tc+';flex-shrink:0"></div>' +
-            '<div style="flex:1;font-size:13px;font-weight:500;color:var(--t1)">' + label + '</div>' +
+            '<div style="width:3px;height:16px;background:'+tc+';flex-shrink:0;border-radius:2px"></div>' +
+            '<span class="rfi-badge ' + bc + '" style="flex-shrink:0">' + bl + '</span>' +
+            '<div style="flex:1;font-size:13px;font-weight:500;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + label + '</div>' +
             '<div style="font-family:\'Geist Mono\',monospace;font-size:13px;font-weight:700;color:var(--t1)">' + km + '</div>' +
             (pace ? '<div style="font-family:\'Geist Mono\',monospace;font-size:11px;color:var(--t3);min-width:68px;text-align:right">' + pace + '</div>' : '') +
           '</div>';
