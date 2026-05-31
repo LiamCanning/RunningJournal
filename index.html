@@ -2569,7 +2569,7 @@ var planMB = [
     {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'5–6',flex:false,club:false,
      desc:'110min. 80min easy @ 5:40 then 30min @ MP (4:55/km). ~20km. GUT: 4 gels (30/60/90/105min). Notice how MP feels after 80min easy  -  HR will be 163–172, effort should feel like a 6. That’s your marathon effort.'},
    ]},
-  {id:'mbw10',wk:'MB W10 (Aug 3–9)',vol:'~65km',tag:'',
+  {id:'mbw10',wk:'MB W10 (Aug 3–9)',vol:'~71km',tag:'',
    note:'Double MP blocks on Monday. Long run extends to 125min with caffeine gel test. The caffeine simulation is critical  -  log how you feel precisely.',
    sessions:[
     {id:'flex',day:'Mon / Fri / Sat',t:'Double MP blocks',c:'tq',rpe:'6–7',flex:true,club:false,
@@ -2583,7 +2583,7 @@ var planMB = [
     {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'6',flex:false,club:false,
      desc:'125min. 90min easy @ 5:40 then 35min @ MP (4:55). ~22.5km. GUT + CAFFEINE TEST: gels at 30/60min (non-caf), caffeinated gel at 90min, non-caf at 120min. First caffeine gel in training. Note any jitteriness, palpitations, or GI change in the final 35min. Log it precisely  -  this data shapes your race-day plan.'},
    ]},
-  {id:'mbw11',wk:'MB W11 (Aug 10–16)',vol:'~68km',tag:'',
+  {id:'mbw11',wk:'MB W11 (Aug 10–16)',vol:'~73km',tag:'',
    note:'Hardest week of the specificity block. 40 total minutes at T-pace on Monday. Sunday is 140min with a 50min MP finale and full double-caffeine protocol  -  exactly as Cologne.',
    sessions:[
     {id:'flex',day:'Mon / Fri / Sat',t:'T-pace high vol',c:'tq',rpe:'7–8',flex:true,club:false,
@@ -6342,7 +6342,8 @@ function renderLogEntry(key) {
   if (entry.pace) parts.push('<span class="mb-logged-val">' + entry.pace + '/km</span>');
   if (entry.rpe)  parts.push('RPE <span class="mb-logged-val">' + entry.rpe + '</span>');
   if (entry.notes) parts.push('<span class="mb-logged-note">' + entry.notes + '</span>');
-  return '<div class="mb-logged-entry" data-logkey="' + key + '">' + parts.join(' \u00b7 ') + '<button class="mb-log-delete" data-deletekey="' + key + '" title="Delete">\u2715</button></div>';
+  var splitsHtml = entry.splits ? renderSplitsTable(entry.splits) : '';
+  return '<div class="mb-logged-entry" data-logkey="' + key + '">' + parts.join(' \u00b7 ') + '<button class="mb-log-delete" data-deletekey="' + key + '" title="Delete">\u2715</button></div>' + splitsHtml;
 }
 
 // Render log form
@@ -6355,8 +6356,25 @@ function renderLogForm(key) {
       '<div class="mb-log-field"><label class="mb-log-label">RPE (1-10)</label><input class="mb-log-input" type="number" min="1" max="10" placeholder="7" id="lf-rpe-' + key + '"></div>' +
     '</div>' +
     '<input class="mb-log-input mb-log-notes" type="text" placeholder="Notes (optional)" id="lf-notes-' + key + '">' +
+    '<input class="mb-log-input mb-log-notes" type="text" placeholder="Splits (optional) — e.g. 3:52, 3:54, 3:55, 3:58" id="lf-splits-' + key + '" style="margin-top:4px">' +
     '<div style="margin-top:8px"><button class="mb-log-save" data-savekey="' + key + '">Save</button><button class="mb-log-cancel" data-cancelkey="' + key + '">Cancel</button></div>' +
   '</div>';
+}
+
+// Render splits as a mini rep table
+function renderSplitsTable(splitsStr) {
+  if (!splitsStr) return '';
+  var splits = splitsStr.split(/[,;]+/).map(function(s){ return s.trim(); }).filter(Boolean);
+  if (splits.length < 2) return '';
+  var fastest = splits.reduce(function(f,s){ return paceToSecs(s) < paceToSecs(f) ? s : f; });
+  var slowest = splits.reduce(function(f,s){ return paceToSecs(s) > paceToSecs(f) ? s : f; });
+  var cells = splits.map(function(s, i) {
+    var isFast = s === fastest, isSlow = s === slowest;
+    var col = isFast ? 'var(--grn)' : isSlow ? 'var(--org)' : 'var(--t2)';
+    return '<td style="padding:3px 8px;font-family:\'Geist Mono\';font-size:11px;font-weight:' + (isFast||isSlow?'700':'500') + ';color:' + col + '">' +
+      '<span style="font-size:9px;color:var(--t3);margin-right:3px">R' + (i+1) + '</span>' + s + '</td>';
+  }).join('');
+  return '<div style="margin-top:5px;overflow-x:auto"><table style="border-collapse:collapse;white-space:nowrap"><tr>' + cells + '</tr></table></div>';
 }
 
 // Render marathon block
@@ -7431,10 +7449,11 @@ document.getElementById('pg-plan').addEventListener('click', function(e) {
     var key = saveBtn.dataset.savekey;
     var entry = {
       date:  document.getElementById('lf-date-' + key)  ? document.getElementById('lf-date-' + key).value  : '',
-      km:    document.getElementById('lf-km-' + key)    ? document.getElementById('lf-km-' + key).value    : '',
-      pace:  document.getElementById('lf-pace-' + key)  ? document.getElementById('lf-pace-' + key).value  : '',
-      rpe:   document.getElementById('lf-rpe-' + key)   ? document.getElementById('lf-rpe-' + key).value   : '',
-      notes: document.getElementById('lf-notes-' + key) ? document.getElementById('lf-notes-' + key).value : '',
+      km:    document.getElementById('lf-km-' + key)     ? document.getElementById('lf-km-' + key).value     : '',
+      pace:  document.getElementById('lf-pace-' + key)   ? document.getElementById('lf-pace-' + key).value   : '',
+      rpe:   document.getElementById('lf-rpe-' + key)    ? document.getElementById('lf-rpe-' + key).value    : '',
+      notes: document.getElementById('lf-notes-' + key)  ? document.getElementById('lf-notes-' + key).value  : '',
+      splits:document.getElementById('lf-splits-' + key) ? document.getElementById('lf-splits-' + key).value : '',
     };
     mbLogs[key] = entry;
     saveMbLogs();
