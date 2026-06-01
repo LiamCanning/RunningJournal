@@ -2455,7 +2455,7 @@ var planMB = [
     {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
      desc:'Club session  -  log after.'},
     {id:'fri',day:'Fri',t:'Easy + strides',c:'te',rpe:'2',flex:false,club:false,
-     desc:'WU: None. Main: 30-35min easy @ 5:35-5:50/km, HR <145. ~6km. Flat route, no pressure, no watch-chasing. CD: 4 x 20s strides at the end - build to 4:10/km pace, walk back each time. Then 5min easy walk to finish. Coach: The purpose of this run is to arrive at Sunday\'s long run with loose legs and without fatigue. The strides are not a workout - they prevent Sunday starting flat by keeping the neuromuscular system engaged. If the legs feel heavy, drop to 5:50/km and skip the strides. Better to arrive at Sunday fresh than to arrive tired from Friday.'},
+     desc:'WU: None. Main: 35min easy @ 5:35-5:50/km, HR <145. ~6km. Run at a pace where conversation is easy. No pace targets, no watch pressure. Flat route if possible. CD: 4 x 20s strides - build to 4:10/km pace, walk back each time. Then 5min easy walk to bring HR below 120. Coach: This run has one job: arrive at Sunday\'s long run with loose legs and without fatigue. 35 minutes at easy HR is the exact dose. The strides keep the neuromuscular system engaged so Sunday does not start flat. If the legs feel heavy after Thursday club, drop to 5:50/km and skip the strides. Arriving at Sunday fresh matters more than hitting 35 minutes on Friday.'},
     {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'3',flex:false,club:false,
      desc:'WU: First 10min very easy @ 5:45+/km, HR <135. Body waking up. Main: 60min total @ 5:20–5:40/km, HR 135–148. Run by feel - if HR creeps above 150 in the heat, slow to 5:50. ~10.5km. CD: Final 5min easy, HR <125. GUT: 1 gel at exactly 30min with water. Note brand, flavour, any bloating or GI discomfort. Gut training session 1. Coach: Every Sunday from now until October has a purpose. W1 is pure base - teaching your aerobic system to sustain effort over time. 60min at easy HR does more long-term good than 50min at moderate effort. Your stomach needs 16 weeks of practice. Start today.'},
    ]},
@@ -6179,7 +6179,7 @@ function buildSessModalContent(sess, wk) {
   }
   var wuText  = (d.match(/WU:\s*([\s\S]*?)(?=\s*Main:|$)/i)  || ['',''])[1].trim();
   var mainText= (d.match(/Main:\s*([\s\S]*?)(?=\s*CD:|GUT:|GEL TEST:|GEL:|Should feel|If you|Monitor|Notice|$)/i) || ['',''])[1].trim();
-  var cdText  = (d.match(/CD:\s*([\s\S]*?)(?=\s*GUT:|GEL TEST:|GEL:|Should feel|If you|Monitor|Notice|RPE|$)/i)  || ['',''])[1].trim();
+  var cdText  = (d.match(/CD:\s*([\s\S]*?)(?=\s*GUT:|GEL TEST:|GEL:|Coach:|Should feel|If you|Monitor|Notice|RPE|$)/i)  || ['',''])[1].trim();
   var gutText = (d.match(/(?:GUT|GEL TEST|GEL):\s*([\s\S]*?)(?=\.|$)/i) || ['',''])[1].trim();
   var noteM   = d.match(/(?:Should feel|Notice how|Monitor|If you|Log it|RPE should|Controlled effort)[^.]*\./g);
   if (!wuText && !mainText) mainText = d.split(/GUT:|GEL TEST:|GEL:/i)[0].trim();
