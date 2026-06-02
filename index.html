@@ -2449,7 +2449,7 @@ var planMB = [
   {id:'mbw1',wk:'MB W1 (Jun 1–7)',vol:'~43km',tag:'',
    note:'First week of the marathon block. Let the club sessions settle before pushing quality on Monday. This week is about establishing pattern, not breaking records.',
    sessions:[
-    {id:'flex',day:'Tue / Mon / Fri',t:'Quality',c:'tq',rpe:'4',flex:true,club:false,
+    {id:'flex',day:'Tue',t:'Quality',c:'tq',rpe:'4',flex:true,club:false,
      desc:'WU: 1.5km easy jog @ 5:40+/km, HR <140 (10min). Main: 3×10min @ LT1 (4:54/km, HR 148–58, RPE 3–4), 2min easy jog recovery. In Valencia summer heat, run HR-based - 5:05–5:15/km is fine if that holds HR under 158. First rep should feel almost too easy. Third rep: still conversational, short sentences possible. ~8.5km. CD: 1.5km easy jog (10min), HR dropping to <130. Coach: LT1 is your aerobic ceiling. These reps teach fat-burning efficiency - the exact mechanism needed for 42km. Three 10-minute reps is enough stimulus without digging deep. Walk away feeling like you had more in the tank. If any rep felt hard, you went too fast.'},
     {id:'wed',day:'Wed',t:'Easy / Gym',c:'te',rpe:'3',flex:false,club:false,
      desc:'7km easy @ 5:40–5:50/km. Or gym + 20min easy. HR <145.'},
@@ -6477,16 +6477,18 @@ function renderMarathonBlock() {
           var logBtnHtml = '<button class="mb-log-btn' + (logged ? ' logged' : (stravaRun ? ' logged' : '')) + '" data-logopen="' + logKey + '">' + (logged ? '✓ Logged' : (stravaRun ? '✓ Synced' : '+ Log')) + '</button>';
           var existingLog = renderLogEntry(logKey);
           var logForm = renderLogForm(logKey);
+          var isDone = logged || !!stravaRun;
           var dayClass = s.flex ? 'mb-sess-day flex-day' : 'mb-sess-day';
-          var flexBadge = s.flex ? '<span class="mb-flex-badge">Flexible</span>' : '';
-          var clubBadge = s.club ? '<span class="mb-club-badge">Club TBD</span>' : '';
+          var doneBadge = isDone ? '<span style="font-size:11px;font-weight:800;color:var(--grn);margin-left:6px">&#10003; Done</span>' : '';
+          var flexBadge = (!isDone && s.flex) ? '<span class="mb-flex-badge">Flexible</span>' : '';
+          var clubBadge = (!isDone && s.club) ? '<span class="mb-club-badge">Club TBD</span>' : '';
           var rpeBadge = s.rpe ? '<span class="mb-rpe">RPE ' + s.rpe + '</span>' : '';
-          var sessAttrs = ' data-sessdetail="' + logKey + '" data-wid2="' + w.id + '" data-sid="' + s.id + '" style="cursor:pointer"';
+          var sessAttrs = ' data-sessdetail="' + logKey + '" data-wid2="' + w.id + '" data-sid="' + s.id + '" style="cursor:pointer' + (isDone ? ';opacity:.75' : '') + '"';
           return '<div class="mb-sess"' + sessAttrs + '>' +
             '<div class="' + dayClass + '">' + s.day + '</div>' +
             '<div class="mb-sess-main">' +
-              '<div class="mb-sess-head"><span class="pd-t ' + s.c + '" style="min-width:auto;padding:3px 10px">' + s.t + '</span>' + flexBadge + clubBadge + rpeBadge + '</div>' +
-              '<div class="mb-sess-desc" style="display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;color:var(--t3);font-size:12px">' + s.desc + '</div>' +
+              '<div class="mb-sess-head"><span class="pd-t ' + s.c + '" style="min-width:auto;padding:3px 10px">' + s.t + '</span>' + doneBadge + flexBadge + clubBadge + rpeBadge + '</div>' +
+              '<div class="mb-sess-desc" style="display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;color:var(--t3);font-size:12px">' + (isDone ? '<s>' + s.desc + '</s>' : s.desc) + '</div>' +
               stravaHtml + existingLog + logForm +
             '</div>' +
             '<div>' + logBtnHtml + '</div>' +
