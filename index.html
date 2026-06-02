@@ -6354,23 +6354,26 @@ function renderPhase1() {
 
 // Render a logged entry
 // Find a Strava run matching a session day within a week's date range
+function localDateStr(d) {
+  // Use local date components to avoid UTC timezone shift (Valencia = UTC+2)
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
 function findStravaRunForSession(wkDates, dayLabel) {
   if (!wkDates) return null;
   var dayMap = {Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6};
-  // dayLabel can be 'Tue', 'Thu', 'Wed', 'Sun', or 'Mon / Fri / Sat'
   var targets = dayLabel.split(/\s*\/\s*/).map(function(d){ return d.trim(); });
   var mon = new Date(wkDates.start);
   var candidates = [];
   targets.forEach(function(day) {
     var offset = dayMap[day];
     if (offset === undefined) return;
-    var targetDate = new Date(mon); targetDate.setDate(mon.getDate() + offset);
-    var ds = targetDate.toISOString().slice(0,10);
+    var targetDate = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + offset);
+    var ds = localDateStr(targetDate);
     var match = allRuns.filter(function(r){ return r.ds === ds; });
     candidates = candidates.concat(match);
   });
   if (!candidates.length) return null;
-  // Prefer longest run if multiple on same day
   candidates.sort(function(a,b){ return b.dist - a.dist; });
   return candidates[0];
 }
