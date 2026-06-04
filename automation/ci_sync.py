@@ -22,6 +22,7 @@ CLIENT_SECRET = os.environ['STRAVA_CLIENT_SECRET']
 REFRESH_TOKEN = os.environ['STRAVA_REFRESH_TOKEN']
 GH_PAT        = os.environ.get('GH_PAT', '')
 GH_REPO       = os.environ.get('GH_REPO', '')
+UA            = 'RunningJournal-strava-sync/1.0 (+https://github.com/LiamCanning/RunningJournal)'
 
 # ── Repo-relative paths ───────────────────────────────────────────────────────
 REPO_DIR       = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -30,30 +31,34 @@ CLASSIFIED_CSV = os.path.join(REPO_DIR, 'classified_runs.csv')
 DASHBOARD_HTML = os.path.join(REPO_DIR, 'index.html')
 
 # ── 1. Token refresh ──────────────────────────────────────────────────────────
-def _strava_post_with_retry(url, data, retries=3, backoff=15):
-    """POST to Strava with exponential-backoff retry on 5xx / network errors."""
+def _strava_post_with_retry(url, data, retries=4, backoff=15):
+    """POST to Strava with exponential-backoff retry on 5xx, 429 and transient
+    403s (Cloudflare/WAF blips on cloud-runner IPs) plus network errors.
+    Returns the last response (or None on persistent network error) so the caller
+    can skip a run gracefully instead of crashing on a transient issue."""
+    resp = None
     for attempt in range(retries):
         try:
-            resp = requests.post(url, data=data, timeout=30)
-            if resp.status_code < 500:
-                return resp          # success or 4xx — don't retry 4xx
+            resp = requests.post(url, data=data, timeout=30, headers={'User-Agent': UA})
+            if resp.status_code not in (403, 429) and resp.status_code < 500:
+                return resp          # 200, or a non-transient 4xx (e.g. 400)
             print(f"[retry] Strava POST {resp.status_code} (attempt {attempt+1}/{retries})", file=sys.stderr)
         except requests.exceptions.RequestException as e:
             print(f"[retry] Strava POST network error: {e} (attempt {attempt+1}/{retries})", file=sys.stderr)
             if attempt == retries - 1:
-                raise
+                return None
         if attempt < retries - 1:
             time.sleep(backoff * (attempt + 1))
-    resp.raise_for_status()
     return resp
 
 
 def _strava_get_with_retry(url, headers, params=None, retries=3, backoff=15):
     """GET from Strava with retry on 5xx. Exits gracefully on rate limit."""
     last_429 = None
+    last_403 = None
     for attempt in range(retries):
         try:
-            resp = requests.get(url, headers=headers, params=params, timeout=30)
+            resp = requests.get(url, headers={**headers, 'User-Agent': UA}, params=params, timeout=30)
             if resp.status_code == 429:
                 last_429 = resp
                 usage = resp.headers.get('X-ReadRateLimit-Usage', '')
@@ -72,6 +77,12 @@ def _strava_get_with_retry(url, headers, params=None, retries=3, backoff=15):
                     print(f"[rate-limit] Waiting {wait}s...")
                     time.sleep(wait)
                 continue
+            if resp.status_code == 403:
+                last_403 = resp
+                print(f"[retry] Strava GET 403 (attempt {attempt+1}/{retries})", file=sys.stderr)
+                if attempt < retries - 1:
+                    time.sleep(15 * (2 ** attempt))
+                continue
             if resp.status_code < 500:
                 return resp
             print(f"[retry] Strava GET {resp.status_code} (attempt {attempt+1}/{retries})", file=sys.stderr)
@@ -85,6 +96,9 @@ def _strava_get_with_retry(url, headers, params=None, retries=3, backoff=15):
     if last_429 is not None:
         print("[rate-limit] All retries exhausted on 429. Exiting cleanly.")
         sys.exit(0)
+    if last_403 is not None:
+        print("[forbidden] All retries exhausted on 403 (transient Strava/Cloudflare). Exiting cleanly.")
+        sys.exit(0)
     resp.raise_for_status()
     return resp
 
@@ -96,7 +110,11 @@ def get_access_token():
         'refresh_token': REFRESH_TOKEN,
         'grant_type':    'refresh_token',
     })
-    resp.raise_for_status()
+    if resp is None or resp.status_code != 200:
+        code = resp.status_code if resp is not None else 'network error'
+        print(f"[token] Strava token refresh failed ({code}) after retries. "
+              "Transient Strava/Cloudflare issue - skipping this run; next hour retries.")
+        sys.exit(0)
     data = resp.json()
     new_refresh = data['refresh_token']
     access_token = data['access_token']
