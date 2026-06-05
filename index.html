@@ -463,6 +463,12 @@ body{font-family:'Geist',system-ui,-apple-system,sans-serif;color:var(--t1);back
 .mb-log-btn{font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;background:var(--bg2);border:1px solid var(--bdr2);color:var(--t2);cursor:pointer;white-space:nowrap;transition:all .15s}
 .mb-log-btn:hover{background:var(--card2);color:var(--t1)}
 .mb-log-btn.logged{background:var(--grnSoft);color:var(--grn);border-color:rgba(34,201,122,.3)}
+.mb-done-btn{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;background:var(--bg2);border:1px solid var(--bdr2);color:var(--t2);cursor:pointer;white-space:nowrap;transition:all .15s}
+.mb-done-btn:hover{border-color:var(--grn);color:var(--t1)}
+.mb-done-btn .mb-done-box{width:14px;height:14px;border:2px solid var(--bdr2);border-radius:4px;flex-shrink:0;position:relative;transition:all .15s}
+.mb-done-btn.done{background:var(--grnSoft);color:var(--grn);border-color:rgba(34,201,122,.3)}
+.mb-done-btn.done .mb-done-box{background:var(--grn);border-color:var(--grn)}
+.mb-done-btn.done .mb-done-box::after{content:'';position:absolute;left:3px;top:0;width:4px;height:8px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
 .mb-log-form{background:var(--bg2);border-radius:8px;padding:12px;margin-top:8px;display:none}
 .mb-log-form.open{display:block}
 .mb-log-row{display:grid;grid-template-columns:1fr 1fr 1fr 60px;gap:8px;margin-bottom:8px}
@@ -6080,6 +6086,9 @@ function savePlanChecks() { localStorage.setItem('planChecks', JSON.stringify(pl
 var mbLogs = {};
 try { mbLogs = JSON.parse(localStorage.getItem('mbLogs') || '{}'); } catch(e) {}
 function saveMbLogs() { localStorage.setItem('mbLogs', JSON.stringify(mbLogs)); }
+var mbDone = {};
+try { mbDone = JSON.parse(localStorage.getItem('mbDone') || '{}'); } catch(e) {}
+function saveMbDone() { localStorage.setItem('mbDone', JSON.stringify(mbDone)); }
 
 var planWkIdx = 0;
 var todayDate = new Date(); todayDate.setHours(0,0,0,0);
@@ -6687,7 +6696,7 @@ function renderMarathonBlock() {
         var nowBadge = isCurrent ? '<span class="pw-now-badge">This week</span>' : '';
         var tagBadge = w.tag ? '<span style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;background:var(--orgGlow);color:var(--org);padding:2px 8px;border-radius:4px;margin-left:8px">' + w.tag + '</span>' : '';
         // Count logged sessions for progress
-        var loggedCount = w.sessions.filter(function(s){ return mbLogs[w.id + '_' + s.id]; }).length;
+        var loggedCount = w.sessions.filter(function(s){ var k = w.id + '_' + s.id; return mbLogs[k] || mbDone[k]; }).length;
         var totalLoggable = w.sessions.length;
         var weekLoggedKm = w.sessions.reduce(function(sum, s) {
           var e = mbLogs[w.id + '_' + s.id];
@@ -6714,10 +6723,12 @@ function renderMarathonBlock() {
           // Auto-match from Strava by day
           var stravaRun = findStravaRunForSession(wkDates, s.day);
           var stravaHtml = (!logged && stravaRun) ? renderStravaMatch(stravaRun) : '';
+          var manualDone = !!mbDone[logKey];
           var logBtnHtml = '<button class="mb-log-btn' + (logged ? ' logged' : (stravaRun ? ' logged' : '')) + '" data-logopen="' + logKey + '">' + (logged ? '✓ Logged' : (stravaRun ? '✓ Synced' : '+ Log')) + '</button>';
           var existingLog = renderLogEntry(logKey);
           var logForm = renderLogForm(logKey);
-          var isDone = logged || !!stravaRun;
+          var isDone = logged || !!stravaRun || manualDone;
+          var doneBtnHtml = '<button class="mb-done-btn' + (isDone ? ' done' : '') + '" data-donetoggle="' + logKey + '" title="Mark complete"><span class="mb-done-box"></span>' + (isDone ? 'Done' : 'Mark done') + '</button>';
           var dayClass = s.flex ? 'mb-sess-day flex-day' : 'mb-sess-day';
           var doneBadge = isDone ? '<span style="font-size:11px;font-weight:800;color:var(--grn);margin-left:6px">&#10003; Done</span>' : '';
           var flexBadge = (!isDone && s.flex) ? '<span class="mb-flex-badge">Flexible</span>' : '';
@@ -6731,7 +6742,7 @@ function renderMarathonBlock() {
               '<div class="mb-sess-desc" style="display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;color:var(--t3);font-size:12px">' + (isDone ? '<s>' + s.desc + '</s>' : s.desc) + '</div>' +
               stravaHtml + existingLog + logForm +
             '</div>' +
-            '<div>' + logBtnHtml + '</div>' +
+            '<div style="display:flex;flex-direction:column;gap:6px;align-items:stretch">' + doneBtnHtml + logBtnHtml + '</div>' +
           '</div>';
         }).join('');
         return '<div class="' + cls + '" data-wid="' + w.id + '">' +
@@ -7733,6 +7744,19 @@ document.getElementById('pg-plan').addEventListener('click', function(e) {
   // Phase 1 week expand/collapse
   var pw = e.target.closest('.pw');
   if (pw && !e.target.closest('.pw-body')) { pw.classList.toggle('open'); return; }
+  // Done tick: mark/unmark a session complete (strike-through)
+  var doneBtn = e.target.closest('[data-donetoggle]');
+  if (doneBtn) {
+    var dkey = doneBtn.dataset.donetoggle;
+    if (mbDone[dkey]) { delete mbDone[dkey]; } else { mbDone[dkey] = true; }
+    saveMbDone();
+    document.getElementById('pg-plan').innerHTML =
+      buildPaceZonesKey() +
+      renderPhase1() +
+      renderMarathonBlock() +
+      '<div class="mb-log-summary"><div class="mb-log-summary-h">Block log — all sessions</div>' + renderBlockLog() + '</div>';
+    e.stopPropagation(); return;
+  }
   // Log button: open/close form
   var logBtn = e.target.closest('[data-logopen]');
   if (logBtn) {
