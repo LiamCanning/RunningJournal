@@ -1411,59 +1411,73 @@ textarea.race-modal-inp{resize:vertical;min-height:56px}
 .fc-band { background: linear-gradient(90deg,var(--c-easy) 0%,var(--c-easy) var(--bestPct),var(--c-race) var(--bestPct),var(--c-race) var(--midPct),var(--c-tempo) var(--midPct),var(--c-tempo) 100%) !important; }
 
 /* ===== PROGRESS PAGE ===== */
-.pgr-sec{margin-bottom:34px}
-.pgr-sec-h{font-size:13px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--t3);margin:0 0 4px}
-.pgr-sec-sub{font-size:13px;color:var(--t3);margin:0 0 16px;line-height:1.4}
-.pgr-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
-.pgr-card{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden}
-.pgr-card.hot{border-color:var(--grn);background:var(--grnSoft)}
-.pgr-card.cold{border-color:var(--bdr2)}
-.pgr-card-k{font-size:30px;font-weight:800;font-family:'Geist Mono',monospace;color:var(--t1);line-height:1}
-.pgr-card-k small{font-size:14px;font-weight:700;color:var(--t3)}
-.pgr-card-l{font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--t3);margin-top:8px}
-.pgr-card-note{font-size:11px;color:var(--t3);margin-top:4px;line-height:1.3}
-.pgr-weeks{display:flex;flex-direction:column;gap:7px}
-.pgr-wkrow{display:flex;align-items:center;gap:10px}
-.pgr-wkrow-lbl{font-size:11px;font-weight:700;color:var(--t2);width:120px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pgr-wkrow-bar{flex:1;height:14px;background:var(--card2);border:1px solid var(--bdr);border-radius:7px;overflow:hidden;position:relative}
-.pgr-wkrow-fill{height:100%;border-radius:7px;transition:width .4s}
-.pgr-wkrow-pct{font-size:11px;font-weight:800;font-family:'Geist Mono',monospace;color:var(--t2);width:52px;flex-shrink:0;text-align:right}
-.pgr-wkrow.future{opacity:.45}
-.pgr-wkrow.current .pgr-wkrow-lbl{color:var(--grn)}
-.pgr-heat{display:flex;gap:4px;overflow-x:auto;padding-bottom:6px}
-.pgr-heat-wk{display:flex;flex-direction:column;gap:4px}
-.pgr-heat-cell{width:15px;height:15px;border-radius:3px;background:var(--card3);position:relative}
-.pgr-heat-lbl{font-size:9px;color:var(--t3);text-align:center;margin-top:2px;font-weight:700}
-.pgr-heat-leg{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:11px;color:var(--t3);font-weight:600}
-.pgr-heat-leg span{display:inline-flex;align-items:center;gap:5px}
-.pgr-heat-leg i{width:11px;height:11px;border-radius:3px;display:inline-block}
-.pgr-gauge{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:16px 18px}
-.pgr-gauge-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
-.pgr-gauge-name{font-size:13px;font-weight:800;color:var(--t1)}
-.pgr-gauge-val{font-size:13px;font-weight:700;font-family:'Geist Mono',monospace;color:var(--t2)}
-.pgr-gauge-track{height:10px;background:var(--card2);border:1px solid var(--bdr);border-radius:6px;overflow:hidden}
-.pgr-gauge-fill{height:100%;border-radius:6px;transition:width .5s}
-.pgr-gauge-note{font-size:11px;color:var(--t3);margin-top:7px;line-height:1.35}
-.pgr-timeline{display:flex;border:1px solid var(--bdr);border-radius:10px;overflow:hidden;height:34px;margin-bottom:8px;position:relative}
-.pgr-tl-seg{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:.5px;overflow:hidden;white-space:nowrap}
-.pgr-tl-now{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--t1)}
-.pgr-tl-now::after{content:'';position:absolute;top:-4px;left:-4px;width:10px;height:10px;border-radius:50%;background:var(--t1)}
-.pgr-badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
-.pgr-badge{background:var(--card);border:1px solid var(--bdr);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px;position:relative;transition:all .2s}
-.pgr-badge.earned{border-color:var(--grn);background:var(--grnSoft)}
-.pgr-badge.locked{opacity:.55}
-.pgr-badge-ic{font-size:28px;line-height:1;filter:grayscale(0)}
-.pgr-badge.locked .pgr-badge-ic{filter:grayscale(1) opacity(.6)}
-.pgr-badge-name{font-size:13px;font-weight:800;color:var(--t1)}
-.pgr-badge-crit{font-size:11px;color:var(--t3);line-height:1.35}
-.pgr-badge-date{font-size:10px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--grn)}
-.pgr-badge-prog{font-size:10px;font-weight:700;color:var(--t3)}
-.pgr-badge-tick{position:absolute;top:12px;right:12px;font-size:14px;color:var(--grn);font-weight:800}
-.pgr-rings{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
-.pgr-ring-legend{display:flex;flex-direction:column;gap:8px}
-.pgr-ring-leg-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t2);font-weight:600}
+.pgr-block{margin-bottom:26px}
+.pgr-card{background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:20px 22px;position:relative;overflow:hidden}
+/* hero phase timeline (sits on the dark hero) */
+.pgr-htl-wrap{margin-top:18px}
+.pgr-htl{display:flex;height:30px;border-radius:8px;overflow:hidden;position:relative;background:rgba(255,255,255,.12)}
+.pgr-htl-seg{display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800;color:rgba(255,255,255,.92);text-transform:uppercase;letter-spacing:.6px;overflow:hidden;white-space:nowrap;border-right:1px solid rgba(0,0,0,.18)}
+.pgr-htl-seg:last-child{border-right:none}
+.pgr-htl-now{position:absolute;top:-3px;bottom:-3px;width:3px;background:#fff;border-radius:2px;box-shadow:0 0 0 2px rgba(0,0,0,.15)}
+.pgr-htl-now::after{content:'';position:absolute;top:-5px;left:-4px;width:11px;height:11px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px rgba(0,0,0,.15)}
+.pgr-htl-cap{display:flex;justify-content:space-between;font-size:10px;opacity:.7;margin-top:6px;font-weight:600}
+/* gauge cards (fitness markers) */
+.pgr-gauge{background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:18px 20px;position:relative;overflow:hidden}
+.pgr-gauge::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.pgr-gauge.g-prp::before{background:var(--prp)}
+.pgr-gauge.g-grn::before{background:var(--grn)}
+.pgr-gauge-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.pgr-gauge-name{font-size:13px;font-weight:700;color:var(--t1)}
+.pgr-gauge-val{font-family:'Geist Mono',monospace;font-size:15px;font-weight:600;color:var(--t1)}
+.pgr-gauge-val small{color:var(--t3);font-size:12px}
+.pgr-gauge-track{height:9px;background:var(--card3);border-radius:5px;overflow:hidden}
+.pgr-gauge-fill{height:100%;border-radius:5px;transition:width .6s ease}
+.pgr-gauge-note{font-size:11.5px;color:var(--t3);margin-top:9px;line-height:1.4}
+/* weekly adherence bars */
+.pgr-wk{display:flex;align-items:center;gap:12px;padding:5px 0}
+.pgr-wk+.pgr-wk{border-top:1px solid var(--bdr2)}
+.pgr-wk-lbl{font-size:11.5px;font-weight:600;color:var(--t2);width:132px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Geist Mono',monospace}
+.pgr-wk-bar{flex:1;height:10px;background:var(--card3);border-radius:5px;overflow:hidden}
+.pgr-wk-fill{height:100%;border-radius:5px;transition:width .5s ease}
+.pgr-wk-pct{font-size:11.5px;font-weight:600;font-family:'Geist Mono',monospace;color:var(--t2);width:42px;flex-shrink:0;text-align:right}
+.pgr-wk.future{opacity:.4}
+.pgr-wk.current .pgr-wk-lbl{color:var(--grn);font-weight:800}
+.pgr-wk-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--grn);margin-left:5px;vertical-align:middle}
+/* this-week rings */
+.pgr-rings{display:flex;gap:28px;align-items:center;flex-wrap:wrap}
+.pgr-ring-svg{flex-shrink:0}
+.pgr-ring-legend{display:flex;flex-direction:column;gap:12px;flex:1;min-width:180px}
+.pgr-ring-leg-item{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--t2);font-weight:600}
 .pgr-ring-leg-item i{width:12px;height:12px;border-radius:50%;flex-shrink:0}
-.pgr-ring-leg-item b{font-family:'Geist Mono',monospace;color:var(--t1)}
+.pgr-ring-leg-item b{margin-left:auto;font-family:'Geist Mono',monospace;color:var(--t1);font-weight:600}
+.pgr-load{font-size:12.5px;color:var(--t2);margin-top:16px;padding-top:14px;border-top:1px solid var(--bdr2);line-height:1.5}
+/* consistency heatmap */
+.pgr-heat{display:flex;gap:3px;overflow-x:auto;padding-bottom:2px}
+.pgr-heat-wk{display:flex;flex-direction:column;gap:3px}
+.pgr-heat-cell{width:16px;height:16px;border-radius:4px;background:var(--card3)}
+.pgr-heat-months{display:flex;gap:3px;margin-top:5px}
+.pgr-heat-mn{width:16px;font-size:9px;color:var(--t3);font-weight:700}
+.pgr-heat-leg{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;font-size:11.5px;color:var(--t3);font-weight:600}
+.pgr-heat-leg span{display:inline-flex;align-items:center;gap:6px}
+.pgr-heat-leg i{width:11px;height:11px;border-radius:3px;display:inline-block}
+/* milestones / badges */
+.pgr-badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:14px}
+.pgr-badge{background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:18px 16px 16px;display:flex;flex-direction:column;gap:7px;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.pgr-badge.earned{border-color:var(--bdr)}
+.pgr-badge.earned::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grd1)}
+.pgr-badge.earned:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.pgr-badge.locked{background:var(--card2)}
+.pgr-badge-ic{font-size:30px;line-height:1}
+.pgr-badge.locked .pgr-badge-ic{filter:grayscale(1);opacity:.45}
+.pgr-badge-name{font-size:13.5px;font-weight:700;color:var(--t1)}
+.pgr-badge.locked .pgr-badge-name{color:var(--t2)}
+.pgr-badge-crit{font-size:11px;color:var(--t3);line-height:1.4;flex:1}
+.pgr-badge-date{font-size:10px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:var(--grn);font-family:'Geist Mono',monospace}
+.pgr-badge-ptrack{height:5px;background:var(--card3);border-radius:3px;overflow:hidden;margin-top:2px}
+.pgr-badge-pfill{height:100%;background:var(--t3);border-radius:3px;opacity:.5}
+.pgr-badge-ptxt{font-size:10px;font-weight:700;color:var(--t3);font-family:'Geist Mono',monospace}
+.pgr-badge-tick{position:absolute;top:13px;right:14px;font-size:13px;color:var(--grn);font-weight:800}
+@media(max-width:600px){.pgr-wk-lbl{width:96px}.pgr-badges{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -8660,28 +8674,10 @@ setTimeout(function() {
   var greenWks=started.filter(function(f){return f.pct>=THRESH;}).length;
   var avgAdh=started.length?Math.round(started.reduce(function(a,f){return a+f.pct;},0)/started.length):0;
 
-  // ---------- TIER 1a: adherence ----------
   function barCol(p){ return p>=80?'var(--grn)':p>=50?'var(--org)':'var(--red)'; }
-  var streakCards=
-    '<div class="pgr-cards">'+
-      '<div class="pgr-card '+(curStreak>0?'hot':'cold')+'"><div class="pgr-card-k">'+curStreak+'<small> wk</small></div><div class="pgr-card-l">Current streak</div><div class="pgr-card-note">consecutive weeks &ge;'+THRESH+'% of plan done</div></div>'+
-      '<div class="pgr-card"><div class="pgr-card-k">'+bestStreak+'<small> wk</small></div><div class="pgr-card-l">Best streak</div><div class="pgr-card-note">longest run of green weeks</div></div>'+
-      '<div class="pgr-card"><div class="pgr-card-k">'+greenWks+'<small> / '+started.length+'</small></div><div class="pgr-card-l">Weeks nailed</div><div class="pgr-card-note">of '+flat.length+' in the block</div></div>'+
-      '<div class="pgr-card"><div class="pgr-card-k">'+avgAdh+'<small>%</small></div><div class="pgr-card-l">Avg adherence</div><div class="pgr-card-note">across started weeks</div></div>'+
-    '</div>';
-  var wkBars=flat.map(function(f){
-    var lbl=f.w.wk.replace(/^MB\s*/,'').replace(/\s*–\s*(HOLIDAY|RE-ENTRY)/,'');
-    var cls='pgr-wkrow'+(f.status==='future'?' future':'')+(f.status==='current'?' current':'');
-    var fillpct=f.status==='future'?0:f.pct;
-    var pcttxt=f.status==='future'?'—':f.pct+'%';
-    return '<div class="'+cls+'"><div class="pgr-wkrow-lbl">'+lbl+(f.status==='current'?' ●':'')+'</div>'+
-      '<div class="pgr-wkrow-bar"><div class="pgr-wkrow-fill" style="width:'+fillpct+'%;background:'+barCol(f.pct)+'"></div></div>'+
-      '<div class="pgr-wkrow-pct">'+pcttxt+'</div></div>';
-  }).join('');
-  var blockNote=started.length?'':'<div class="pgr-sec-sub">Block opens '+MN[parsePlanWeekDates(planMB[0].weeks[0].wk).start.getMonth()]+' '+parsePlanWeekDates(planMB[0].weeks[0].wk).start.getDate()+'. Streaks start counting once weeks complete.</div>';
-  var tier1a='<div class="pgr-sec"><div class="pgr-sec-h">Plan adherence</div><div class="pgr-sec-sub">A week counts as nailed at '+THRESH+'%+ of planned sessions done (logged, ticked off, or auto-matched from Strava).</div>'+blockNote+streakCards+'<div class="pgr-weeks">'+wkBars+'</div></div>';
+  var curF=flat.filter(function(f){return f.status==='current';})[0];
 
-  // ---------- TIER 1b: consistency heatmap (last 18 weeks to date) ----------
+  // ---------- consistency heatmap (last 18 weeks to date) ----------
   var COLS=18;
   var hStart=mondayOf(now); hStart.setDate(hStart.getDate()-(COLS-1)*7);
   var heatCols='',monthRow='',lastMonth=-1;
@@ -8689,7 +8685,7 @@ setTimeout(function() {
     var wkStart=new Date(hStart); wkStart.setDate(hStart.getDate()+c*7);
     var mLbl=(wkStart.getMonth()!==lastMonth)?MN[wkStart.getMonth()]:'';
     lastMonth=wkStart.getMonth();
-    monthRow+='<div style="width:15px;font-size:9px;color:var(--t3);font-weight:700">'+mLbl+'</div>';
+    monthRow+='<div class="pgr-heat-mn">'+mLbl+'</div>';
     var cells='';
     for(var r=0;r<7;r++){
       var day=new Date(wkStart); day.setDate(wkStart.getDate()+r);
@@ -8712,35 +8708,40 @@ setTimeout(function() {
     '<span><i style="background:'+CC_ITVL+'"></i>Intervals</span>'+
     '<span><i style="background:'+CC_RACE+'"></i>Race</span>'+
     '<span><i style="background:var(--card3)"></i>Rest</span></div>';
-  var tier1b='<div class="pgr-sec"><div class="pgr-sec-h">Consistency</div><div class="pgr-sec-sub">Last 18 weeks. Each column is a week (Mon&ndash;Sun), each square a day, coloured by hardest session.</div>'+
-    '<div class="pgr-heat">'+heatCols+'</div><div class="pgr-heat" style="margin-top:2px">'+monthRow+'</div>'+heatLeg+'</div>';
 
-  // ---------- TIER 1c: road to 3:25 ----------
+  // ---------- phase timeline (hero progress strip) ----------
   var phaseCol={base:'#2563EB',threshold:'#4338CA',specificity:'#0F766E',consolidation:'#B45309',taper:'#d32828'};
+  function phaseName(ph){ return (ph.label.split('–')[1]||ph.label).replace(/\(.*$/,'').trim(); }
   var totWk=flat.length;
   var tlSegs=planMB.map(function(ph){
     var n=ph.weeks.length, wpc=(n/totWk*100).toFixed(2);
-    var nm=(ph.label.split('–')[1]||ph.label).replace(/\(.*$/,'').trim();
     var col=phaseCol[ph.cls]||'#8A8680';
-    return '<div class="pgr-tl-seg" style="width:'+wpc+'%;background:'+col+'" title="'+nm+' · '+n+' wk">'+(n>=2?nm:'')+'</div>';
+    return '<div class="pgr-htl-seg" style="width:'+wpc+'%;background:'+col+'" title="'+phaseName(ph)+' · '+n+' wk">'+(n>=2?phaseName(ph):'')+'</div>';
   }).join('');
   var fStart=parsePlanWeekDates(planMB[0].weeks[0].wk).start;
   var nowPct=Math.max(0,Math.min(100,(now-fStart)/(RACE-fStart)*100));
   var daysToRace=Math.max(0,Math.ceil((RACE-now)/864e5));
-  var timeline='<div class="pgr-timeline">'+tlSegs+'<div class="pgr-tl-now" style="left:'+nowPct+'%"></div></div>';
-  function gauge(name,val,target,unit,col,note){
+  var curPhaseName=curF?phaseName(curF.ph):(now<fStart?'Pre-block':'Taper');
+
+  // ---------- gauge cards (fitness markers) ----------
+  function gauge(name,val,target,unit,cls,col,note){
     var p=Math.max(0,Math.min(100,val/target*100));
-    return '<div class="pgr-gauge"><div class="pgr-gauge-top"><span class="pgr-gauge-name">'+name+'</span>'+
-      '<span class="pgr-gauge-val">'+val.toFixed(1)+' / '+target+unit+'</span></div>'+
+    return '<div class="pgr-gauge '+cls+'"><div class="pgr-gauge-top"><span class="pgr-gauge-name">'+name+'</span>'+
+      '<span class="pgr-gauge-val">'+val.toFixed(1)+'<small> / '+target+unit+'</small></span></div>'+
       '<div class="pgr-gauge-track"><div class="pgr-gauge-fill" style="width:'+p+'%;background:'+col+'"></div></div>'+
       '<div class="pgr-gauge-note">'+note+'</div></div>';
   }
-  var tier1c='<div class="pgr-sec"><div class="pgr-sec-h">Road to 3:25</div><div class="pgr-sec-sub">'+daysToRace+' days to Cologne. Target 3:25:00 at 4:52/km.</div>'+
-    timeline+
-    '<div class="pgr-cards" style="margin-top:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">'+
-      gauge('Longest run',longestRun,35,'km','var(--prp)','Plan peaks at a 35km long run. Best so far '+(longestRunDate||'—')+'.')+
-      gauge('Weekly volume',weeklyAvg,60,'km','var(--grn)','4-week rolling average vs the ~60km peak week.')+
-    '</div></div>';
+
+  // ---------- weekly adherence bars ----------
+  var wkBars=flat.map(function(f){
+    var lbl=f.w.wk.replace(/^MB\s*/,'').replace(/\s*–\s*(HOLIDAY|RE-ENTRY)/,'');
+    var cls='pgr-wk'+(f.status==='future'?' future':'')+(f.status==='current'?' current':'');
+    var fillpct=f.status==='future'?0:f.pct;
+    var pcttxt=f.status==='future'?'—':f.pct+'%';
+    return '<div class="'+cls+'"><div class="pgr-wk-lbl">'+lbl+(f.status==='current'?'<span class="pgr-wk-dot"></span>':'')+'</div>'+
+      '<div class="pgr-wk-bar"><div class="pgr-wk-fill" style="width:'+fillpct+'%;background:'+barCol(f.pct)+'"></div></div>'+
+      '<div class="pgr-wk-pct">'+pcttxt+'</div></div>';
+  }).join('');
 
   // ---------- TIER 2: badge wall ----------
   function paceS(r){ return paceToSecs(r.pace); }
@@ -8771,14 +8772,15 @@ setTimeout(function() {
     {ic:'✅',name:'Perfect week',crit:'100% of a plan week done',earned:perfectWk.length>0,date:perfectWk.length?(perfectWk[0].dt?dsOf(perfectWk[0].dt.end):null):null}
   ];
   var earnedN=BADGES.filter(function(b){return b.earned;}).length;
-  var badgeHtml=BADGES.map(function(b){
-    var tail=b.earned?(b.date?'<div class="pgr-badge-date">'+b.date+'</div>':'<div class="pgr-badge-date">Earned</div>'):
-      (b.prog!=null?'<div class="pgr-badge-prog">'+b.prog+'% there</div>':'<div class="pgr-badge-prog">Locked</div>');
+  var badgeOrder=BADGES.filter(function(b){return b.earned;}).concat(BADGES.filter(function(b){return !b.earned;}));
+  var badgeHtml=badgeOrder.map(function(b){
+    var tail=b.earned?
+      '<div class="pgr-badge-date">'+(b.date||'Earned')+'</div>':
+      (b.prog!=null?'<div class="pgr-badge-ptrack"><div class="pgr-badge-pfill" style="width:'+b.prog+'%"></div></div><div class="pgr-badge-ptxt">'+b.prog+'% there</div>':'<div class="pgr-badge-ptxt">Locked</div>');
     return '<div class="pgr-badge '+(b.earned?'earned':'locked')+'">'+(b.earned?'<div class="pgr-badge-tick">✓</div>':'')+
       '<div class="pgr-badge-ic">'+b.ic+'</div><div class="pgr-badge-name">'+b.name+'</div>'+
       '<div class="pgr-badge-crit">'+b.crit+'</div>'+tail+'</div>';
   }).join('');
-  var tier2='<div class="pgr-sec"><div class="pgr-sec-h">Trophy case</div><div class="pgr-sec-sub">'+earnedN+' of '+BADGES.length+' unlocked. Computed from your run history.</div><div class="pgr-badges">'+badgeHtml+'</div></div>';
 
   // ---------- TIER 3: weekly rings + load ----------
   var cwStart=mondayOf(now), cwEnd=new Date(cwStart); cwEnd.setDate(cwStart.getDate()+6);
@@ -8786,8 +8788,7 @@ setTimeout(function() {
   var wkKm=wkRuns.reduce(function(a,r){return a+(r.dist||0);},0);
   var wkLong=wkRuns.reduce(function(m,r){return Math.max(m,r.dist||0);},0);
   var wkQual=wkRuns.filter(function(r){var p=runColour(r).p;return p>=3;}).length;
-  // current plan week targets
-  var curF=flat.filter(function(f){return f.status==='current';})[0];
+  // current plan week targets (curF computed earlier)
   var tVol=50,tQual=2,tLong=20;
   if(curF){
     var vm=(curF.w.vol||'').match(/([\d.]+)/); if(vm) tVol=parseFloat(vm[1]);
@@ -8797,31 +8798,77 @@ setTimeout(function() {
   }
   function ring(cx,cy,rad,frac,col){
     var circ=2*Math.PI*rad, off=circ*(1-Math.min(1,frac));
-    return '<circle cx="'+cx+'" cy="'+cy+'" r="'+rad+'" fill="none" stroke="var(--card2)" stroke-width="11"/>'+
-      '<circle cx="'+cx+'" cy="'+cy+'" r="'+rad+'" fill="none" stroke="'+col+'" stroke-width="11" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'" transform="rotate(-90 '+cx+' '+cy+')"/>';
+    return '<circle cx="'+cx+'" cy="'+cy+'" r="'+rad+'" fill="none" stroke="var(--card3)" stroke-width="12"/>'+
+      '<circle cx="'+cx+'" cy="'+cy+'" r="'+rad+'" fill="none" stroke="'+col+'" stroke-width="12" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'" transform="rotate(-90 '+cx+' '+cy+')"/>';
   }
   var rVol=wkKm/tVol, rQual=tQual?wkQual/tQual:0, rLong=tLong?wkLong/tLong:0;
-  var ringsSvg='<svg width="150" height="150" viewBox="0 0 150 150">'+
-    ring(75,75,62,rVol,CC_LONG)+ring(75,75,48,rQual,CC_ITVL)+ring(75,75,34,rLong,CC_TEMPO)+'</svg>';
+  var ringsSvg='<svg class="pgr-ring-svg" width="156" height="156" viewBox="0 0 156 156">'+
+    ring(78,78,66,rVol,CC_LONG)+ring(78,78,50,rQual,CC_ITVL)+ring(78,78,34,rLong,CC_TEMPO)+'</svg>';
   var ringsLeg='<div class="pgr-ring-legend">'+
-    '<div class="pgr-ring-leg-item"><i style="background:'+CC_LONG+'"></i>Volume <b>'+wkKm.toFixed(0)+' / '+tVol+'km</b></div>'+
-    '<div class="pgr-ring-leg-item"><i style="background:'+CC_ITVL+'"></i>Quality <b>'+wkQual+' / '+tQual+'</b></div>'+
-    '<div class="pgr-ring-leg-item"><i style="background:'+CC_TEMPO+'"></i>Long run <b>'+wkLong.toFixed(1)+' / '+tLong+'km</b></div></div>';
+    '<div class="pgr-ring-leg-item"><i style="background:'+CC_LONG+'"></i>Volume <b>'+wkKm.toFixed(0)+' / '+tVol+' km</b></div>'+
+    '<div class="pgr-ring-leg-item"><i style="background:'+CC_ITVL+'"></i>Quality sessions <b>'+wkQual+' / '+tQual+'</b></div>'+
+    '<div class="pgr-ring-leg-item"><i style="background:'+CC_TEMPO+'"></i>Long run <b>'+wkLong.toFixed(1)+' / '+tLong+' km</b></div></div>';
   // load trend: last completed week vs avg of 3 prior
   function wkKmEnding(weeksAgo){ var s=new Date(cwStart); s.setDate(s.getDate()-7*weeksAgo); var e=new Date(s); e.setDate(s.getDate()+6); return allRuns.reduce(function(a,r){var d=new Date(r.ds);return a+((d>=s&&d<=e)?(r.dist||0):0);},0); }
   var lastWk=wkKmEnding(1), prior3=(wkKmEnding(2)+wkKmEnding(3)+wkKmEnding(4))/3;
   var loadMsg;
   if(prior3<1){ loadMsg='Not enough history yet to judge load progression.'; }
   else { var chg=Math.round((lastWk/prior3-1)*100);
-    if(chg>10) loadMsg='⚠️ Last week ('+lastWk.toFixed(0)+'km) jumped '+chg+'% over the prior 3-week average ('+prior3.toFixed(0)+'km). Watch for overreaching - the 10% rule says ease back.';
-    else if(chg<-15) loadMsg='Last week ('+lastWk.toFixed(0)+'km) was '+Math.abs(chg)+'% below the 3-week average. Fine if it is a recovery or taper week.';
-    else loadMsg='✓ Last week ('+lastWk.toFixed(0)+'km) is '+(chg>=0?'+':'')+chg+'% vs the 3-week average ('+prior3.toFixed(0)+'km). Healthy progression.';
+    if(chg>10) loadMsg='<b style="color:var(--org)">Building fast.</b> Last week ('+lastWk.toFixed(0)+'km) jumped '+chg+'% over the prior 3-week average ('+prior3.toFixed(0)+'km). The 10% rule says ease back to avoid overreaching.';
+    else if(chg<-15) loadMsg='<b>Down week.</b> Last week ('+lastWk.toFixed(0)+'km) was '+Math.abs(chg)+'% below the 3-week average. Fine if it is recovery or taper.';
+    else loadMsg='<b style="color:var(--grn)">Healthy progression.</b> Last week ('+lastWk.toFixed(0)+'km) is '+(chg>=0?'+':'')+chg+'% vs the 3-week average ('+prior3.toFixed(0)+'km).';
   }
-  var tier3='<div class="pgr-sec"><div class="pgr-sec-h">This week</div><div class="pgr-sec-sub">'+MN[cwStart.getMonth()]+' '+cwStart.getDate()+' – '+MN[cwEnd.getMonth()]+' '+cwEnd.getDate()+'. Close the rings.</div>'+
-    '<div class="pgr-gauge"><div class="pgr-rings">'+ringsSvg+ringsLeg+'</div>'+
-    '<div class="pgr-gauge-note" style="margin-top:14px">'+loadMsg+'</div></div></div>';
 
-  document.getElementById('pg-progress').innerHTML=tier1a+tier1b+tier1c+tier2+tier3;
+  // ---------- ASSEMBLE ----------
+  function pill(txt){ return '<div class="dash-hero-pill">'+txt+'</div>'; }
+  var hero='<div class="dash-hero">'+
+    '<div class="dash-hero-status">🏅 '+earnedN+' / '+BADGES.length+' milestones</div>'+
+    '<div class="dash-hero-race">Road to 3:25</div>'+
+    '<div class="dash-hero-date">Cologne Marathon · 4 October 2026</div>'+
+    '<div class="dash-hero-goal">'+daysToRace+' days to go · '+curPhaseName+' phase · '+Math.round(nowPct)+'% through the block</div>'+
+    '<div class="dash-hero-row">'+
+      pill('🔥 '+(curStreak>0?curStreak+'-week streak':'No streak yet'))+
+      pill('Best '+bestStreak+' wk')+
+      pill(greenWks+' / '+started.length+' weeks nailed')+
+      pill(avgAdh+'% adherence')+
+    '</div>'+
+    '<div class="pgr-htl-wrap"><div class="pgr-htl">'+tlSegs+'<div class="pgr-htl-now" style="left:'+nowPct+'%"></div></div>'+
+      '<div class="pgr-htl-cap"><span>'+MN[fStart.getMonth()]+' '+fStart.getDate()+'</span><span>Race day · Oct 4</span></div></div>'+
+  '</div>';
+
+  // peak targets from the plan itself (not hardcoded)
+  var peakLong=0;
+  planMB.forEach(function(ph){ph.weeks.forEach(function(w){w.sessions.forEach(function(s){
+    if(s.id==='long'||/long/i.test(s.t)){
+      var mm=(s.desc||'').match(/~([\d.]+)\s*km/g);
+      if(mm) mm.forEach(function(x){ var v=parseFloat(x.replace(/[~\skm]/g,'')); if(v>peakLong) peakLong=v; });
+    }
+  });});});
+  peakLong=Math.round(peakLong)||32;
+  var peakVol=0;
+  flat.forEach(function(f){ var vm2=(f.w.vol||'').match(/([\d.]+)/); if(vm2){ var v=parseFloat(vm2[1]); if(v>peakVol) peakVol=v; } });
+  peakVol=Math.round(peakVol)||60;
+  var longDate=longestRunDate?formatDate(longestRunDate):'—';
+  var gauges='<div class="pgr-block" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px">'+
+    gauge('Longest run ever',longestRun,peakLong,' km','g-prp','var(--prp)','Your furthest single run ('+longDate+'). The plan builds to a '+peakLong+'km long run at peak.')+
+    gauge('Weekly volume',weeklyAvg,peakVol,' km','g-grn','var(--grn)','Your 4-week rolling average against the plan\'s ~'+peakVol+'km peak week.')+
+  '</div>';
+
+  var adhSection='<div class="pgr-block"><div class="sec-h">Weekly adherence</div>'+
+    '<div class="pgr-card">'+wkBars+
+    '<div class="pgr-gauge-note" style="margin-top:14px">A week counts as nailed at '+THRESH+'%+ of planned sessions (logged, ticked off, or auto-matched from Strava). Green &ge;80%, amber 50–79%, red below.</div></div></div>';
+
+  var weekSection='<div class="pgr-block"><div class="sec-h">This week · '+MN[cwStart.getMonth()]+' '+cwStart.getDate()+'–'+cwEnd.getDate()+'</div>'+
+    '<div class="pgr-card"><div class="pgr-rings">'+ringsSvg+ringsLeg+'</div>'+
+    '<div class="pgr-load">'+loadMsg+'</div></div></div>';
+
+  var consSection='<div class="pgr-block"><div class="sec-h">Consistency · last 18 weeks</div>'+
+    '<div class="pgr-card"><div class="pgr-heat">'+heatCols+'</div><div class="pgr-heat-months">'+monthRow+'</div>'+heatLeg+'</div></div>';
+
+  var badgeSection='<div class="pgr-block"><div class="sec-h">Milestones · '+earnedN+' of '+BADGES.length+' unlocked</div>'+
+    '<div class="pgr-badges">'+badgeHtml+'</div></div>';
+
+  document.getElementById('pg-progress').innerHTML=hero+weekSection+gauges+adhSection+consSection+badgeSection;
 })();
 })();
 
