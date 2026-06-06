@@ -2708,7 +2708,7 @@ var planMB = [
     {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
      desc:'Club session  -  log after.'},
     {id:'long',day:'Sun',t:'KEY LONG RUN',c:'tl',rpe:'8',flex:false,club:false,
-     desc:'WU: 0:00–0:30 easy @ 5:35–5:45/km, HR <145. Long easy opener. Settle in. Main segment 1: 0:30–1:00 @ LT1 4:54/km (HR 148–158, RPE 3–4). Comfortable aerobic effort, not pushing. Main segment 2: 1:00–2:45 - four 20min blocks @ MP 4:58/km (HR 160–170, RPE 5–6) with 5min easy jog recovery between each. Total MP: 80min. MP blocks start feeling hard around block 3. Block 4 (starts ~2:15) is the hardest thing in this training plan. Form check every 5min: tall, relaxed arms, 180 cadence. If pace slips to 5:03/km in the final block, hold the effort not the pace. Finish: 2:00–2:20 easy @ 5:40/km. ~30km. CD: 10min easy walk/jog. GUT: Gel at 30min (non-caf), 60min (non-caf), 90min (non-caf), 105min (non-caf), 120min (caf 75mg), 135min (caf 75mg). Sip water every 2km simulating race stations. Coach: The defining session of 18 weeks. 80 minutes of marathon pace after 60 minutes of aerobic running is as close to race specificity as training gets. It will be hard. It is supposed to be hard. The runners who finish sub-3:30 marathons are the ones who did this session and came back the following Sunday to do it again. After this run: rest, eat well, be proud of what you just did.'},
+     desc:'WU: 0:00–0:30 easy @ 5:35–5:45/km, HR <145. Long easy opener. Settle in. Main segment 1: 0:30–1:00 @ LT1 4:54/km (HR 148–158, RPE 3–4). Comfortable aerobic effort, not pushing. Main segment 2: 1:00–2:35 - four 20min blocks @ MP 4:58/km (HR 160–170, RPE 5–6) with 5min easy jog recovery between each. Total MP: 80min. MP blocks start feeling hard around block 3. Block 4 (starts ~2:15) is the hardest thing in this training plan. Form check every 5min: tall, relaxed arms, 180 cadence. If pace slips to 5:03/km in the final block, hold the effort not the pace. Finish: 2:35–2:45 easy @ 5:40/km. ~30km. CD: 10min easy walk/jog. GUT: Gel at 30min (non-caf), 60min (non-caf), 90min (non-caf), 105min (non-caf), 120min (caf 75mg), 135min (caf 75mg). Sip water every 2km simulating race stations. Coach: The defining session of 18 weeks. 80 minutes of marathon pace after 60 minutes of aerobic running is as close to race specificity as training gets. It will be hard. It is supposed to be hard. The runners who finish sub-3:30 marathons are the ones who did this session and came back the following Sunday to do it again. After this run: rest, eat well, be proud of what you just did.'},
    ]},
   {id:'mbw14',wk:'MB W14 (Aug 31–Sep 6) – RECOVERY',vol:'~55km',tag:'',
    note:'Recovery week after W13 peak. Monday is easy  -  no quality. Legs need it. Sunday is a solid session but nothing like last week.',
@@ -6243,6 +6243,8 @@ function rpeBar(rpeStr) {
 
 function buildSessModalContent(sess, wk) {
   var d = sess.desc || '';
+  // Progressive long-run format: "WU: 0:00–1:00 ... Main segment 1: 1:00–1:30 @ LT1 4:54/km ... Main segment 2: 1:30–2:45 @ MP 4:58/km ..."
+  var isProg = /Main segment\s*\d/i.test(d);
 
   // Parse sections
   // Handle arrow-notation long runs: '80min easy → 30min @ MP → ...'
@@ -6321,6 +6323,37 @@ function buildSessModalContent(sess, wk) {
     });
   } else {
 
+  if (isProg) {
+    // Progressive long run: split into WU + Main segment N, each with its own duration/pace/HR/zone
+    var head = d.split(/\s*(?:CD:|GUT:|GEL TEST:|GEL:|Coach:)/i)[0];
+    var markRe = /(WU|Main segment\s*\d+|Finale|Finish)\s*:/gi, mk, marks = [];
+    while ((mk = markRe.exec(head)) !== null) marks.push({ label: mk[1].trim(), e: markRe.lastIndex, s: mk.index });
+    marks.forEach(function(mark, i) {
+      var body = head.slice(mark.e, i+1 < marks.length ? marks[i+1].s : head.length).trim();
+      var isWU = /^WU/i.test(mark.label);
+      var isFin = /^(Finale|Finish)/i.test(mark.label);
+      // duration: prefer a time range that is NOT a pace (not followed by /km); else a leading "Nmin"
+      var tM = body.match(/(\d{1,2}):(\d{2})\s*[–\-]\s*(\d{1,2}):(\d{2})(?!\s*\/km)/);
+      var durTxt = null;
+      if (tM) { var a=(+tM[1])*60+(+tM[2]), b=(+tM[3])*60+(+tM[4]); if (b>a) durTxt = (b-a) + ' min'; }
+      else { var nM = body.match(/(\d+)\s*min/i); if (nM) durTxt = nM[1] + ' min'; }
+      var pM = body.match(/(\d:\d{2}\s*[–\-]\s*\d:\d{2}|\d:\d{2})\s*\/km/);
+      var hM = body.match(/HR\s*([<>]?\s*\d+(?:\s*[–\-]\s*\d+)?)/i);
+      var zM = body.match(/\b(LT1|LT2|MP|Marathon pace|T pace|Tempo|Threshold|Easy)\b/i);
+      var zone = zM ? zM[1].replace(/marathon pace/i,'MP') : null;
+      var segNum = (mark.label.match(/\d+/) || [''])[0];
+      var segLabel = isWU ? 'Warm-up' : isFin ? 'Finish' : ('Main ' + segNum + (zone ? ' · ' + zone : ''));
+      var sb = '';
+      if (durTxt) sb += '<div class="sd-rep-hero"><span class="sd-rep-dur">' + durTxt + '</span></div>';
+      var st = [];
+      if (pM) st.push({label:'Pace', val: pM[1].replace(/\s/g,''), unit:'/km', cls:'pace'});
+      if (hM) st.push({label:'HR', val: hM[1].replace(/\s/g,''), unit:'bpm', cls:'hr'});
+      if (st.length) sb += statsGrid(st);
+      sb += '<div class="sd-simple-body">' + body.replace(/\s+/g,' ') + '</div>';
+      html += segCard(isWU ? 'wu' : isFin ? 'cd' : 'main', segLabel, sb);
+    });
+  } else {
+
   // WU
   if (wuText) {
     var wuPace = wuText.match(/\d:\d{2}[+–\-]\d:\d{2}|\d:\d{2}\+/) || wuText.match(/\d:\d{2}/);
@@ -6357,6 +6390,8 @@ function buildSessModalContent(sess, wk) {
   if (recM) mainBody += '<div class="sd-rec">Recovery: ' + recM[1].trim() + '</div>';
   if (!mainBody) mainBody = '<div class="sd-simple-body">' + (src).replace(/\s+/g,' ').trim() + '</div>';
   html += segCard('main', 'Main set', mainBody);
+
+  } // end else (non-progressive)
 
   // CD
   if (cdText) {
@@ -8825,7 +8860,7 @@ setTimeout(function() {
     '<div class="dash-hero-status">🏅 '+earnedN+' / '+BADGES.length+' milestones</div>'+
     '<div class="dash-hero-race">Road to 3:25</div>'+
     '<div class="dash-hero-date">Cologne Marathon · 4 October 2026</div>'+
-    '<div class="dash-hero-goal">'+daysToRace+' days to go · '+curPhaseName+' phase · '+Math.round(nowPct)+'% through the block</div>'+
+    '<div class="dash-hero-goal">'+daysToRace+' days to go · '+curPhaseName+' phase · train 3:25 to bank time, race sub-3:30</div>'+
     '<div class="dash-hero-row">'+
       pill('🔥 '+(curStreak>0?curStreak+'-week streak':'No streak yet'))+
       pill('Best '+bestStreak+' wk')+
