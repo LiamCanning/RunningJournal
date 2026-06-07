@@ -6823,9 +6823,6 @@ function renderMarathonBlock() {
         var cls = 'mb-week' + (isPast ? ' mb-past' : '') + (isCurrent ? ' mb-current open' : '');
         var nowBadge = isCurrent ? '<span class="pw-now-badge">This week</span>' : '';
         var tagBadge = w.tag ? '<span style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;background:var(--orgGlow);color:var(--org);padding:2px 8px;border-radius:4px;margin-left:8px">' + w.tag + '</span>' : '';
-        // Count logged sessions for progress
-        var loggedCount = w.sessions.filter(function(s){ var k = w.id + '_' + s.id; return mbLogs[k] || mbDone[k]; }).length;
-        var totalLoggable = w.sessions.length;
         var weekLoggedKm = w.sessions.reduce(function(sum, s) {
           var e = mbLogs[w.id + '_' + s.id];
           return sum + (e && e.km ? parseFloat(e.km) || 0 : 0);
@@ -6840,8 +6837,10 @@ function renderMarathonBlock() {
           });
         }
         stravaKm = Math.round(stravaKm * 10) / 10;
-        // Progress bar uses session log count; vol uses Strava actual > manual logged > target
-        var pct = totalLoggable > 0 ? Math.round(loggedCount / totalLoggable * 100) : 0;
+        // Progress bar = actual km run vs the week's target km (auto-fills as Strava runs import)
+        var targetKm = parseFloat(((w.vol || '').match(/([\d.]+)/) || [])[1]) || 0;
+        var actualKm = stravaKm > 0 ? stravaKm : weekLoggedKm;
+        var pct = targetKm > 0 ? Math.min(100, Math.round(actualKm / targetKm * 100)) : (actualKm > 0 ? 100 : 0);
         var volDisplay = stravaKm > 0 ? stravaKm.toFixed(1) + '\u202fkm' :
                          weekLoggedKm > 0 ? weekLoggedKm.toFixed(1) + '\u202fkm' : w.vol;
         var progressHtml = '<div class="pw-progress"><div class="pw-progress-fill" style="width:' + pct + '%"></div></div>';
