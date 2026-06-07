@@ -67,6 +67,29 @@ if si_r >= 0 and ei_r > si_r and si_l >= 0 and ei_l > si_l:
     except json.JSONDecodeError as e:
         print(f"[sync] LAPS_DATA: merge skipped (parse error: {e})")
 
+# ── CLUB_SESSIONS: merge by week key (repo/routine wins, preserves injected club sessions) ──
+CSTART = 'var CLUB_SESSIONS = '
+CEND   = '/*__CLUB_SESSIONS_END__*/'
+cr_s, cr_e = repo_html.find(CSTART), repo_html.find(CEND)
+cl_s, cl_e = local_html.find(CSTART), local_html.find(CEND)
+if cr_s >= 0 and cr_e > cr_s and cl_s >= 0 and cl_e > cl_s:
+    repo_club_str  = repo_html[cr_s  + len(CSTART):cr_e].rstrip().rstrip(';').strip()
+    local_club_str = local_html[cl_s + len(CSTART):cl_e].rstrip().rstrip(';').strip()
+    try:
+        repo_club  = json.loads(repo_club_str)  if repo_club_str  else {}
+        local_club = json.loads(local_club_str) if local_club_str else {}
+        merged_club = {**local_club, **repo_club}  # routine-injected (repo) wins
+        if merged_club != local_club:
+            merged_json = json.dumps(merged_club, ensure_ascii=False, separators=(',', ':'))
+            local_html = local_html[:cl_s + len(CSTART)] + merged_json + '; ' + local_html[cl_e:]
+            new_keys = [k for k in repo_club if k not in local_club]
+            print(f"[sync] CLUB_SESSIONS: merged {len(new_keys)} new week(s) from routine: {', '.join(sorted(new_keys)[-3:])}")
+            changed = True
+        else:
+            print(f"[sync] CLUB_SESSIONS: local already current ({len(local_club)} week(s))")
+    except json.JSONDecodeError as e:
+        print(f"[sync] CLUB_SESSIONS: merge skipped (parse error: {e})")
+
 if changed:
     open(local_path, 'w', encoding='utf-8').write(local_html)
     print("[sync] Local dashboard updated.")
