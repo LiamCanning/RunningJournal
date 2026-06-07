@@ -42,6 +42,9 @@ body{font-family:'Geist',system-ui,-apple-system,sans-serif;color:var(--t1);back
 .chrome .chrome-meta{font-family:'Geist Mono',monospace;font-size:11px;color:var(--t3);letter-spacing:0.04em;text-transform:uppercase}
 .chrome .chrome-spacer{flex:1}
 .chrome .chrome-cd{font-family:'Geist Mono',monospace;font-weight:500;font-size:11px;letter-spacing:-0.02em;background:var(--t1);color:var(--bg);padding:3px 8px}
+.chrome .chrome-rings{display:inline-flex;align-items:center;cursor:pointer;line-height:0;border-radius:50%;transition:transform .15s}
+.chrome .chrome-rings:hover{transform:scale(1.08)}
+.chrome .chrome-rings svg{display:block}
 
 /* TAB NAV */
 .bb-nav{background:var(--bg);border-bottom:1px solid var(--bdr2);padding:0 32px;display:flex;gap:0;overflow-x:auto;scrollbar-width:none;position:sticky;top:47px;z-index:90}
@@ -450,7 +453,7 @@ body{font-family:'Geist',system-ui,-apple-system,sans-serif;color:var(--t1);back
 .mb-body{display:none;padding:0 20px 16px;border-top:1px solid var(--bdr)}
 .mb-week.open .mb-body{display:block}
 .mb-note{background:var(--bg2);border-left:3px solid var(--grn);padding:8px 12px;font-size:12px;color:var(--t2);border-radius:0 6px 6px 0;margin:12px 0 8px;line-height:1.5}
-.mb-sess{display:grid;grid-template-columns:52px 1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid var(--bdr);font-size:13px;align-items:start}
+.mb-sess{display:grid;grid-template-columns:68px 1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid var(--bdr);font-size:13px;align-items:start}
 .mb-sess:last-child{border:none}
 .mb-sess-day{font-weight:800;font-size:10px;text-transform:uppercase;color:var(--t3);padding-top:4px;line-height:1.4}
 .mb-sess-day.flex-day{color:var(--org)}
@@ -1488,6 +1491,7 @@ textarea.race-modal-inp{resize:vertical;min-height:56px}
 <span class="chrome-sep">·</span>
 <span class="chrome-meta">K&ouml;ln Marathon · Oct 4, 2026</span>
 <span class="chrome-spacer"></span>
+<span class="chrome-rings" id="chrome-rings" title="This week's training rings"></span>
 <span class="chrome-cd"><span id="cd">0</span> days to go</span>
 </div>
 <nav class="bb-nav" id="nav">
@@ -2534,7 +2538,7 @@ var planMB = [
     {id:'wed',day:'Wed',t:'Gym',c:'tr2',rpe:'2',flex:false,club:false,
      desc:'Gym + 20min easy. HR <145. Easy run moved to Saturday this week.'},
     {id:'thu',day:'Thu',t:'LT1 intervals',c:'tq',rpe:'4',flex:false,club:false,
-     desc:'WU: 2km easy @ 5:40+/km, HR <140 (12min). Main: 4\xd78min @ LT1 (4:54/km, HR 148-158, RPE 3-4), 90s standing rest. Different structure from Tuesday - shorter reps, one more of them. In summer heat: run by HR, 5:05-5:15/km acceptable. ~10.5km. CD: 1.5km easy jog, HR dropping to <130. Coach: A second LT1 session this week builds on Tuesday without repeating it. Four 8-minute reps create more total time at LT1 than three 10-minute reps would suggest - the shorter rest means lactate stays slightly elevated between reps, which is a different and complementary stress. Wednesday\' easy run is the buffer. Friday is easy. This session should not feel as hard as Tuesday did.'},
+     desc:'WU: 2km easy @ 5:40+/km, HR <140 (12min). Main: 4\xd78min @ LT1 (4:54/km, HR 148-158, RPE 3-4), 90s standing rest - that is 32min of actual running, and the 4 reps ARE the whole main set (nothing hidden inside the number). The warm-up and cool-down below are extra, on top of it. Total for the session ~10.5km. Different structure from Tuesday - shorter reps, one more of them. In summer heat: run by HR, 5:05-5:15/km acceptable. CD: 1.5km easy jog, HR dropping to <130. Coach: A second LT1 session this week builds on Tuesday without repeating it. Four 8-minute reps create more total time at LT1 than three 10-minute reps would suggest - the shorter rest means lactate stays slightly elevated between reps, which is a different and complementary stress. Wednesday\' easy run is the buffer. Friday is easy. This session should not feel as hard as Tuesday did.'},
     {id:'fri',day:'Fri',t:'Easy + strides',c:'te',rpe:'2',flex:false,club:false,
      desc:'WU: None. Main: 35min easy @ 5:35-5:50/km, HR <145. ~6km. Run at a pace where conversation is easy. No pace targets, no watch pressure. Flat route if possible. CD: 4 x 20s strides - build to 4:10/km pace, walk back each time. Then 5min easy walk to bring HR below 120. Coach: This run has one job: arrive at Sunday\'s long run with loose legs and without fatigue. 35 minutes at easy HR is the exact dose. The strides keep the neuromuscular system engaged so Sunday does not start flat. If the legs feel heavy after Thursday club, drop to 5:50/km and skip the strides. Arriving at Sunday fresh matters more than hitting 35 minutes on Friday.'},
     {id:'sat',day:'Sat',t:'Easy',c:'te',rpe:'3',flex:false,club:false,
@@ -2553,8 +2557,8 @@ var planMB = [
      desc:'7km easy @ 5:40–5:50/km. Or gym + 20min easy.'},
     {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
      desc:'Club session  -  log after.'},
-    {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'3',flex:false,club:false,
-     desc:'Total 70min (~12.5km). WU: First 10min very easy @ 5:45+/km, HR <135. Body waking up. Main: 55min @ 5:20–5:40/km, HR 135–148. Run by feel - if HR creeps above 150 in the heat, slow to 5:50. CD: Final 5min easy, HR <125. GUT: 2 gels - one at 30min, one at 55min, water alongside. First run that needs two gels. Note brand, flavour, any bloating. Coach: Up 10min from last week (60 to 70). The long run is the anchor of the week and the single most important session - get it done and the week is a success. Base aerobic work: keep HR easy, time on feet matters more than pace. First two-gel run, so practise the fuelling timing now.'},
+    {id:'long',day:'Sun',t:'5K Race',c:'tx',rpe:'8',flex:false,club:false,
+     desc:'Runners Ciutat club 5K, your home race. This replaces the Sunday long run this week. Total ~11km: 3km warm-up + 5km race + 3km cool-down (these are separate and add together). WU: 3km easy @ 5:30/km, then 4x20s strides. Main: 5km hard, target around your 5K PB (sub-20:00, 3:50-4:00/km). Go out controlled (first km ~3:58), build through the middle, empty the tank on the last km. CD: 3km easy jog @ 5:45/km. Coach: A base-phase fitness benchmark and a fun club race - race it, but it is not your A-race. A sub-20 confirms your speed base is intact while the block builds the aerobic engine. Keep Monday quality easy this week and treat Thursday club as steady; the 5K is your one hard session. Log the result, it refreshes your VDOT and race predictor.'},
    ]},
   {id:'mbw3',wk:'MB W3 (Jun 15–21) – HOLIDAY',vol:'~10km',tag:'HOLIDAY',
    note:'Free week. No structure, no pressure. 10km across the week if you can  -  2 easy runs of 4–5km each, 5:40+ pace. Run in the morning or evening to avoid heat. Showing up to W4 healthy and rested is the only goal.',
@@ -2656,7 +2660,7 @@ var planMB = [
    note:'Double MP blocks on Monday. Long run extends to 125min with caffeine gel test. The caffeine simulation is critical  -  log how you feel precisely.',
    sessions:[
     {id:'flex',day:'Mon / Fri / Sat',t:'Double MP blocks',c:'tq',rpe:'6–7',flex:true,club:false,
-     desc:'13.5km. WU: 2km easy. Main: 2\xd7(20min @ MP 4:55/km, 5min easy jog). CD: 3km easy. Monitor HR  -  if above 175 in the first 20min block you’re working too hard. Both blocks should feel the same. Target HR 163–172 throughout.'},
+     desc:'Total 13.5km = 2km warm-up + the main set + 3km cool-down (warm-up and cool-down are extra, on top of the main set). WU: 2km easy. Main: 2\xd7(20min @ MP 4:55/km, 5min easy jog) - 40min of marathon-pace work in two blocks. CD: 3km easy. Monitor HR  -  if above 175 in the first 20min block you’re working too hard. Both blocks should feel the same. Target HR 163–172 throughout.'},
     {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
      desc:'Club session  -  log after.'},
     {id:'wed',day:'Wed',t:'Easy / Gym',c:'te',rpe:'3',flex:false,club:false,
@@ -2692,7 +2696,7 @@ var planMB = [
     {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
      desc:'Club session  -  log after.'},
     {id:'long',day:'Sun',t:'HM race or Long run',c:'tl',rpe:'7–8',flex:false,club:false,
-     desc:'Option A - Half Marathon: WU: 15min easy jog + leg swings. Race: target 1:42–1:44 (4:55/km MP effort). Run first 10km at 4:58/km - conservatively. Build to 4:53/km for second half. Negative split. GUT: Gel at km 7 (non-caf), Gel at km 15 (non-caf). Option B - No race: WU: 15min easy. Main: 90min easy @ 5:30–5:45/km, HR 135–148 + 20min @ MP 4:58/km at the 60min mark. GUT: Gel at 30min, 60min. ~18km. CD: 5min easy. Coach: The half marathon is the single most valuable data point of the training block. Running MP as a race teaches you what that effort feels like under race conditions: nerves, crowd, competition. A 1:42–1:44 half at MP effort signals you are on track for sub-3:30. Any result is useful data.'},
+     desc:'Option A - Half Marathon: WU: 15min easy jog + leg swings. Race: target 1:42–1:44 (4:55/km MP effort). Run first 10km at 4:58/km - conservatively. Build to 4:53/km for second half. Negative split. GUT: Gel at km 7 (non-caf), Gel at km 15 (non-caf). Option B - No race: Total ~110min (~18km) = 15min warm-up + 90min main + 5min cool-down (warm-up and cool-down are extra, on top of the main set). WU: 15min easy. Main: 90min in total - run easy @ 5:30–5:45/km (HR 135–148), and from the 60min mark include 20min @ MP 4:58/km, then ease back to easy. The 20min MP is INSIDE the 90min, not on top. GUT: Gel at 30min, 60min. CD: 5min easy. Coach: The half marathon is the single most valuable data point of the training block. Running MP as a race teaches you what that effort feels like under race conditions: nerves, crowd, competition. A 1:42–1:44 half at MP effort signals you are on track for sub-3:30. Any result is useful data.'},
    ]},
  ]},
  {phase:'consolidation',label:'Marathon Block – Consolidation (Aug 24–Sep 13)',cls:'consolidation',pnote:'Peak volume. W13 Sunday is the defining session of the entire block: 30km with exact race-day nutrition. W15 Sunday is the peak long run: 32km. Between them, W14 is a recovery week. Do not skip it.',weeks:[
@@ -2744,15 +2748,15 @@ var planMB = [
    note:'Sharp quality, short volume. Monday session keeps the legs quick without digging deep. Sunday is the last run with effort.',
    sessions:[
     {id:'flex',day:'Mon / Fri / Sat',t:'T-pace sharpener',c:'tq',rpe:'6',flex:true,club:false,
-     desc:'WU: 2km easy jog @ 5:40+/km, HR <140 (12min). Main: 3×8min @ T pace (4:28–4:38/km, HR 165–175, RPE 6–7), 90s standing recovery. Three reps. Short, sharp, clean. Legs may feel heavy (glycogen supercompensation) - run the reps at true T pace regardless. ~10km. CD: 3km easy jog. Coach: First taper quality session. Three T reps maintains neuromuscular sharpness without digging into fitness reserves built over 15 weeks. The legs feeling heavy and flat this week is the taper working - glycogen is refilling. Do not add extra sessions. The work is done.'},
+     desc:'Total ~10km: 2km warm-up + 3×8min reps + 3km cool-down (warm-up and cool-down are extra, on top of the reps). WU: 2km easy jog @ 5:40+/km, HR <140 (12min). Main: 3×8min @ T pace (4:28–4:38/km, HR 165–175, RPE 6–7), 90s standing recovery - 24min of running. Three reps. Short, sharp, clean. Legs may feel heavy (glycogen supercompensation) - run the reps at true T pace regardless. ~10km. CD: 3km easy jog. Coach: First taper quality session. Three T reps maintains neuromuscular sharpness without digging into fitness reserves built over 15 weeks. The legs feeling heavy and flat this week is the taper working - glycogen is refilling. Do not add extra sessions. The work is done.'},
     {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
      desc:'Club session  -  log after. Taper means slightly less volume but keep quality.'},
     {id:'wed',day:'Wed',t:'Easy',c:'te',rpe:'2–3',flex:false,club:false,
      desc:'6km easy @ 5:40–5:50/km.'},
     {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
      desc:'Club session  -  log after.'},
-    {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'5–6',flex:false,club:false,
-     desc:'WU: First 10min very easy @ 5:50/km, HR <130. Main: 45min easy @ 5:35-5:45/km, HR 135-145. Then without stopping: 30min @ MP 4:58/km (HR 160-170, RPE 5-6). This is the last meaningful quality effort before the race. Run it confidently. The 30min MP should feel controlled - you have run 50min at MP three weeks ago. CD: 5min easy walk/jog. GUT: Gel at 30min (non-caf) during easy section. Coach: The last long run with real effort. Thirty minutes at marathon pace should feel almost comfortable now compared to what you were doing in September. That is fitness. Trust it. Do not do anything extra this week. From now until race day: eat, sleep, stay off your feet when not running.'},
+    {id:'long',day:'Sun',t:'5K Race',c:'tx',rpe:'8',flex:false,club:false,
+     desc:'Barris de Sant Marcelli 5K, taper sharpener two weeks out. This replaces the Sunday long run this week. Total ~12km: 3km warm-up + 5km race + 4km cool-down (these are separate and add together). WU: 3km easy, then 4x20s strides and 2 race-pace pickups. Main: 5km strong but smart (3:55-4:05/km, 5K to 10K effort). Race it well, but do not dig into a desperate PB - the marathon is the prize. CD: 4km easy jog. Coach: A taper sharpener that wakes up the legs and the VO2 system after the big aerobic block, and gives a clean confidence read on your fitness. Your last hard marathon-pace work (W13 and W15) is banked, so this replaces the Sunday MP long run. Run smart, recover fast, then it is easy running into race week.'},
    ]},
   {id:'mbrw1',wk:'MB W17 (Sep 21–27)',vol:'~30km',tag:'',
    note:'Volume drops sharply. Legs should feel fresh and slightly restless by midweek  -  that’s the taper working. Let it happen.',
@@ -2765,6 +2769,8 @@ var planMB = [
      desc:'WU: None. Main: 20–25min very easy @ 5:45–5:55/km, HR <135. This is movement only, not training. CD: 5min walk. Coach: The Nocturna 15K is Sep 26 this week. This run keeps the legs from going stale. Arrive at the race feeling fresh. Run the Nocturna at sub-threshold effort - it is a confidence builder, not a race to destroy yourself.'},
     {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
      desc:'Club session  -  light. Log after.'},
+    {id:'nocturna',day:'Sat',t:'15K Nocturna',c:'tx',rpe:'5–6',flex:false,club:false,
+     desc:'15K Nocturna Valencia, marathon-pace dress rehearsal 8 days out. This is a rehearsal, NOT a race to win. Total ~18km: 2km warm-up + 15km at MP + 1km cool-down (these are separate and add together). WU: 2km easy, then 4x20s strides. Main: 15km at MP (4:58/km, HR 160-170) - the full distance at marathon effort. Treat it as race day: same kit, shoes and breakfast timing, and take a gel every ~30min exactly as the marathon plan. Settle into MP from the gun and hold it relaxed. CD: 1km easy walk. Coach: Your dress rehearsal - resist the start-line adrenaline and do not chase people. Holding 4:58 for 15K should feel comfortable now, and if it does that is your sub-3:30 confirmed with margin. Rehearse everything you will do on Oct 4, then it is pure taper into Koln.'},
     {id:'long',day:'Sun',t:'Easy run',c:'te',rpe:'2',flex:false,club:false,
      desc:'WU: None. Main: 35–40min very easy @ 5:45–6:00/km, HR <135. This is movement, not training. Run by feel. CD: 5min walk. Coach: The week of the 15K Nocturna on Sep 26. This easy run keeps the legs from going stale. The Nocturna is a confidence builder - not a race to destroy yourself. Run it at MP effort or sub-threshold and enjoy the city night run.'},
    ]},
@@ -6151,6 +6157,19 @@ function parsePlanWeekDates(wk) {
   var em = m[3] ? planMonths[m[3]] : sm, ed = parseInt(m[4]);
   return { start: new Date(2026, sm, sd), end: new Date(2026, em, ed, 23, 59, 59) };
 }
+// Turn a session day ("Sun", "Tue") into a dated label ("Sun 27 Sep") using the week's Monday start.
+// Flexible multi-day sessions ("Mon / Fri / Sat", "Tue or Wed") keep their names.
+function dayLabelWithDate(dayStr, wkLabel) {
+  if (!dayStr || /\s\/\s|\sor\s/i.test(dayStr)) return dayStr;
+  var wd = parsePlanWeekDates(wkLabel || '');
+  if (!wd) return dayStr;
+  var off = { Mon:0, Tue:1, Wed:2, Thu:3, Fri:4, Sat:5, Sun:6 };
+  var key = dayStr.trim().substring(0,3);
+  if (off[key] == null) return dayStr;
+  var dt = new Date(wd.start); dt.setDate(dt.getDate() + off[key]);
+  var mn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return dayStr + ' ' + dt.getDate() + ' ' + mn[dt.getMonth()];
+}
 
 var planChecks = {};
 try { planChecks = JSON.parse(localStorage.getItem('planChecks') || '{}'); } catch(e) {}
@@ -6640,7 +6659,7 @@ function openSessModal(sess, wk) {
   var wkDates = wkObj ? parsePlanWeekDates(wkObj.wk) : null;
   var stravaRun = wkDates ? findStravaRunForSession(wkDates, sess.day) : null;
 
-  var title = (wkObj ? wkObj.wk : wk) + ' · ' + sess.day + ' · ' + sess.t;
+  var title = (wkObj ? wkObj.wk : wk) + ' · ' + dayLabelWithDate(sess.day, wkObj ? wkObj.wk : wk) + ' · ' + sess.t;
   document.getElementById('sess-modal-title').textContent = title;
 
   var planContent = buildSessModalContent(sess, wk);
@@ -6844,7 +6863,7 @@ function renderMarathonBlock() {
           var rpeBadge = s.rpe ? '<span class="mb-rpe">RPE ' + s.rpe + '</span>' : '';
           var sessAttrs = ' data-sessdetail="' + logKey + '" data-wid2="' + w.id + '" data-sid="' + s.id + '" style="cursor:pointer' + (isDone ? ';opacity:.75' : '') + '"';
           return '<div class="mb-sess"' + sessAttrs + '>' +
-            '<div class="' + dayClass + '">' + s.day + '</div>' +
+            '<div class="' + dayClass + '">' + dayLabelWithDate(s.day, w.wk) + '</div>' +
             '<div class="mb-sess-main">' +
               '<div class="mb-sess-head"><span class="pd-t ' + s.c + '" style="min-width:auto;padding:3px 10px">' + s.t + '</span>' + doneBadge + flexBadge + clubBadge + rpeBadge + '</div>' +
               '<div class="mb-sess-desc" style="display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;color:var(--t3);font-size:12px">' + (isDone ? '<s>' + s.desc + '</s>' : s.desc) + '</div>' +
@@ -8843,6 +8862,20 @@ setTimeout(function() {
     '<div class="pgr-ring-leg-item"><i style="background:'+CC_LONG+'"></i>Volume <b>'+wkKm.toFixed(0)+' / '+tVol+' km</b></div>'+
     '<div class="pgr-ring-leg-item"><i style="background:'+CC_ITVL+'"></i>Quality sessions <b>'+wkQual+' / '+tQual+'</b></div>'+
     '<div class="pgr-ring-leg-item"><i style="background:'+CC_TEMPO+'"></i>Long run <b>'+wkLong.toFixed(1)+' / '+tLong+' km</b></div></div>';
+  // compact rings in the header bar (persistent across every page)
+  (function(){
+    function miniRing(rad,frac,col){
+      var c=2*Math.PI*rad, off=c*(1-Math.min(1,frac));
+      return '<circle cx="18" cy="18" r="'+rad+'" fill="none" stroke="var(--card3)" stroke-width="3.4"/>'+
+        '<circle cx="18" cy="18" r="'+rad+'" fill="none" stroke="'+col+'" stroke-width="3.4" stroke-linecap="round" stroke-dasharray="'+c+'" stroke-dashoffset="'+off+'" transform="rotate(-90 18 18)"/>';
+    }
+    var crEl=document.getElementById('chrome-rings');
+    if(crEl){
+      crEl.innerHTML='<svg width="30" height="30" viewBox="0 0 36 36">'+miniRing(15.5,rVol,CC_LONG)+miniRing(11,rQual,CC_ITVL)+miniRing(6.5,rLong,CC_TEMPO)+'</svg>';
+      crEl.title='This week — Volume '+wkKm.toFixed(0)+'/'+tVol+'km · Quality '+wkQual+'/'+tQual+' · Long '+wkLong.toFixed(0)+'/'+tLong+'km (tap for detail)';
+      crEl.addEventListener('click',function(){ navTo('progress'); });
+    }
+  })();
   // load trend: last completed week vs avg of 3 prior
   function wkKmEnding(weeksAgo){ var s=new Date(cwStart); s.setDate(s.getDate()-7*weeksAgo); var e=new Date(s); e.setDate(s.getDate()+6); return allRuns.reduce(function(a,r){var d=new Date(r.ds);return a+((d>=s&&d<=e)?(r.dist||0):0);},0); }
   var lastWk=wkKmEnding(1), prior3=(wkKmEnding(2)+wkKmEnding(3)+wkKmEnding(4))/3;
