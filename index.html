@@ -2566,15 +2566,23 @@ var planMB = [
     {id:'long',day:'Sun',t:'5K Race',c:'tx',rpe:'6',flex:false,club:false,
      desc:'Runners Ciutat club 5K, your home race - but it is the morning after a Saturday party, so this is NOT a race effort. This replaces the Sunday long run this week. Total ~11km: 3km warm-up + 5km at ~4:30/km + 3km cool-down (these are separate and add together). WU: 3km easy @ 5:30/km, HR <145, then 4x20s strides. Main: 5km steady at 4:30/km (about 22:30, HR 165-175). Comfortable-hard and controlled - do not chase a PB on tired, dehydrated legs. CD: 3km easy jog @ 5:45/km, HR <145. Coach: After a party the legs and fuel tank will not be at their best, so run this as a relaxed tempo at 4:30/km, not a benchmark. Run by feel, enjoy the club race, and save the real efforts for when you are fresh. Keep Monday quality easy this week. Log it for the record.'},
    ]},
-  {id:'mbw3',wk:'MB W3 (Jun 15–21) – RACE',vol:'~22km',tag:'RACE',
-   note:'Light week into the Ponle Freno 10K on Sunday. Two easy runs midweek (4-6km, 5:40+/km, HR <145), no quality - the race is the only hard effort. You raced the 5K on the 14th, so keep the legs fresh for this one. After Sunday it is holiday: easy recovery only.',
+  {id:'mbw3',wk:'MB W3 (Jun 15–21) – RACE',vol:'~52km',tag:'RACE',
+   note:'A full training week with the Ponle Freno 10K on Sunday - not a taper, so the volume stays up. Bank the mileage Monday to Thursday (easy runs plus your two club sessions), then freshen Friday and Saturday into the race. You race on slightly worked legs, which is fine: it is a fitness check inside a normal week, judged on effort, with the holiday straight after for recovery.',
    sessions:[
-    {id:'easy1',day:'Tue or Wed',t:'Easy',c:'te',rpe:'2–3',flex:true,club:false,
-     desc:'WU: None. Main: 20–25min very easy @ 5:45–6:00/km, HR <145 wherever you are on holiday, HR <140. Morning only to beat heat. No watch pressure. No distance target. CD: 5min walk. Coach: Holiday week. One or two easy jogs to keep the legs moving is all you need. Aerobic adaptations from W1–W2 are consolidating. Arriving at W4 healthy and rested matters more than extra km.'},
-    {id:'easy2',day:'Fri or Sat',t:'Easy',c:'te',rpe:'2–3',flex:true,club:false,
-     desc:'4–5km very easy @ 5:45–6:00/km, HR <145. Stay loose.'},
+    {id:'mon',day:'Mon',t:'Easy + Gym',c:'te',rpe:'3',flex:false,club:false,
+     desc:'8km easy @ 5:40–5:50/km, HR <145, plus gym (squats, hip thrusts, lunges) + core. Bank good volume early - this is a race week, not a taper, so the mileage stays up and you only freshen the last two days.'},
+    {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session  -  follow Pistas, log after.'},
+    {id:'wed',day:'Wed',t:'Easy',c:'te',rpe:'3',flex:false,club:false,
+     desc:'10–11km steady-easy @ 5:35–5:50/km, HR <148. The volume anchor of the week (no long run this week because of the race) - keep it aerobic and relaxed.'},
+    {id:'club2',day:'Thu',t:'Club',c:'tq',rpe:null,flex:false,club:true,
+     desc:'Club session  -  follow Pistas, log after. With the race on Sunday, take the recoveries fully and ease the last reps if the legs feel heavy.'},
+    {id:'fri',day:'Fri',t:'Easy + strides',c:'te',rpe:'2',flex:false,club:false,
+     desc:'6km easy @ 5:40–5:50/km, HR <145 + 4x20s strides (build to 4:10/km, walk back). Start freshening for Sunday.'},
+    {id:'sat',day:'Sat',t:'Shakeout',c:'te',rpe:'2',flex:false,club:false,
+     desc:'3–4km very easy @ 5:45+/km, HR <140, or rest. Day before the race - legs loose, not tired.'},
     {id:'race10k',day:'Sun',t:'10K Race',c:'tx',rpe:'8',flex:false,club:false,
-     desc:'Ponle Freno 10K, Valencia - evening race (around 18:00), the one hard effort before your holiday. Total ~15km: 3km warm-up + 10km race + 2km cool-down. WU: 3km easy @ 5:30/km (HR <150) + 4x20s strides, finishing close to gun time. Main: 10km strong and controlled - target around your 10K PB (41:27, ~4:09/km), but it is an evening race in June heat so run by feel: settle the first 3-4km at ~4:12/km (HR 175-185), then squeeze the back half. CD: 2km easy jog. Fuelling: main meal early afternoon (3-4h before), kept light. Coach: A complementary effort to the 14 Jun 5K - a 10K stresses the aerobic engine you are building for the marathon and is your first proper fitness readout. Race it, then the holiday (22-27 Jun) is full easy recovery. A sub-42 on a warm evening means the base work is landing.'},
+     desc:'Ponle Freno 10K, Valencia - evening race (around 18:00), the effort that caps a full training week before your holiday. Total ~15km: 3km warm-up + 10km race + 2km cool-down. WU: 3km easy @ 5:30/km (HR <150) + 4x20s strides, finishing close to gun time. Main: 10km strong and controlled - target around your 10K PB (41:27, ~4:09/km), but it is an evening race in June heat on slightly worked legs, so run by feel: settle the first 3-4km at ~4:12/km (HR 175-185), then squeeze the back half. CD: 2km easy jog. Fuelling: main meal early afternoon (3-4h before), kept light. Coach: A complementary effort to the 14 Jun 5K - a 10K stresses the aerobic engine you are building for the marathon and is your first proper fitness readout. You banked the mileage Mon-Thu, so judge this on effort, not just the clock. Then the holiday (22-27 Jun) is full easy recovery. A sub-42 on a warm evening means the base work is landing.'},
    ]},
   {id:'mbw4',wk:'MB W4 (Jun 22–28) – HOLIDAY',vol:'~25km',tag:'HOLIDAY',
    note:'Holiday 22-27 June: easy recovery after the Ponle Freno 10K. Just 2-3 easy jogs of 4-6km when you can (mornings or evenings to beat the heat), no club and no quality while you are away. The Sunday long run (28th) is back home - keep it gentle to ease back into rhythm.',
@@ -4909,6 +4917,39 @@ function renderRaceCompare() {
   '</div>';
 }
 
+// Standard (official) distance per category, in km. Used to flag long/short
+// courses and to compute the time at the official distance for long courses.
+var OFFICIAL_DIST = { '5k':5, '10k':10, '15k':15, '21k':21.0975, '30k':30, '42k':42.195 };
+
+// Time (secs) at the official distance for a race that ran long. Walks the real
+// Strava laps and interpolates within the lap that crosses the official mark;
+// falls back to even-pace proportional estimate when no laps are available.
+function officialSplitSecs(r) {
+  var target = OFFICIAL_DIST[r.cat];
+  if (!target || r.dist < target - 0.01) return null; // unknown cat or ran short
+  var dayEntries = LAPS_DATA[r.ds], laps = null;
+  if (dayEntries && dayEntries.length) {
+    var best = dayEntries[0], bestDiff = Math.abs((dayEntries[0].dist_km||0) - r.dist);
+    for (var i = 1; i < dayEntries.length; i++) {
+      var d = Math.abs((dayEntries[i].dist_km||0) - r.dist);
+      if (d < bestDiff) { bestDiff = d; best = dayEntries[i]; }
+    }
+    if (best.laps && best.laps.length) laps = best.laps;
+  }
+  if (laps && laps.length) {
+    var cumDist = 0, cumTime = 0;
+    for (var j = 0; j < laps.length; j++) {
+      var ld = laps[j].dist || 0, lt = laps[j].time || 0;
+      if (cumDist + ld >= target) {
+        var frac = ld > 0 ? (target - cumDist) / ld : 0;
+        return cumTime + lt * frac;
+      }
+      cumDist += ld; cumTime += lt;
+    }
+  }
+  return r.timeSecs * target / r.dist; // proportional fallback
+}
+
 function renderRaces() {
   var filtered = curDist === 'all' ? races : races.filter(function(r) { return r.cat === curDist; });
   var sorted = filtered.slice().sort(function(a, b) { return b.ds > a.ds ? 1 : -1; });
@@ -5006,6 +5047,19 @@ function renderRaces() {
       var catCls = r.cat ? ' cat-' + r.cat : '';
       var distChipCls = r.cat ? 'd' + r.cat : '';
       var distLabel = r.cat === '21k' ? 'Half' : r.cat === '42k' ? 'Marathon' : (r.cat || '').toUpperCase();
+      // Long/short course flag vs the official distance, and the official-distance split.
+      var official = OFFICIAL_DIST[r.cat];
+      var deltaM = official ? Math.round((r.dist - official) * 1000) : 0;
+      var isLong = !!official && deltaM > 30;
+      var isShort = !!official && deltaM < -30;
+      var fmtDelta = function(m) { return (m > 0 ? '+' : '') + (Math.abs(m) >= 1000 ? (m/1000).toFixed(2) + 'km' : m + 'm'); };
+      var distTag = !official ? '' :
+        isLong  ? '<span style="font-size:10px;font-weight:700;margin-left:5px;color:#e0823d">▲ ' + fmtDelta(deltaM) + '</span>' :
+        isShort ? '<span style="font-size:10px;font-weight:700;margin-left:5px;color:#4a9fd4">▼ ' + fmtDelta(deltaM) + '</span>' :
+                  '<span style="font-size:10px;font-weight:700;margin-left:5px;color:var(--t3)">exact</span>';
+      var distStat = '<div class="mn"><div class="mnl">Distance</div><div class="mnv mono">' + r.dist.toFixed(2) + 'km' + distTag + '</div></div>';
+      var officialSecs = isLong ? officialSplitSecs(r) : null;
+      var officialStat = officialSecs ? '<div class="mn"><div class="mnl">' + distLabel + ' time</div><div class="mnv mono">' + secsToTime(Math.round(officialSecs)) + '</div></div>' : '';
       // Mini sparkline from splits
       var sparkHtml = '';
       if (allPaces.length > 1 && maxP > minP) {
@@ -5020,7 +5074,9 @@ function renderRaces() {
         '<div class="rc-head"' + (raceCompareMode ? ' style="cursor:default"' : '') + '>' +
           '<div class="rc-top"><div class="rc-name">' + (isBest ? '<span class="badge">PB</span>' : '') + '<span class="rc-dist-chip ' + distChipCls + '">' + distLabel + '</span>' + r.name + '</div><div style="display:flex;align-items:center;gap:10px' + (raceCompareMode ? ';margin-right:32px' : '') + '"><div class="rc-date">' + r.date + '</div><span class="rc-chevron">\u25BE</span></div></div>' +
           '<div class="rc-stats">' +
-            '<div class="mn"><div class="mnl">Time</div><div class="mnv mono' + (isBest ? ' hl' : '') + '">' + r.time + '</div></div>' +
+            '<div class="mn"><div class="mnl">' + (isLong ? 'Finish' : 'Time') + '</div><div class="mnv mono' + (isBest ? ' hl' : '') + '">' + r.time + '</div></div>' +
+            officialStat +
+            distStat +
             '<div class="mn"><div class="mnl">Pace</div><div class="mnv mono">' + r.pace + '/km</div></div>' +
             '<div class="mn"><div class="mnl">Avg HR</div><div class="mnv mono">' + (r.hr || '--') + '</div></div>' +
             '<div class="mn"><div class="mnl">Max HR</div><div class="mnv mono">' + (r.mhr || '--') + '</div></div>' +
