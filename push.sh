@@ -78,7 +78,7 @@ if cr_s >= 0 and cr_e > cr_s and cl_s >= 0 and cl_e > cl_s:
     try:
         repo_club  = json.loads(repo_club_str)  if repo_club_str  else {}
         local_club = json.loads(local_club_str) if local_club_str else {}
-        merged_club = {**local_club, **repo_club}  # routine-injected (repo) wins
+        merged_club = {**repo_club, **local_club}  # local (manually maintained) wins; repo adds only new keys
         if merged_club != local_club:
             merged_json = json.dumps(merged_club, ensure_ascii=False, separators=(',', ':'))
             local_html = local_html[:cl_s + len(CSTART)] + merged_json + '; ' + local_html[cl_e:]
