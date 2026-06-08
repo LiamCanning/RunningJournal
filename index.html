@@ -445,10 +445,11 @@ body{font-family:'Geist',system-ui,-apple-system,sans-serif;color:var(--t1);back
 /* MB WEEK CARDS */
 .ph1-archive{margin-bottom:16px}.ph1-archive-head{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg2);border-radius:8px;cursor:pointer;border:1px solid var(--bdr);margin-bottom:4px}.ph1-archive-head:hover{background:var(--card2)}.ph1-toggle-btn{background:none;border:1px solid var(--bdr2);border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;color:var(--t3);cursor:pointer}.mb-week{background:var(--card);border:1px solid var(--bdr);border-radius:12px;margin-bottom:8px;overflow:hidden;transition:all .2s}
 .mb-week:hover{border-color:var(--bdr2)}
-.mb-week.mb-past{opacity:.5}.mb-week.mb-past:hover{opacity:.75}
+.mb-week.mb-past .mb-label{color:var(--t3)}.mb-week.mb-past .mb-vol{opacity:.65}.mb-week.mb-past .mb-body{opacity:.6}
 .mb-week.mb-current{border-left:4px solid var(--grn);box-shadow:0 0 0 1px var(--grn),var(--shadowL)}
 .mb-head{padding:14px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;-webkit-user-select:none;user-select:none}
 .mb-label{font-size:14px;font-weight:700}
+.mb-done-tick{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--grn);color:#fff;font-size:11px;font-weight:800;margin-right:8px;vertical-align:middle;flex-shrink:0}
 .mb-vol{font-family:'Geist Mono';font-size:13px;font-weight:700;color:var(--grn);display:flex;align-items:center;gap:10px}
 .mb-body{display:none;padding:0 20px 16px;border-top:1px solid var(--bdr)}
 .mb-week.open .mb-body{display:block}
@@ -6926,6 +6927,7 @@ function renderMarathonBlock() {
         var isCurrent = dates && todayDate >= dates.start && todayDate <= dates.end;
         var cls = 'mb-week' + (isPast ? ' mb-past' : '') + (isCurrent ? ' mb-current open' : '');
         var nowBadge = isCurrent ? '<span class="pw-now-badge">This week</span>' : '';
+        var doneBadge = isPast ? '<span class="mb-done-tick" title="Week complete">✓</span>' : '';
         var tagBadge = w.tag ? '<span style="font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;background:var(--orgGlow);color:var(--org);padding:2px 8px;border-radius:4px;margin-left:8px">' + w.tag + '</span>' : '';
         var weekLoggedKm = w.sessions.reduce(function(sum, s) {
           var e = mbLogs[w.id + '_' + s.id];
@@ -6977,7 +6979,7 @@ function renderMarathonBlock() {
           '</div>';
         }).join('');
         return '<div class="' + cls + '" data-wid="' + w.id + '">' +
-          '<div class="mb-head"><span class="mb-label">' + w.wk + nowBadge + tagBadge + '</span>' +
+          '<div class="mb-head"><span class="mb-label">' + doneBadge + w.wk + nowBadge + tagBadge + '</span>' +
           '<span class="mb-vol">' + progressHtml + volDisplay + '</span></div>' +
           '<div class="mb-body">' +
             (w.note ? '<div class="mb-note">' + w.note + '</div>' : '') +
