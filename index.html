@@ -6507,6 +6507,8 @@ function buildSessModalContent(sess, wk) {
   if (zoneM) ms.push({label:'Zone', val: zoneM[1], unit:'', cls:'zone'});
   if (ms.length) mainBody += statsGrid(ms);
   if (recM) mainBody += '<div class="sd-rec">Recovery: ' + recM[1].trim() + '</div>';
+  // Compound main (e.g. fartlek 5x2min then 5x1min): show the full text so no block is hidden
+  if ((src.match(/\d+\s*[\u00d7x]\s*\d+\s*(?:min|'|sec)/gi)||[]).length > 1 || /,?\s*then\s/i.test(src)) mainBody = '<div class="sd-simple-body">' + src.replace(/\s+/g,' ').trim() + '</div>';
   if (!mainBody) mainBody = '<div class="sd-simple-body">' + (src).replace(/\s+/g,' ').trim() + '</div>';
   html += segCard('main', 'Main set', mainBody);
 
