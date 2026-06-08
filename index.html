@@ -3481,7 +3481,7 @@ document.getElementById('pg-dash').innerHTML =
     var ts = GARMIN_TRAINING_STATUS[GARMIN_TRAINING_STATUS.length - 1];
     var tr = GARMIN_READINESS[GARMIN_READINESS.length - 1];
     var readinessColor = tr.score >= 70 ? 'var(--c-easy)' : tr.score >= 50 ? 'var(--c-tempo)' : 'var(--red)';
-    var blockStart = new Date('2026-06-08');
+    var blockStart = new Date('2026-06-01');
     var raceD = new Date('2026-10-04');
     var blockTotal = Math.round((raceD - blockStart) / 86400000);
     var blockElapsed = Math.max(0, Math.round((now - blockStart) / 86400000));
