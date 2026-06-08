@@ -5299,24 +5299,50 @@ var raceStrategies = {
   },
   '2026-06-21': {
     race: 'Ponle Freno 10K', dist: '10K', distKm: 10,
-    goalA: { label: 'A Goal - Sub-40:30', time: '40:30', totalSecs: 2430, pace: '4:03/km',
-      desc: 'Realistic ceiling based on Garmin prediction (40:37). Beat it with race-day execution and a negative split.' },
-    goalB: { label: 'B Goal - PR', time: '41:00', totalSecs: 2460, pace: '4:06/km',
-      desc: 'Beat current PR (41:27) with a comfortable effort. Week 2 of marathon block so legs should be fresh.' },
+    goalA: { label: 'A Goal - Sub-41 (PB)', time: '40:45', totalSecs: 2445, pace: '4:05/km',
+      desc: 'Your stated target and a PB (current PB 41:27). A genuine stretch: it lands on a full 52km training week and an evening race in June heat, so everything has to go right. Negative split, nothing wasted early.' },
+    goalB: { label: 'B Goal - Around PB', time: '41:25', totalSecs: 2485, pace: '4:08/km',
+      desc: 'If the legs are flat from the week or the heat is brutal, run a strong even effort around your PB. On worked legs that is still an excellent result and the smart fallback.' },
     splits: [
-      { km: 1, a: '4:04', b: '4:07', note: 'Deliberately slow start. Do not go out in 3:58 - you will blow up. Settle.' },
-      { km: 2, a: '4:03', b: '4:06', note: 'Find race pace. Breathing settles, lock into a group running similar pace.' },
-      { km: 3, a: '4:03', b: '4:06', note: 'Cruise control. Arms relaxed, jaw unclenched. This should feel sustainable.' },
-      { km: 4, a: '4:03', b: '4:06', note: 'First quarter done. Can you hold this for 6 more? Commit or ease to B-goal.' },
-      { km: 5, a: '4:03', b: '4:06', note: 'Halfway. You should still feel in control. If suffering, that is normal - hold on.' },
-      { km: 6, a: '4:03', b: '4:06', note: 'Grind zone. Stay present. Chase the runner just ahead of you.' },
-      { km: 7, a: '4:02', b: '4:05', note: '3km to go. Slight acceleration. Shorten stride, increase turnover.' },
-      { km: 8, a: '4:01', b: '4:04', note: '2km to go. This is where the race is won or lost. Push through.' },
-      { km: 9, a: '3:59', b: '4:03', note: 'Penultimate km. Wind up. You can suffer for 4 more minutes.' },
-      { km: 10, a: '3:56', b: '4:01', note: 'Everything. Kick from 500m. Sprint the last 200m. Empty it out.' }
+      { km: 1, a: '4:11', b: '4:14', note: 'Controlled start. Heat punishes a hot opener hardest - do NOT go out at 4:00. Let people go up the road.' },
+      { km: 2, a: '4:07', b: '4:10', note: 'Ease onto race pace. Breathing settles. Tuck into a group running your pace and share the work.' },
+      { km: 3, a: '4:06', b: '4:09', note: 'Cruise. Shoulders relaxed, jaw loose. This should feel sustainable, not heroic.' },
+      { km: 4, a: '4:06', b: '4:09', note: 'Decision km. Can you hold this for 6 more? If yes, commit to the A line. If already straining, settle to B.' },
+      { km: 5, a: '4:05', b: '4:09', note: 'Halfway, ~20:35 on the A line. You should still feel in control, holding back a fraction.' },
+      { km: 6, a: '4:05', b: '4:09', note: 'Grind zone begins. Stay present, one km at a time. Lock onto the runner just ahead.' },
+      { km: 7, a: '4:04', b: '4:08', note: '3km to go. Lean in. Shorten the stride a touch, lift the turnover.' },
+      { km: 8, a: '4:03', b: '4:07', note: '2km to go. Where sub-41 is won or lost. The pace comes down now, not at the line.' },
+      { km: 9, a: '4:01', b: '4:06', note: 'Penultimate km. Wind it up. You can hurt for 4 more minutes.' },
+      { km: 10, a: '3:57', b: '4:03', note: 'Everything. Kick from 500m, sprint the last 200m. Nothing left for the line.' }
     ],
-    strategy: 'Negative split is essential - restrained km 1-5, building km 6-10. Week 2 of marathon block so legs should still be sharp. Garmin predicts 40:37 which is your realistic ceiling right now. Sub-40 is a 2027 goal. Chase 40:30 with smart pacing - going out at 3:58 pace risks a 42-minute death march. Go through 5km in 20:15, come back in 20:15 or faster.',
-    coaching: 'Your 10K PR is 41:27 and Garmin already predicts 40:37 — that\'s nearly a minute improvement without any dedicated 10K training. This race falls in week 2 of marathon block when your aerobic base is at its biggest and your legs are still fresh. Sub-40:30 is a realistic and exciting target. Even if everything clicks perfectly and you squeeze closer to 40:00, that would be an extraordinary performance. And honestly, a sub-41:00 on week 2 of a marathon block is excellent running by any measure. You\'re better at 10K than you think.'
+    strategy: 'Sub-41 lives or dies on the first 3km. Go out controlled (4:08-4:11, slower in the heat), settle at ~4:06, then build from km 6. Through 5km in ~20:35 and come home faster - a negative split is the only way this works on worked legs in heat. A hot 4:00/km start turns a sub-41 attempt into a 42-minute death march by km 7. Earn it in the back half. If by km 4-5 the legs are gone or the heat is severe, drop to the B line and run a strong even effort around your PB.',
+    coaching: 'Be honest with the conditions and the target stays achievable. Garmin had you near 40:37 on fresh legs - you are NOT fresh this week (52km, two club sessions), and an evening race in Valencia June heat typically costs 10-20 seconds over 10K. So sub-41 is the right stretch goal, but the realistic landing zone is 40:45 to 41:30 depending on the day. The engine is there: your aerobic base is the biggest it has ever been. Do not let excitement burn the first 3km. Run the back half faster than the front and you give yourself every chance. Whatever the clock says, a controlled sub-41-area 10K on a full training week is strong running.',
+    coach: {
+      timeline: [
+        {t:'Lunch ~13:00',icon:'🍝',title:'Main meal early',desc:'Eat your main carb-based meal around lunchtime, about 5 hours before the gun: pasta or rice with a little protein, nothing fatty, fried or high-fibre. An evening race means you do not race on breakfast - this is your real fuel.'},
+        {t:'T-3 h',icon:'🥪',title:'Light top-up',desc:'A small familiar snack: toast and honey, a banana, a cereal bar. Sip water steadily through the afternoon and stop solids by T-2h. In the heat, add a pinch of salt to your drinks across the day.'},
+        {t:'T-75 min',icon:'🎽',title:'Kit and arrive',desc:'Shoes tied twice, bib pinned flat, watch charged with GPS locked. Leave earlier than feels necessary. Light singlet, cap or visor, and do not stand in the sun before the start.'},
+        {t:'T-30 min',icon:'🏃',title:'Easy warm-up',desc:'10-12 minutes easy at 5:30/km or slower. Shorter and gentler than a cool-day warm-up - the heat already has you warm. Goal is loose legs, not a soaked shirt before the gun.'},
+        {t:'T-15 min',icon:'⚡',title:'Strides',desc:'4 x 80m strides, the last two up to race pace, short walk back. These switch the legs on and remind them what 4:05/km feels like. Then small sips of water and find some shade.'},
+        {t:'T-5 min',icon:'🧠',title:'Zone in',desc:'Into the pen. Two slow breaths. Your one job for the first 2km is restraint. Cue word: CONTROLLED. The heat and the evening adrenaline will both tempt you to go too hard early - do not.'},
+        {t:'Gun',icon:'🏁',title:'Go - controlled',desc:'The first 400m feels easy and everyone surges. Let them. Target km 1 is 4:08-4:11. A 3:58 here is the one mistake that ends a sub-41 day. Patience now buys you the back half.'}
+      ],
+      kmMental: [
+        {km:'1-2',heading:'Sit on your hands',cue:'The hardest discipline of the race: running slower than you feel you can. 4:08-4:11, relaxed, letting runners go. In the heat a controlled start is not caution, it is the only way to be racing at km 8 instead of surviving. Bank patience now.'},
+        {km:'3-5',heading:'Lock and cruise',cue:'Settle onto 4:05-4:06 and make it automatic. Tuck behind someone, match their rhythm, share the pace. Breathing steady, shoulders down, jaw loose. Through halfway you should feel you are holding back a fraction - that is your back half.'},
+        {km:'6-7',heading:'The race starts here',cue:'Now it costs. Everyone hurts at km 6-7 of a 10K - the question is who keeps the pace honest. Do not let it drift. Pick the runner ahead and reel them in. Shorten the stride, lift the cadence, stay tall.'},
+        {km:'8-9',heading:'Pay it back',cue:'All that patience in km 1-5 gets spent now. The pace comes down: 4:03, then 4:01. It hurts and it is supposed to. Two kilometres is a number of hard breaths you can count. Drive the arms, they pull the legs.'},
+        {km:'10',heading:'Empty it',cue:'From the 500m board, everything. No race tomorrow needs these legs. Kick at 500m, sprint the last 200m, do not look at the watch - race the line. This is where a 41:0x becomes a 40:5x.'}
+      ],
+      mantras: [
+        {phase:'Km 1-2',word:'CONTROLLED',context:'The heat and the adrenaline are both lying. Slower than you feel. Bank it.'},
+        {phase:'Km 3-7',word:'CRUISE',context:'Smooth, relaxed, automatic. Sit in, share the pace, stay tall.'},
+        {phase:'Km 8-10',word:'PAY IT BACK',context:'Everything you saved early, spend it now. Faster every km to the line.'}
+      ],
+      hurt: 'Km 6 to 8 is where a 10K is lost, not from lack of fitness but because the brain reads hard effort as danger. When that voice gets loud: drop the shoulders and feel them fall; breathe two sips in through the nose and one long out; pick a target 10-15m ahead and close the gap, racing the person not the finish; count 30 strides then 30 more, because effort shrinks when measured in seconds; and tell yourself this is 10K, around 40 minutes, you can hold anything for that long.',
+      mindset: 'Sub-41 on a full training week in evening heat is a stretch, and that is exactly why it is worth chasing. You do not need a perfect day, you need a disciplined one. The fitness is already in your legs from every session this block. Your job is not to find more, it is to spend what you have in the right order: nothing wasted early, everything spent late. Run the plan and let the clock take care of itself.',
+      postRace: 'Do not stop dead at the line - jog 5-10 minutes easy to clear the legs, then rehydrate with water plus electrolytes (you raced in the heat). Then two questions: what went well, and what would you change? Note it. And remember this is week 3 of a marathon block, not a peak - whatever the time, it is a data point on the way to October, not the verdict.'
+    }
   },
   '2026-09-20': {
     race: 'Barris de Sant Marcel-li 5K', dist: '5K', distKm: 5,
