@@ -4,7 +4,7 @@
 # before pushing, so new activities from the hourly CI sync are never lost.
 set -e
 
-ICLOUD="/Users/liam/Library/Mobile Documents/com~apple~CloudDocs/Personal/Fitness/Running"
+ICLOUD="$HOME/Library/Mobile Documents/com~apple~CloudDocs/Personal/Fitness/Running"
 REPO="$HOME/RunningJournal"
 LOCAL_HTML="$ICLOUD/Dashboard/cologne-marathon-dashboard.html"
 
@@ -12,11 +12,11 @@ cd "$REPO"
 git pull --rebase origin main
 
 # Merge CI-injected data from repo's index.html into local dashboard HTML
-python3 - << 'PYEOF'
-import re, json, sys
+LOCAL_HTML="$LOCAL_HTML" python3 - << 'PYEOF'
+import re, json, sys, os
 
 repo_path   = 'index.html'
-local_path  = "/Users/liam/Library/Mobile Documents/com~apple~CloudDocs/Personal/Fitness/Running/Dashboard/cologne-marathon-dashboard.html"
+local_path  = os.environ['LOCAL_HTML']
 
 try:
     repo_html  = open(repo_path,  encoding='utf-8').read()
