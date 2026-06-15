@@ -6453,9 +6453,20 @@ function buildSessModalContent(sess, wk) {
   var ccKms=[], ccRe=/(?:^|[\s(~])(\d+(?:\.\d+)?)\s*km\b/g, ccM;
   while((ccM=ccRe.exec(d))!==null) ccKms.push(parseFloat(ccM[1]));
   var totKmV = ccKms.length ? Math.max.apply(null, ccKms) : null;
+  // Display-only fallbacks: estimate duration / distance from the data already in
+  // the description so simpler cards still lead with time and km (marked "est").
+  var totMin = totMinM ? parseInt(totMinM[1]) : null, minEst = false, kmEst = false;
+  if (totMin === null) {
+    var mins = [], mRe = /(\d+)\s*min\b/gi, mm;
+    while ((mm = mRe.exec(d)) !== null) mins.push(parseInt(mm[1]));
+    if (mins.length) { totMin = mins.reduce(function(a,b){return a+b;},0); minEst = true; }
+  }
+  var pAll = d.match(/(\d):(\d{2})\s*\/km/);
+  var paceSec = pAll ? (parseInt(pAll[1])*60 + parseInt(pAll[2])) : 330;
+  if (totKmV === null && totMin) { totKmV = Math.round(totMin*60/paceSec); kmEst = true; }
   var totBits = [];
-  if (totMinM) totBits.push(totMinM[1] + ' min');
-  if (totKmV)  totBits.push('~' + totKmV + 'km');
+  if (totMin) totBits.push(totMin + ' min' + (minEst ? ' est' : ''));
+  if (totKmV) totBits.push('~' + totKmV + 'km' + (kmEst ? ' est' : ''));
   if (totBits.length) {
     html += '<div class="sd-total"><span class="sd-total-lbl">Total</span><span class="sd-total-val">' + totBits.join('  ·  ') + '</span><span class="sd-total-sub">warm-up, main &amp; cool-down are within this</span></div>';
   }
@@ -6563,7 +6574,9 @@ function buildSessModalContent(sess, wk) {
   if (ms.length) mainBody += statsGrid(ms);
   if (recM) mainBody += '<div class="sd-rec">Recovery: ' + recM[1].trim() + '</div>';
   }
-  if (!mainBody) mainBody = '<div class="sd-simple-body">' + (src).replace(/\s+/g,' ').trim() + '</div>';
+  // Always show the full readable session text so the parser never hides detail
+  var mainReadable = (src).replace(/\s+/g,' ').trim();
+  if (mainReadable) mainBody += '<div class="sd-simple-body"' + (mainBody ? ' style="margin-top:12px;padding-top:12px;border-top:1px solid var(--bdr2)"' : '') + '>' + mainReadable + '</div>';
   html += segCard('main', 'Main set', mainBody);
 
   } // end else (non-progressive)
