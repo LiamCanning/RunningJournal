@@ -7144,7 +7144,7 @@ document.getElementById('pg-plan').innerHTML =
   // Race day timeline
   html += '<div class="coach-sec-h">Race day timeline</div>' +
     '<div class="coach-timeline">' +
-    c.timeline.map(function(step) {
+    (c.timeline||[]).map(function(step) {
       return '<div class="coach-step">' +
         '<div class="coach-step-left">' +
           '<div class="coach-step-icon">' + step.icon + '</div>' +
@@ -7183,7 +7183,7 @@ document.getElementById('pg-plan').innerHTML =
   html += '</div>';
 
   // Watch strategy
-  html += '<div class="coach-sec-h">Watch strategy</div>' +
+  if (c.watch && c.watch.length) html += '<div class="coach-sec-h">Watch strategy</div>' +
     '<div class="coach-watch-grid">' +
     c.watch.map(function(w) {
       return '<div class="coach-watch-card">' +
@@ -7197,7 +7197,7 @@ document.getElementById('pg-plan').innerHTML =
     '</div>';
 
   // Mantras
-  html += '<div class="coach-sec-h">Race mantras</div>' +
+  if (c.mantras && c.mantras.length) html += '<div class="coach-sec-h">Race mantras</div>' +
     '<div class="coach-mantras">' +
     c.mantras.map(function(m) {
       return '<div class="coach-mantra">' +
