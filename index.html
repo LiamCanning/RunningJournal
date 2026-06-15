@@ -2573,10 +2573,10 @@ var planMB = [
      desc:'Runners Ciutat club 5K, your home race - but it is the morning after a Saturday party, so this is NOT a race effort. This replaces the Sunday long run this week. Total ~11km: 3km warm-up + 5km at ~4:30/km + 3km cool-down (these are separate and add together). WU: 3km easy @ 5:30/km, HR <145, then 4x20s strides. Main: 5km steady at 4:30/km (about 22:30, HR 165-175). Comfortable-hard and controlled - do not chase a PB on tired, dehydrated legs. CD: 3km easy jog @ 5:45/km, HR <145. Coach: After a party the legs and fuel tank will not be at their best, so run this as a relaxed tempo at 4:30/km, not a benchmark. Run by feel, enjoy the club race, and save the real efforts for when you are fresh. Keep Monday quality easy this week. Log it for the record.'}
    ]},
   {id:'mbw3',wk:'MB W3 (Jun 15–21) – RACE',vol:'~52km',tag:'RACE',
-   note:'A full training week with the Ponle Freno 10K on Sunday - not a taper, so the volume stays up. Bank the mileage Monday to Thursday (easy runs plus your two club sessions), then freshen Friday and Saturday into the race. You race on slightly worked legs, which is fine: it is a fitness check inside a normal week, judged on effort, with the holiday straight after for recovery.',
+   note:'A full training week with the Ponle Freno 10K on Sunday - not a taper, so the volume stays up. Bank the mileage Tuesday to Thursday (two club sessions plus Wednesday easy run), then freshen Friday and Saturday into the race. You race on slightly worked legs, which is fine: it is a fitness check inside a normal week, judged on effort, with the holiday straight after for recovery.',
    sessions:[
     {id:'mon',day:'Mon',t:'Gym',c:'tr2',rpe:'3',flex:false,club:false,
-     desc:'Gym / strength session (squats, hip thrusts, lunges, vertical jumps, skipping) + core. This is a volume race week, so also run 8km easy @ 5:40-5:50/km, HR <145, before or after the gym to keep the mileage up. Freshen only the last two days before Sunday.'},
+     desc:'Gym / strength session (squats, hip thrusts, lunges, vertical jumps, skipping) + core. No running today - keep Monday gym-only. Race week volume comes from Tuesday to Thursday with the two club sessions and Wednesday easy run.'},
     {id:'club1',day:'Tue',t:'Club',c:'tq',rpe:null,flex:false,club:true,
      desc:'Club session  -  follow Pistas, log after.'},
     {id:'wed',day:'Wed',t:'Easy',c:'te',rpe:'3',flex:false,club:false,
@@ -2593,8 +2593,6 @@ var planMB = [
   {id:'mbw4',wk:'MB W4 (Jun 22–28) – HOLIDAY',vol:'~22km',tag:'HOLIDAY',
    note:'Holiday in Portugal, 22-27 June - recovery after the Ponle Freno 10K. Running chances will be limited while away, so bank one good run: a single 10km+ easy run any day Monday to Saturday. Then back home for the Sunday long run on the 28th. No other structure this week - rest and enjoy the trip.',
    sessions:[
-    {id:'gym',day:'Mon',t:'Gym',c:'tr2',rpe:'2',flex:false,club:false,
-     desc:'Gym / strength day - do it if you have access to a gym or bands while away; otherwise mobility and core, or an easy 20-30min jog. Holiday week, so no pressure: keep it light and enjoy the break.'},
     {id:'long',day:'Sun',t:'Long run',c:'tl',rpe:'3',flex:false,club:false,
      desc:'Total 60min (~10.5km). WU: First 10min very easy @ 5:45+/km, HR <130. Main: 45min @ 5:20–5:40/km, HR 135–148. First long run back after holiday. It does not need to be fast, it needs to happen. CD: 5min easy. GUT: 1 gel at 30min with water. Re-establish gut training after holiday. Coach: The long run is the single most important session of every week. This one re-establishes the rhythm after the holiday break. Simple and non-negotiable. Arriving at W5 with a completed long run matters more than the pace.'},
     {id:'flex',day:'Any day',t:'Long easy',c:'tl',rpe:'3',flex:true,club:false,
@@ -6402,7 +6400,7 @@ function buildSessModalContent(sess, wk) {
   function zoneFromText(t){
     var pv = t.match(/(\d+)(?:\s*[–\-]\s*(\d+))?\s*%\s*VAM/i);
     if (pv){ var p=parseInt(pv[2]||pv[1]); var nm = p<66?'Easy':p<76?'Steady':p<84?'Tempo':p<91?'Threshold':'VO2max'; return nm+' ('+pv[0].replace(/\s+/g,'')+')'; }
-    var n2 = t.match(/\b(LT2|LT1|Marathon pace|MP|Tempo|Threshold|Easy)\b/i) || t.match(/\bT pace\b/i);
+    var n2 = t.match(/\b(LT2|LT1|Marathon pace|MP|Tempo|Threshold|Easy)\b(?!\s+(?:phase|block|work|training|running|stimulus))/i) || t.match(/\bT pace\b/i);
     return n2 ? n2[0].charAt(0).toUpperCase() + n2[0].slice(1) : null;
   }
   // Progressive long-run format: "WU: 0:00–1:00 ... Main segment 1: 1:00–1:30 @ LT1 4:54/km ... Main segment 2: 1:30–2:45 @ MP 4:58/km ..."
@@ -6437,7 +6435,7 @@ function buildSessModalContent(sess, wk) {
   var src = mainText || d;
   var repM     = src.match(/(\d+)\s*[\xd7x]\s*(\d+)\s*(min|'|''|sec|s\b)/i);
   var singleM  = !repM && src.match(/^(\d+)\s*(min|')/);
-  var distOnlyM= !repM && !singleM && src.match(/^~?([\d.]+)\s*km/);
+  var distOnlyM= !repM && !singleM && (src.match(/^~?([\d.]+\s*[–\-]\s*[\d.]+)\s*km/) || src.match(/^~?([\d.]+)\s*km/));
   var paceM    = src.match(/(\d:\d{2})[–\-](\d:\d{2})\/km/) || src.match(/(\d:\d{2})\/km/);
   var hrM      = src.match(/HR\s*([<>]?\s*\d+(?:[–\-]\d+)?)/i);
   var zoneVal  = zoneFromText(src);
