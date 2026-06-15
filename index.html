@@ -6395,6 +6395,16 @@ function rpeBar(rpeStr) {
 
 function buildSessModalContent(sess, wk) {
   var d = sess.desc || '';
+  function esc(x){ return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  // Strength/gym/rest days are not runs - don't decorate them with running pace, zone or distance.
+  var isStrength = /^(gym|strength|rest|mobility)/i.test((sess.t||'').trim());
+  // Turn a "% VAM" or a named effort into a plain-English zone, so the card never shows a bare, jargon "VAM".
+  function zoneFromText(t){
+    var pv = t.match(/(\d+)(?:\s*[–\-]\s*(\d+))?\s*%\s*VAM/i);
+    if (pv){ var p=parseInt(pv[2]||pv[1]); var nm = p<66?'Easy':p<76?'Steady':p<84?'Tempo':p<91?'Threshold':'VO2max'; return nm+' ('+pv[0].replace(/\s+/g,'')+')'; }
+    var n2 = t.match(/\b(LT2|LT1|Marathon pace|MP|Tempo|Threshold|Easy)\b/i) || t.match(/\bT pace\b/i);
+    return n2 ? n2[0].charAt(0).toUpperCase() + n2[0].slice(1) : null;
+  }
   // Progressive long-run format: "WU: 0:00–1:00 ... Main segment 1: 1:00–1:30 @ LT1 4:54/km ... Main segment 2: 1:30–2:45 @ MP 4:58/km ..."
   var isProg = /Main segment\s*\d/i.test(d);
 
@@ -6430,7 +6440,7 @@ function buildSessModalContent(sess, wk) {
   var distOnlyM= !repM && !singleM && src.match(/^~?([\d.]+)\s*km/);
   var paceM    = src.match(/(\d:\d{2})[–\-](\d:\d{2})\/km/) || src.match(/(\d:\d{2})\/km/);
   var hrM      = src.match(/HR\s*([<>]?\s*\d+(?:[–\-]\d+)?)/i);
-  var zoneM    = src.match(/\b(LT2|LT1|T pace|Tempo|Marathon pace|MP|VAM|Threshold)\b/i);
+  var zoneVal  = zoneFromText(src);
   var recM     = mainText.match(/,\s*(\d+\s*(?:min|s|')\s*(?:easy\s*jog|standing|jog)?(?:\s*rec)?)/i);
   var totalKm  = d.match(/~([\d.]+)km/);
   var rpeVal   = sess.rpe || (d.match(/RPE\s*([\d–\-]+)/i) || [])[1];
@@ -6441,9 +6451,9 @@ function buildSessModalContent(sess, wk) {
   function statsGrid(items) {
     var cls = items.length === 2 ? ' two' : '';
     return '<div class="sd-stats' + cls + '">' + items.map(function(it) {
-      return '<div class="sd-stat"><div class="sd-stat-lbl">' + it.label + '</div>' +
-        '<div class="sd-stat-val ' + (it.cls||'') + '">' + it.val + '</div>' +
-        (it.unit ? '<div class="sd-stat-unit">' + it.unit + '</div>' : '') + '</div>';
+      return '<div class="sd-stat"><div class="sd-stat-lbl">' + esc(it.label) + '</div>' +
+        '<div class="sd-stat-val ' + (it.cls||'') + '">' + esc(it.val) + '</div>' +
+        (it.unit ? '<div class="sd-stat-unit">' + esc(it.unit) + '</div>' : '') + '</div>';
     }).join('') + '</div>';
   }
 
@@ -6455,18 +6465,17 @@ function buildSessModalContent(sess, wk) {
   var totKmV = ccKms.length ? Math.max.apply(null, ccKms) : null;
   // Display-only fallbacks: estimate duration / distance from the data already in
   // the description so simpler cards still lead with time and km (marked "est").
-  var totMin = totMinM ? parseInt(totMinM[1]) : null, minEst = false, kmEst = false;
-  if (totMin === null) {
-    var mins = [], mRe = /(\d+)\s*min\b/gi, mm;
-    while ((mm = mRe.exec(d)) !== null) mins.push(parseInt(mm[1]));
-    if (mins.length) { totMin = mins.reduce(function(a,b){return a+b;},0); minEst = true; }
-  }
   var pAll = d.match(/(\d):(\d{2})\s*\/km/);
   var paceSec = pAll ? (parseInt(pAll[1])*60 + parseInt(pAll[2])) : 330;
-  if (totKmV === null && totMin) { totKmV = Math.round(totMin*60/paceSec); kmEst = true; }
+  var totMin = totMinM ? parseInt(totMinM[1]) : null, minEst = false, kmEst = false;
+  // Reliable order: explicit total -> a stated continuous duration -> derive from distance+pace.
+  // Never sum fragment minutes (that under-counts structured sessions and misleads).
+  if (totMin === null) { var sgl = (mainText||'').match(/^~?(\d+)\s*min\b/i); if (sgl) totMin = parseInt(sgl[1]); }
+  if (totMin === null && totKmV && !isStrength) { totMin = Math.round(totKmV * paceSec / 60); minEst = true; }
+  if (!isStrength && totKmV === null && totMin) { totKmV = Math.round(totMin*60/paceSec); kmEst = true; }
   var totBits = [];
   if (totMin) totBits.push(totMin + ' min' + (minEst ? ' est' : ''));
-  if (totKmV) totBits.push('~' + totKmV + 'km' + (kmEst ? ' est' : ''));
+  if (!isStrength && totKmV) totBits.push('~' + totKmV + 'km' + (kmEst ? ' est' : ''));
   if (totBits.length) {
     html += '<div class="sd-total"><span class="sd-total-lbl">Total</span><span class="sd-total-val">' + totBits.join('  ·  ') + '</span><span class="sd-total-sub">warm-up, main &amp; cool-down are within this</span></div>';
   }
@@ -6568,9 +6577,9 @@ function buildSessModalContent(sess, wk) {
     mainBody += '<div class="sd-rep-hero"><span class="sd-rep-dur">' + distOnlyM[1] + '<span style="font-size:16px;opacity:.6;font-weight:600"> km</span></span></div>';
   }
   var ms = [];
-  if (paceM) ms.push({label:'Pace', val: paceM[0].replace('/km',''), unit:'/km', cls:'pace'});
-  if (hrM)   ms.push({label:'HR',   val: hrM[1], unit:'bpm', cls:'hr'});
-  if (zoneM) ms.push({label:'Zone', val: zoneM[1], unit:'', cls:'zone'});
+  if (!isStrength && paceM) ms.push({label:'Pace', val: paceM[0].replace('/km',''), unit:'/km', cls:'pace'});
+  if (hrM && !isStrength) ms.push({label:'HR', val: hrM[1].replace(/\s/g,''), unit:'bpm', cls:'hr'});
+  if (!isStrength && zoneVal) ms.push({label:'Zone', val: zoneVal, unit:'', cls:'zone'});
   if (ms.length) mainBody += statsGrid(ms);
   if (recM) mainBody += '<div class="sd-rec">Recovery: ' + recM[1].trim() + '</div>';
   }
