@@ -6284,7 +6284,7 @@ function parsePlanWeekDates(wk) {
     var cw = CLUB_SESSIONS[key]; if (!cw) return;
     w.sessions.forEach(function(s) {
       var ov = /Tue/i.test(s.day) ? cw.tue : (/Thu/i.test(s.day) ? cw.thu : null);
-      if (ov && ov.desc) { s.t = 'Club (Pistas)'; s.desc = ov.desc; s.club = true; s.flex = false; if (ov.rpe) s.rpe = ov.rpe; }
+      if (ov && ov.desc && s.club) { s.t = 'Club (Pistas)'; s.desc = ov.desc; s.flex = false; if (ov.rpe) s.rpe = ov.rpe; }
     });
   }); });
 })();
