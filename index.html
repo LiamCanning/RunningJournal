@@ -1482,6 +1482,9 @@ textarea.race-modal-inp{resize:vertical;min-height:56px}
 .pgr-badge-ptxt{font-size:10px;font-weight:700;color:var(--t3);font-family:'Geist Mono',monospace}
 .pgr-badge-tick{position:absolute;top:13px;right:14px;font-size:13px;color:var(--grn);font-weight:800}
 @media(max-width:600px){.pgr-wk-lbl{width:96px}.pgr-badges{grid-template-columns:repeat(2,1fr)}}
+.race-coach-note{margin-top:14px;padding:12px 14px;background:var(--grnSoft);border-left:3px solid var(--grn);border-radius:0 6px 6px 0}
+.race-coach-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--grn);margin-bottom:6px;font-family:'Geist Mono',monospace}
+.race-coach-text{font-size:13px;color:var(--t2);line-height:1.55}
 </style>
 </head>
 <body>
@@ -1865,8 +1868,8 @@ Carrera,2026-06-07 10:34:07,false,Easy Run – 1 Hora ‍♂️,11.16,,01:02:35,
 Carrera,2026-06-09 19:41:42,false,Easy Run – MB W2: Runners Ciutat,9.50,,00:55:04,162,194,,,,5:06,,,,,,,,,,,,,,,,,,,,,,,,,,
 Carrera,2026-06-10 20:05:04,false,Easy Run – 7km fácil,7.02,,00:39:41,141,169,,,,5:26,,,,,,,,,,,,,,,,,,,,,,,,,,
 Carrera,2026-06-11 14:30:46,false,Intervals – 2x5',12.01,,01:08:47,160,193,,,,5:04,,,,,,,,,,,,,,,,,,,,,,,,,,
-Carrera,2026-06-13 12:53:09,false,Race – Carrera a la hora del almuerzo,10.32,,01:01:08,144,171,,,,5:31,,,,,,,,,,,,,,,,,,,,,,,,,,
-Carrera,2026-06-14 08:29:47,false,Easy Run – Runners Ciutat | Circuit de Carreres,5.04,,00:20:51,186,203,,,,4:08,,,,,,,,,,,,,,,,,,,,,,,,,,
+Carrera,2026-06-13 12:53:09,false,Easy Run – Carrera a la hora del almuerzo,10.32,,01:01:08,144,171,,,,5:31,,,,,,,,,,,,,,,,,,,,,,,,,,
+Carrera,2026-06-14 08:29:47,false,Race – 5K Runners Ciutat | Circuit de Carreres,5.04,,00:20:51,186,203,,,,4:08,,,,,,,,,,,,,,,,,,,,,,,,,,
 `;
 
 // ===== GARMIN METRICS =====
@@ -2203,6 +2206,29 @@ races.forEach(function(r) {
     if (!bestByDist[r.cat] || r.timeSecs < bestByDist[r.cat]) bestByDist[r.cat] = r.timeSecs;
   }
 });
+var RACE_NOTES = {
+  '2024-12-15': {
+    label: 'Pre-season baseline',
+    coach: '42:49 on a cold December morning - this is the winter fitness benchmark. 4:16/km pace translates to roughly 3:35-3:40 marathon potential. HR 168 avg / 191 max shows you were working at a meaningful but sustainable effort, not at ceiling. This is where the season started - everything since has built on it.'
+  },
+  '2026-03-22': {
+    label: 'Spring fitness check',
+    coach: '41:34 - 1:15 quicker than December, and HR dropped 2 beats average at a faster pace. That combination is exactly what base training produces. Pace 4:09/km gives 49 seconds of headroom above marathon target pace (4:58/km). That gap needs to widen further through the marathon block, but the direction is right.'
+  },
+  '2026-04-12': {
+    label: 'PB - race season peak',
+    coach: '41:27 PB - 7 seconds off Pas Ras, which is meaningful at this level. Projects to 3:22-3:25 marathon by McMillan, clear of the sub-3:30 target. Higher HR (178 avg vs 166 at Pas Ras) at a similar pace suggests you pushed harder for this one - which is correct for a PB attempt. The aerobic engine is ahead of schedule. The marathon block converts this short-distance speed into 42km staying power.'
+  },
+  '2026-04-25': {
+    label: 'Race season 5K',
+    coach: '19:43 at avg HR 187, max HR 205. Genuine max effort. 3:55/km at VO2max projects to roughly 3:18 marathon by McMillan - well clear of sub-3:30. What this confirms: the ceiling is high enough. The marathon block is not about building more top-end speed; it is about raising the floor so 4:58/km feels controlled at km 35.'
+  },
+  '2026-06-14': {
+    label: 'MB W2 - controlled effort',
+    coach: '20:51 at 4:08/km. Context: morning after a late night, run as a controlled effort not a time trial - but HR (186 avg, 203 max) shows the legs raced once the gun went. 1:08 slower than the April 5K in incomparable conditions. Do not use this as a fitness benchmark. The positive reading: aerobic output responded even on compromised recovery. File as marathon-block quality stimulus.'
+  }
+};
+
 
 // ===== INTERVALS =====
 var intPatterns = /x1km|x400|x800|x1'|x1\s*min|x\s*60s|track|pista|intervals?|benchmark|mile|20-15-5-10|10x|12x|6x|5x|4x|3x|\d+km\s*@/i;
@@ -5152,6 +5178,14 @@ function renderRaces() {
             var minP2 = Math.min.apply(null,r.splits.map(function(s){return s.secs;}));
             var maxP2 = Math.max.apply(null,r.splits.map(function(s){return s.secs;}));
             return '<div class="splits"><div class="splits-h" style="color:var(--t3)">No lap data available for this race</div></div>';
+          })() +
+          (function() {
+            var rn = RACE_NOTES[r.ds];
+            if (!rn) return '';
+            return '<div class="race-coach-note">' +
+              '<div class="race-coach-label">' + rn.label + '</div>' +
+              '<div class="race-coach-text">' + rn.coach + '</div>' +
+            '</div>';
           })() +
         '</div>' +
       '</div>';
