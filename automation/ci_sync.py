@@ -179,7 +179,19 @@ def fetch_recent(access_token, after_ts):
         page += 1
         if len(batch) < 100:
             break
-    return [a for a in activities if a.get('type') == 'Run']
+    # Diagnostic: log every raw activity the API returned in the window, so a
+    # "missing run" can be traced to type-filtering vs the API not returning it
+    # at all (private activity + activity:read scope).
+    print(f"[fetch] Strava returned {len(activities)} raw activity(ies) in window:")
+    for a in activities:
+        print(f"  [raw] {str(a.get('start_date_local',''))[:10]} "
+              f"id={a.get('id')} type={a.get('type')!r} sport_type={a.get('sport_type')!r} "
+              f"private={a.get('private')} name={a.get('name','')!r}")
+    # Accept all running sport types, not just legacy type=='Run' (trail/virtual
+    # runs and race-tagged runs were being silently dropped).
+    RUN_TYPES = {'Run', 'TrailRun', 'VirtualRun'}
+    return [a for a in activities
+            if a.get('type') == 'Run' or a.get('sport_type') in RUN_TYPES]
 
 
 # ── 3. Load / update Strava cache ─────────────────────────────────────────────
