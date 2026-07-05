@@ -79,7 +79,9 @@ def _strava_get_with_retry(url, headers, params=None, retries=3, backoff=15):
                 continue
             if resp.status_code == 403:
                 last_403 = resp
-                print(f"[retry] Strava GET 403 (attempt {attempt+1}/{retries})", file=sys.stderr)
+                print(f"[retry] Strava GET 403 (attempt {attempt+1}/{retries}) "
+                      f"body={resp.text[:300]!r} scope-hdr={resp.headers.get('X-RateLimit-Limit','')!r}",
+                      file=sys.stderr)
                 if attempt < retries - 1:
                     time.sleep(15 * (2 ** attempt))
                 continue
