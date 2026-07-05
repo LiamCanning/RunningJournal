@@ -99,7 +99,18 @@ def _strava_get_with_retry(url, headers, params=None, retries=3, backoff=15):
         print("[rate-limit] All retries exhausted on 429. Exiting cleanly.")
         sys.exit(0)
     if last_403 is not None:
-        print("[forbidden] All retries exhausted on 403 (transient Strava/Cloudflare). Exiting cleanly.")
+        body = last_403.text or ''
+        # Distinguish a REAL Strava API error (application inactive, auth/scope
+        # error - a structured JSON error) from a transient Cloudflare/WAF IP
+        # block (an HTML page). A real error will never clear on its own, so
+        # fail loudly (raise -> workflow fails -> Slack alert) instead of
+        # exiting 0 and looking healthy while syncing nothing for days.
+        if last_403.headers.get('Content-Type', '').startswith('application/json') \
+           or '"resource"' in body or '"errors"' in body:
+            print(f"[forbidden] Real Strava 403 (needs manual fix, not transient): {body[:300]}",
+                  file=sys.stderr)
+            last_403.raise_for_status()
+        print("[forbidden] All retries exhausted on 403 (transient Cloudflare/WAF). Exiting cleanly.")
         sys.exit(0)
     resp.raise_for_status()
     return resp
