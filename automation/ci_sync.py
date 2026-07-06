@@ -179,6 +179,7 @@ def update_cache(cache, activities):
                     'average_heartrate': act.get('average_heartrate'),
                     'max_heartrate': act.get('max_heartrate'),
                     'description': act.get('description') or '',
+                    'decoupling': act.get('decoupling'),
                     'splits_metric': _compute_km_splits(aid),
                     'laps': [],
                 }
@@ -344,6 +345,79 @@ def classify_strava_run(name, desc, dist_km):
     return "Easy Run"
 
 
+# Garmin default titles carry no session info ("Valencia Carrera", "Morning
+# Run"). Only these fall through to data-based structure detection - a title
+# Liam typed himself always wins.
+GENERIC_NAME_RE = re.compile(
+    r'^([A-Za-zÀ-ÿ.\- ]+\s+)?(carrera|running|run|course|lauf)$|'
+    r'^(morning|afternoon|evening|lunch|night)?\s*(mon|tue|wed|thu|fri|sat|sun)?\s*run$',
+    re.IGNORECASE)
+
+
+def _fmt_rep_time(secs):
+    if secs < 90:
+        return f'{int(round(secs / 10) * 10)}"'
+    m = secs / 60.0
+    return f"{int(round(m))}'"
+
+
+def detect_structure(activity_id):
+    """Classify session type from intervals.icu's auto-detected work/recovery
+    intervals (derived from the pace data itself - no title needed).
+    Returns a title like "Intervals – 6x2'" / "Tempo Run", or None to fall
+    back to the name/distance classifier. Defensive: any surprise -> None."""
+    try:
+        resp = _get_with_retry(f'{API_BASE}/activity/{activity_id}/intervals')
+        if resp.status_code != 200:
+            return None
+        data = resp.json()
+        ivs = data.get('icu_intervals') or []
+        work = [i for i in ivs if (i.get('type') or '').upper() == 'WORK']
+        if not work:
+            return None
+        durations = [i.get('moving_time') or i.get('elapsed_time') or 0 for i in work]
+        durations = [d for d in durations if d > 0]
+        if not durations:
+            return None
+        if len(durations) >= 3 and max(durations) <= min(durations) * 1.6:
+            # Repeated similar reps -> interval session, named like the old
+            # Strava titles ("Intervals – 6x2'") so downstream regexes match.
+            med = sorted(durations)[len(durations) // 2]
+            return f"Intervals – {len(durations)}x{_fmt_rep_time(med)}"
+        if len(durations) <= 2 and max(durations) >= 600:
+            speeds = [i.get('average_speed') or 0 for i in work]
+            if speeds and max(speeds) > 0 and (1000.0 / max(speeds)) <= 285:  # <= 4:45/km
+                return "Tempo Run"
+        return None
+    except Exception as e:
+        print(f"  [detect] structure detection failed for {activity_id}: {e}", file=sys.stderr)
+        return None
+
+
+def decide_title(name, desc, dist_km, date_str, activity_id):
+    """Single title decision used for new runs and re-titled (renamed) ones.
+    Priority: race calendar > typed title/description > detected structure >
+    name/distance classifier."""
+    if date_str in RACE_CALENDAR:
+        race_name, race_dist = RACE_CALENDAR[date_str]
+        if abs(dist_km - race_dist) <= 3:
+            print(f"  [calendar] {date_str}: matched race day → Race – {race_name}")
+            return f"Race – {race_name}"
+    if GENERIC_NAME_RE.match((name or '').strip()) and not (desc or '').strip():
+        detected = detect_structure(activity_id)
+        if detected:
+            print(f"  [detect] {date_str}: generic title, structure says → {detected}")
+            return detected
+        # No structure found: a generic title tells us nothing, so label by
+        # distance. 14km+ with no reps = the Sunday long run.
+        if dist_km >= 14:
+            return f"Long Run – {dist_km:.0f}km"
+        # Otherwise blank the meaningless Garmin default so the classifier's
+        # own heuristics apply instead of "Easy Run – Valencia Carrera".
+        name = ''
+    return classify_strava_run(name, desc, dist_km)
+
+
 def pace_str(avg_speed):
     if not avg_speed or avg_speed <= 0:
         return '--'
@@ -402,7 +476,10 @@ def build_laps_data(cache):
                     'elev': lap.get('elevation_gain'),
                 })
 
-        result.setdefault(date_str, []).append({'dist_km': dist_km, 'laps': processed, 'desc': desc})
+        entry = {'dist_km': dist_km, 'laps': processed, 'desc': desc}
+        if act.get('decoupling') is not None:
+            entry['dec'] = round(act['decoupling'], 1)
+        result.setdefault(date_str, []).append(entry)
     return result
 
 
@@ -480,8 +557,46 @@ def main():
 
     # 4. Update cache
     new_cached = update_cache(cache, activities)
+
+    # 4b. Re-check already-cached activities in the window for renames or
+    # edited notes (title typed in Garmin/intervals.icu after the first sync).
+    # Updates the cache and re-titles the matching classified_runs.csv row.
+    csv_retitled = False
+    for act in activities:
+        aid = str(act['id'])
+        c = cache.get(aid)
+        if not c or c in new_cached:
+            continue
+        new_name = act.get('name') or ''
+        new_desc = act.get('description') or ''
+        if new_name == c.get('name') and new_desc == c.get('description'):
+            continue
+        print(f"  [rename] {aid}: {c.get('name','')!r} -> {new_name!r}")
+        c['name'], c['description'] = new_name, new_desc
+        if act.get('decoupling') is not None:
+            c['decoupling'] = act.get('decoupling')
+        date_str = (c.get('start_date_local') or '')[:10]
+        new_title = decide_title(new_name, new_desc, c.get('distance_km', 0), date_str, aid)
+        t_idx = headers.index('Título') if 'Título' in headers else 3
+        for r in rows:
+            if len(r) > 4 and r[1][:10] == date_str:
+                try:
+                    if abs(float(r[4].replace(',', '.')) - c.get('distance_km', 0)) <= 0.15 \
+                       and r[t_idx] != new_title:
+                        print(f"  [rename] retitled CSV row {date_str}: {r[t_idx]!r} -> {new_title!r}")
+                        r[t_idx] = new_title
+                        csv_retitled = True
+                except ValueError:
+                    pass
+
     save_cache(cache)
     print(f"[cache] {len(new_cached)} new activities added to cache.")
+    if csv_retitled:
+        with open(CLASSIFIED_CSV, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.writer(f)
+            writer.writerow(headers)
+            writer.writerows(rows)
+        print("[csv] classified_runs.csv re-titled after rename(s).")
 
     # 6. Find runs not yet in classified CSV
     col_map = {col: i for i, col in enumerate(headers)}
@@ -506,16 +621,7 @@ def main():
         desc = act.get('description', '')
         dist_full = act.get('distance_km', 0)
 
-        # Race-calendar override: if this date is a confirmed race AND distance
-        # roughly matches (±3km), use the race name regardless of Strava title.
-        calendar_title = None
-        if date_str in RACE_CALENDAR:
-            race_name, race_dist = RACE_CALENDAR[date_str]
-            if abs(dist_full - race_dist) <= 3:
-                calendar_title = f"Race – {race_name}"
-                print(f"  [calendar] {date_str}: matched race day → {calendar_title}")
-
-        title = calendar_title or classify_strava_run(name, desc, dist_full)
+        title = decide_title(name, desc, dist_full, date_str, act['id'])
 
         new_row = [''] * len(headers)
         new_row[col_map.get('Tipo de actividad', 0)] = 'Carrera'
