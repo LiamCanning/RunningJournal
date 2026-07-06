@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
 GitHub Actions sync — runs in the cloud every hour.
-Fetches new Strava runs, classifies them, appends to classified_runs.csv,
-rebuilds index.html. No Garmin CSV or iCloud dependency.
+Fetches new runs from intervals.icu (fed by Garmin's official partner push),
+classifies them, appends to classified_runs.csv, rebuilds index.html.
+No Garmin CSV or iCloud dependency.
 """
 
 import csv
@@ -17,12 +18,13 @@ import time
 import requests
 
 # ── Credentials from GitHub secrets ──────────────────────────────────────────
-CLIENT_ID     = os.environ['STRAVA_CLIENT_ID']
-CLIENT_SECRET = os.environ['STRAVA_CLIENT_SECRET']
-REFRESH_TOKEN = os.environ['STRAVA_REFRESH_TOKEN']
-GH_PAT        = os.environ.get('GH_PAT', '')
-GH_REPO       = os.environ.get('GH_REPO', '')
-UA            = 'RunningJournal-strava-sync/1.0 (+https://github.com/LiamCanning/RunningJournal)'
+# intervals.icu: static API key over HTTP Basic auth (username literally
+# 'API_KEY'). No OAuth, no token refresh, no rotation - nothing to expire.
+ATHLETE_ID = os.environ['INTERVALS_ATHLETE_ID']
+API_KEY    = os.environ['INTERVALS_API_KEY']
+API_BASE   = 'https://intervals.icu/api/v1'
+AUTH       = ('API_KEY', API_KEY)
+UA         = 'RunningJournal-intervals-sync/1.0 (+https://github.com/LiamCanning/RunningJournal)'
 
 # ── Repo-relative paths ───────────────────────────────────────────────────────
 REPO_DIR       = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -30,181 +32,65 @@ CACHE_JSON     = os.path.join(REPO_DIR, 'strava_activity_cache.json')
 CLASSIFIED_CSV = os.path.join(REPO_DIR, 'classified_runs.csv')
 DASHBOARD_HTML = os.path.join(REPO_DIR, 'index.html')
 
-# ── 1. Token refresh ──────────────────────────────────────────────────────────
-def _strava_post_with_retry(url, data, retries=4, backoff=15):
-    """POST to Strava with exponential-backoff retry on 5xx, 429 and transient
-    403s (Cloudflare/WAF blips on cloud-runner IPs) plus network errors.
-    Returns the last response (or None on persistent network error) so the caller
-    can skip a run gracefully instead of crashing on a transient issue."""
-    resp = None
-    for attempt in range(retries):
-        try:
-            resp = requests.post(url, data=data, timeout=30, headers={'User-Agent': UA})
-            if resp.status_code not in (403, 429) and resp.status_code < 500:
-                return resp          # 200, or a non-transient 4xx (e.g. 400)
-            print(f"[retry] Strava POST {resp.status_code} (attempt {attempt+1}/{retries})", file=sys.stderr)
-        except requests.exceptions.RequestException as e:
-            print(f"[retry] Strava POST network error: {e} (attempt {attempt+1}/{retries})", file=sys.stderr)
-            if attempt == retries - 1:
-                return None
-        if attempt < retries - 1:
-            time.sleep(backoff * (attempt + 1))
-    return resp
-
-
-def _strava_get_with_retry(url, headers, params=None, retries=3, backoff=15):
-    """GET from Strava with retry on 5xx. Exits gracefully on rate limit."""
+# ── 1. HTTP layer ─────────────────────────────────────────────────────────────
+def _get_with_retry(url, params=None, retries=3, backoff=15):
+    """GET from intervals.icu with retry on 5xx. Exits gracefully on rate limit."""
     last_429 = None
-    last_403 = None
     for attempt in range(retries):
         try:
-            resp = requests.get(url, headers={**headers, 'User-Agent': UA}, params=params, timeout=30)
+            resp = requests.get(url, auth=AUTH, headers={'User-Agent': UA}, params=params, timeout=30)
             if resp.status_code == 429:
                 last_429 = resp
-                usage = resp.headers.get('X-ReadRateLimit-Usage', '')
-                limit = resp.headers.get('X-ReadRateLimit-Limit', '')
-                print(f"[rate-limit] 429 (attempt {attempt+1}/{retries}). Usage: {usage or '?'} / {limit or '?'}")
-                try:
-                    daily_used  = int(usage.split(',')[1])
-                    daily_limit = int(limit.split(',')[1])
-                    if daily_used >= daily_limit:
-                        print(f"[rate-limit] Daily limit exhausted. Will retry after midnight UTC.")
-                        sys.exit(0)
-                except (ValueError, IndexError, AttributeError):
-                    pass
+                print(f"[rate-limit] 429 (attempt {attempt+1}/{retries})")
                 if attempt < retries - 1:
                     wait = 15 * (2 ** attempt)
                     print(f"[rate-limit] Waiting {wait}s...")
                     time.sleep(wait)
                 continue
-            if resp.status_code == 403:
-                last_403 = resp
-                print(f"[retry] Strava GET 403 (attempt {attempt+1}/{retries}) "
-                      f"body={resp.text[:300]!r} scope-hdr={resp.headers.get('X-RateLimit-Limit','')!r}",
-                      file=sys.stderr)
-                if attempt < retries - 1:
-                    time.sleep(15 * (2 ** attempt))
-                continue
+            if resp.status_code in (401, 403):
+                # Auth errors on a static API key never clear on their own
+                # (revoked/regenerated key). Fail loudly -> workflow fails ->
+                # Slack alert. Never exit 0 looking healthy while syncing nothing.
+                print(f"[forbidden] intervals.icu {resp.status_code} (needs manual fix, "
+                      f"not transient): {resp.text[:300]}", file=sys.stderr)
+                resp.raise_for_status()
             if resp.status_code < 500:
                 return resp
-            print(f"[retry] Strava GET {resp.status_code} (attempt {attempt+1}/{retries})", file=sys.stderr)
+            print(f"[retry] intervals.icu GET {resp.status_code} (attempt {attempt+1}/{retries})", file=sys.stderr)
         except requests.exceptions.RequestException as e:
             print(f"[retry] network error: {e} (attempt {attempt+1}/{retries})", file=sys.stderr)
             if attempt == retries - 1:
                 raise
         if attempt < retries - 1:
             time.sleep(backoff * (attempt + 1))
-    # All retries exhausted on 429 — exit cleanly rather than emailing a failure
+    # All retries exhausted on 429 — exit cleanly; next hourly run retries
     if last_429 is not None:
         print("[rate-limit] All retries exhausted on 429. Exiting cleanly.")
-        sys.exit(0)
-    if last_403 is not None:
-        body = last_403.text or ''
-        # Distinguish a REAL Strava API error (application inactive, auth/scope
-        # error - a structured JSON error) from a transient Cloudflare/WAF IP
-        # block (an HTML page). A real error will never clear on its own, so
-        # fail loudly (raise -> workflow fails -> Slack alert) instead of
-        # exiting 0 and looking healthy while syncing nothing for days.
-        if last_403.headers.get('Content-Type', '').startswith('application/json') \
-           or '"resource"' in body or '"errors"' in body:
-            print(f"[forbidden] Real Strava 403 (needs manual fix, not transient): {body[:300]}",
-                  file=sys.stderr)
-            last_403.raise_for_status()
-        print("[forbidden] All retries exhausted on 403 (transient Cloudflare/WAF). Exiting cleanly.")
         sys.exit(0)
     resp.raise_for_status()
     return resp
 
 
-def get_access_token():
-    resp = _strava_post_with_retry('https://www.strava.com/oauth/token', data={
-        'client_id':     CLIENT_ID,
-        'client_secret': CLIENT_SECRET,
-        'refresh_token': REFRESH_TOKEN,
-        'grant_type':    'refresh_token',
-    })
-    if resp is None or resp.status_code != 200:
-        code = resp.status_code if resp is not None else 'network error'
-        print(f"[token] Strava token refresh failed ({code}) after retries. "
-              "Transient Strava/Cloudflare issue - skipping this run; next hour retries.")
-        sys.exit(0)
-    data = resp.json()
-    new_refresh = data['refresh_token']
-    access_token = data['access_token']
-
-    # If Strava rotated our refresh token, update the GitHub secret so next
-    # run still works. Requires GH_PAT with repo secrets:write scope.
-    if new_refresh != REFRESH_TOKEN and GH_PAT and GH_REPO:
-        _update_github_secret('STRAVA_REFRESH_TOKEN', new_refresh)
-
-    print(f"[token] Access token obtained. Expires: {data.get('expires_at')}")
-    return access_token
+# ── 2. Fetch recent intervals.icu activities ─────────────────────────────────
+RUN_TYPES = {'Run', 'TrailRun', 'VirtualRun'}
 
 
-def _update_github_secret(secret_name, secret_value):
-    """Update a GitHub Actions secret via REST API using a PAT."""
-    try:
-        from base64 import b64encode
-        from nacl import encoding, public  # pip install PyNaCl
-
-        headers = {
-            'Authorization': f'token {GH_PAT}',
-            'Accept': 'application/vnd.github+json',
-        }
-        # Get repo public key
-        key_resp = requests.get(
-            f'https://api.github.com/repos/{GH_REPO}/actions/secrets/public-key',
-            headers=headers
-        )
-        key_resp.raise_for_status()
-        pub_key_data = key_resp.json()
-        pub_key = public.PublicKey(pub_key_data['key'].encode(), encoding.Base64Encoder())
-        sealed = public.SealedBox(pub_key).encrypt(secret_value.encode())
-        encrypted = b64encode(sealed).decode()
-
-        put_resp = requests.put(
-            f'https://api.github.com/repos/{GH_REPO}/actions/secrets/{secret_name}',
-            headers=headers,
-            json={'encrypted_value': encrypted, 'key_id': pub_key_data['key_id']},
-        )
-        put_resp.raise_for_status()
-        print(f"[token] GitHub secret {secret_name} updated (refresh token rotated).")
-    except Exception as e:
-        print(f"[token] WARNING: could not update GitHub secret: {e}", file=sys.stderr)
-
-
-# ── 2. Fetch recent Strava activities ─────────────────────────────────────────
-def fetch_recent(access_token, after_ts):
-    """Fetch all activities after after_ts (unix timestamp)."""
-    activities = []
-    page = 1
-    while True:
-        resp = _strava_get_with_retry(
-            'https://www.strava.com/api/v3/athlete/activities',
-            headers={'Authorization': f'Bearer {access_token}'},
-            params={'after': after_ts, 'per_page': 100, 'page': page},
-        )
-        resp.raise_for_status()
-        batch = resp.json()
-        if not batch:
-            break
-        activities.extend(batch)
-        page += 1
-        if len(batch) < 100:
-            break
-    # Diagnostic: log every raw activity the API returned in the window, so a
-    # "missing run" can be traced to type-filtering vs the API not returning it
-    # at all (private activity + activity:read scope).
-    print(f"[fetch] Strava returned {len(activities)} raw activity(ies) in window:")
+def fetch_recent(after_ts):
+    """Fetch all activities after after_ts (unix timestamp) from intervals.icu."""
+    oldest = datetime.fromtimestamp(after_ts, tz=timezone.utc).strftime('%Y-%m-%dT%H:%M:%S')
+    resp = _get_with_retry(
+        f'{API_BASE}/athlete/{ATHLETE_ID}/activities',
+        params={'oldest': oldest},
+    )
+    resp.raise_for_status()
+    activities = resp.json()
+    # Diagnostic: log every raw activity in the window so a "missing run" can
+    # be traced to type-filtering vs the API not returning it at all.
+    print(f"[fetch] intervals.icu returned {len(activities)} raw activity(ies) in window:")
     for a in activities:
         print(f"  [raw] {str(a.get('start_date_local',''))[:10]} "
-              f"id={a.get('id')} type={a.get('type')!r} sport_type={a.get('sport_type')!r} "
-              f"private={a.get('private')} name={a.get('name','')!r}")
-    # Accept all running sport types, not just legacy type=='Run' (trail/virtual
-    # runs and race-tagged runs were being silently dropped).
-    RUN_TYPES = {'Run', 'TrailRun', 'VirtualRun'}
-    return [a for a in activities
-            if a.get('type') == 'Run' or a.get('sport_type') in RUN_TYPES]
+              f"id={a.get('id')} type={a.get('type')!r} name={a.get('name','')!r}")
+    return [a for a in activities if a.get('type') in RUN_TYPES]
 
 
 # ── 3. Load / update Strava cache ─────────────────────────────────────────────
@@ -220,39 +106,86 @@ def save_cache(cache):
         json.dump(cache, f, ensure_ascii=False)
 
 
-def update_cache(cache, activities, access_token):
-    """Merge new activities into cache. Returns list of newly added."""
+def _compute_km_splits(activity_id):
+    """Build Strava-style per-km splits_metric from intervals.icu streams.
+    Returns [] on any failure - splits are enrichment, not critical."""
+    try:
+        resp = _get_with_retry(
+            f'{API_BASE}/activity/{activity_id}/streams',
+            params={'types': 'time,distance,heartrate,altitude'},
+        )
+        if resp.status_code != 200:
+            return []
+        streams = {s.get('type'): s.get('data') or [] for s in resp.json()}
+        dist = streams.get('distance') or []
+        t    = streams.get('time') or []
+        hr   = streams.get('heartrate') or []
+        alt  = streams.get('altitude') or []
+        if len(dist) < 2 or len(t) != len(dist):
+            return []
+        splits, seg_start, n = [], 0, 1
+        for i in range(1, len(dist)):
+            is_last = (i == len(dist) - 1)
+            if (dist[i] is not None and dist[i] >= n * 1000) or is_last:
+                seg_d = (dist[i] or 0) - (dist[seg_start] or 0)
+                seg_t = (t[i] or 0) - (t[seg_start] or 0)
+                if seg_d <= 0 or seg_t <= 0:
+                    seg_start = i; n += 1; continue
+                seg_hr = [h for h in hr[seg_start:i+1] if h] if hr else []
+                elev = None
+                if len(alt) == len(dist) and alt[i] is not None and alt[seg_start] is not None:
+                    elev = round(alt[i] - alt[seg_start], 1)
+                splits.append({
+                    'split': n,
+                    'distance': round(seg_d, 1),
+                    'moving_time': int(seg_t),
+                    'elapsed_time': int(seg_t),
+                    'average_speed': round(seg_d / seg_t, 3),
+                    'average_heartrate': round(sum(seg_hr) / len(seg_hr), 1) if seg_hr else None,
+                    'elevation_difference': elev,
+                })
+                seg_start = i
+                n += 1
+        return splits
+    except Exception as e:
+        print(f"  [splits] failed for {activity_id}: {e}", file=sys.stderr)
+        return []
+
+
+def update_cache(cache, activities):
+    """Merge new activities into cache. Returns list of newly added.
+    Cache entries keep the exact schema the Strava sync used, so everything
+    downstream (classify, CSV_DATA, LAPS_DATA) is unchanged."""
     new = []
     for act in activities:
         aid = str(act['id'])
         if aid not in cache:
-            # Fetch detail (for laps + description)
             try:
-                detail = _strava_get_with_retry(
-                    f'https://www.strava.com/api/v3/activities/{aid}',
-                    headers={'Authorization': f'Bearer {access_token}'}
-                ).json()
-                dist_m = detail.get('distance', act.get('distance', 0))
+                dist_m = act.get('distance') or 0
+                moving = act.get('moving_time') or 0
+                avg_speed = act.get('average_speed')
+                if not avg_speed and dist_m and moving:
+                    avg_speed = dist_m / moving
                 cache[aid] = {
                     'id': aid,
-                    'name': detail.get('name', act.get('name', '')),
+                    'name': act.get('name', ''),
                     'type': 'Run',
-                    'start_date_local': detail.get('start_date_local', ''),
+                    'start_date_local': (act.get('start_date_local') or '')[:19],
                     'distance_km': dist_m / 1000.0,
                     'distance_m': dist_m,
-                    'elapsed_time': detail.get('elapsed_time', 0),
-                    'moving_time': detail.get('moving_time', 0),
-                    'average_speed': detail.get('average_speed'),
-                    'average_heartrate': detail.get('average_heartrate'),
-                    'max_heartrate': detail.get('max_heartrate'),
-                    'description': detail.get('description', ''),
-                    'splits_metric': detail.get('splits_metric', []),
+                    'elapsed_time': act.get('elapsed_time', 0),
+                    'moving_time': moving,
+                    'average_speed': avg_speed,
+                    'average_heartrate': act.get('average_heartrate'),
+                    'max_heartrate': act.get('max_heartrate'),
+                    'description': act.get('description') or '',
+                    'splits_metric': _compute_km_splits(aid),
                     'laps': [],
                 }
                 print(f"  [cache] +{aid} {cache[aid]['start_date_local'][:10]} {dist_m/1000:.2f}km — {cache[aid]['name']}")
                 new.append(cache[aid])
             except Exception as e:
-                print(f"  [cache] failed to fetch detail for {aid}: {e}", file=sys.stderr)
+                print(f"  [cache] failed to process {aid}: {e}", file=sys.stderr)
     return new
 
 
@@ -498,15 +431,23 @@ def rebuild_dashboard(headers, rows, cache):
     else:
         print("[dashboard] WARNING: CSV_DATA block not found.", file=sys.stderr)
 
-    # Inject LAPS_DATA
+    # Inject LAPS_DATA - MERGE with what's already in the HTML rather than
+    # replace. The local Garmin-import pipeline adds lap entries the activity
+    # cache doesn't have; replacing wholesale would silently drop those dates.
     laps_data = build_laps_data(cache)
-    laps_json = json.dumps(laps_data, ensure_ascii=False, separators=(',', ':'))
     START = 'var LAPS_DATA = '
     END   = '/*__LAPS_DATA_END__*/;'
     si, ei = html.find(START), html.find(END)
     if si >= 0 and ei > si:
+        try:
+            existing = json.loads(html[si + len(START):ei].rstrip().rstrip(';'))
+        except json.JSONDecodeError:
+            existing = {}
+        merged = {**existing, **laps_data}   # cache wins on shared dates
+        laps_json = json.dumps(merged, ensure_ascii=False, separators=(',', ':'))
         html = html[:si + len(START)] + laps_json + html[ei:]
-        print(f"[dashboard] LAPS_DATA injected ({len(laps_data)} date entries).")
+        print(f"[dashboard] LAPS_DATA merged ({len(laps_data)} from cache, "
+              f"{len(merged)} total date entries).")
     else:
         print("[dashboard] WARNING: LAPS_DATA sentinel not found.", file=sys.stderr)
 
@@ -517,31 +458,28 @@ def rebuild_dashboard(headers, rows, cache):
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 def main():
-    print("=== Strava CI Sync ===")
+    print("=== intervals.icu CI Sync ===")
 
-    # 1. Token
-    access_token = get_access_token()
-
-    # 2. Load cache + CSV
+    # 1. Load cache + CSV
     cache = load_cache()
     headers, rows = load_classified()
     if not headers:
         print("[csv] classified_runs.csv missing or empty — nothing to base off.", file=sys.stderr)
         sys.exit(1)
 
-    # 3. Determine fetch window — last classified date minus 24h, capped at 14 days
+    # 2. Determine fetch window — last classified date minus 24h, capped at 14 days
     last_dt = last_classified_date(rows)
     after_ts = int(last_dt.timestamp()) - 86400
     min_ts   = int((datetime.now(timezone.utc) - timedelta(days=14)).timestamp())
     after_ts = max(after_ts, min_ts)
-    print(f"[fetch] Fetching Strava activities after {datetime.fromtimestamp(after_ts, tz=timezone.utc).date()}...")
+    print(f"[fetch] Fetching intervals.icu activities after {datetime.fromtimestamp(after_ts, tz=timezone.utc).date()}...")
 
-    # 4. Fetch new activities
-    activities = fetch_recent(access_token, after_ts)
-    print(f"[fetch] Got {len(activities)} run(s) from Strava.")
+    # 3. Fetch new activities
+    activities = fetch_recent(after_ts)
+    print(f"[fetch] Got {len(activities)} run(s) from intervals.icu.")
 
-    # 5. Update cache
-    new_cached = update_cache(cache, activities, access_token)
+    # 4. Update cache
+    new_cached = update_cache(cache, activities)
     save_cache(cache)
     print(f"[cache] {len(new_cached)} new activities added to cache.")
 

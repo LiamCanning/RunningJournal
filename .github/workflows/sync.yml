@@ -1,4 +1,4 @@
-name: Strava Sync
+name: Activity Sync (intervals.icu)
 
 on:
   schedule:
@@ -7,7 +7,7 @@ on:
 
 # Queue overlapping runs instead of racing on the push to main.
 concurrency:
-  group: strava-sync
+  group: activity-sync
   cancel-in-progress: false
 
 jobs:
@@ -32,21 +32,18 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install requests PyNaCl
+        run: pip install requests
 
-      - name: Run sync (3x retry on transient Strava/network errors)
+      - name: Run sync (3x retry on transient network errors)
         env:
-          STRAVA_CLIENT_ID: ${{ secrets.STRAVA_CLIENT_ID }}
-          STRAVA_CLIENT_SECRET: ${{ secrets.STRAVA_CLIENT_SECRET }}
-          STRAVA_REFRESH_TOKEN: ${{ secrets.STRAVA_REFRESH_TOKEN }}
-          GH_PAT: ${{ secrets.GH_PAT }}
-          GH_REPO: ${{ github.repository }}
+          INTERVALS_ATHLETE_ID: ${{ secrets.INTERVALS_ATHLETE_ID }}
+          INTERVALS_API_KEY: ${{ secrets.INTERVALS_API_KEY }}
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         run: |
           ok=0
           for i in 1 2 3; do
             if python3 automation/ci_sync.py; then ok=1; break; fi
-            echo "Strava sync attempt $i failed (likely transient Strava 403 / network); retrying in 30s..."
+            echo "sync attempt $i failed (likely transient network); retrying in 30s..."
             sleep 30
           done
           [ "$ok" = "1" ]
@@ -83,4 +80,4 @@ jobs:
           curl -s -X POST https://slack.com/api/chat.postMessage \
             -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
             -H "Content-Type: application/json" \
-            -d "{\"channel\":\"C0B3VDBP9LG\",\"text\":\"*Strava sync failed after 3 retries* :x: Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
+            -d "{\"channel\":\"C0B3VDBP9LG\",\"text\":\"*intervals.icu sync failed after 3 retries* :x: Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
