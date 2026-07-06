@@ -2,7 +2,7 @@ name: Activity Sync (intervals.icu)
 
 on:
   schedule:
-    - cron: '15 * * * *'   # every hour at :15 past
+    - cron: '15,45 * * * *'   # every 30 min (public repo - Actions minutes are free)
   workflow_dispatch:         # allow manual trigger from GitHub UI
 
 # Queue overlapping runs instead of racing on the push to main.
