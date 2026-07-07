@@ -112,7 +112,7 @@ def _compute_km_splits(activity_id):
     try:
         resp = _get_with_retry(
             f'{API_BASE}/activity/{activity_id}/streams',
-            params={'types': 'time,distance,heartrate,altitude'},
+            params={'types': 'time,distance,heartrate,altitude,cadence'},
         )
         if resp.status_code != 200:
             return []
@@ -121,6 +121,7 @@ def _compute_km_splits(activity_id):
         t    = streams.get('time') or []
         hr   = streams.get('heartrate') or []
         alt  = streams.get('altitude') or []
+        cad  = streams.get('cadence') or []
         if len(dist) < 2 or len(t) != len(dist):
             return []
         splits, seg_start, n = [], 0, 1
@@ -132,6 +133,7 @@ def _compute_km_splits(activity_id):
                 if seg_d <= 0 or seg_t <= 0:
                     seg_start = i; n += 1; continue
                 seg_hr = [h for h in hr[seg_start:i+1] if h] if hr else []
+                seg_cad = [x for x in cad[seg_start:i+1] if x] if len(cad) == len(dist) else []
                 elev = None
                 if len(alt) == len(dist) and alt[i] is not None and alt[seg_start] is not None:
                     elev = round(alt[i] - alt[seg_start], 1)
@@ -142,6 +144,7 @@ def _compute_km_splits(activity_id):
                     'elapsed_time': int(seg_t),
                     'average_speed': round(seg_d / seg_t, 3),
                     'average_heartrate': round(sum(seg_hr) / len(seg_hr), 1) if seg_hr else None,
+                    'average_cadence': round(sum(seg_cad) / len(seg_cad), 1) if seg_cad else None,
                     'elevation_difference': elev,
                 })
                 seg_start = i
@@ -242,6 +245,14 @@ def update_cache(cache, activities):
                     'max_heartrate': act.get('max_heartrate'),
                     'description': act.get('description') or '',
                     'decoupling': act.get('decoupling'),
+                    # Per-run analysis fields (displayed on the session card)
+                    'average_cadence': act.get('average_cadence'),
+                    'icu_training_load': act.get('icu_training_load'),
+                    'average_stride': act.get('average_stride'),
+                    'gap': act.get('gap'),
+                    'average_temp': act.get('average_temp'),
+                    'icu_hr_zone_times': act.get('icu_hr_zone_times'),
+                    'calories': act.get('calories'),
                     'splits_metric': _compute_km_splits(aid),
                     # Structured sessions get real segment laps (WU / reps /
                     # recoveries / CD); steady runs keep per-km splits.
@@ -514,7 +525,7 @@ def build_laps_data(cache):
                 processed.append({
                     'n': s.get('split', 0), 'dist': round(s.get('distance', 0) / 1000, 2),
                     'time': s.get('moving_time', 0), 'pace': pace,
-                    'hr': s.get('average_heartrate'), 'cad': None,
+                    'hr': s.get('average_heartrate'), 'cad': s.get('average_cadence'),
                     'elev': s.get('elevation_difference'),
                 })
         else:
@@ -535,6 +546,20 @@ def build_laps_data(cache):
         entry = {'dist_km': dist_km, 'laps': processed, 'desc': desc}
         if act.get('decoupling') is not None:
             entry['dec'] = round(act['decoupling'], 1)
+        # Per-run analysis (intervals.icu): shown as stat tiles + HR zone bar
+        if act.get('average_cadence'):
+            entry['cad'] = round(act['average_cadence'] * 2)      # spm, both legs
+        if act.get('icu_training_load') is not None:
+            entry['load'] = act['icu_training_load']
+        if act.get('average_stride'):
+            entry['stride'] = round(act['average_stride'], 2)
+        if act.get('gap'):
+            gp = round(1000.0 / act['gap'])
+            entry['gap'] = f"{gp // 60}:{gp % 60:02d}"
+        if act.get('average_temp') is not None:
+            entry['temp'] = round(act['average_temp'])
+        if act.get('icu_hr_zone_times'):
+            entry['hrz'] = [int(x) for x in act['icu_hr_zone_times']]
         result.setdefault(date_str, []).append(entry)
     return result
 
