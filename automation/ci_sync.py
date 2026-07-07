@@ -505,7 +505,9 @@ def rebuild_dashboard(headers, rows, cache):
     writer = csv.writer(buf)
     writer.writerow(headers)
     writer.writerows(rows)
-    csv_content = '\n' + buf.getvalue()
+    # Sanitise for the JS template literal: a backtick or ${ in an activity
+    # title would break the dashboard script and all future regex merges.
+    csv_content = '\n' + buf.getvalue().replace('`', "'").replace('${', '$ {')
 
     import re as _re
     csv_pat = _re.compile(r'(var\s+CSV_DATA\s*=\s*`)(.*?)(`;\s*)', _re.DOTALL)
@@ -552,9 +554,10 @@ def main():
         print("[csv] classified_runs.csv missing or empty — nothing to base off.", file=sys.stderr)
         sys.exit(1)
 
-    # 2. Determine fetch window — last classified date minus 24h, capped at 14 days
+    # 2. Determine fetch window — last classified date minus 72h (catches
+    # late-syncing watch uploads), capped at 14 days
     last_dt = last_classified_date(rows)
-    after_ts = int(last_dt.timestamp()) - 86400
+    after_ts = int(last_dt.timestamp()) - 3 * 86400
     min_ts   = int((datetime.now(timezone.utc) - timedelta(days=14)).timestamp())
     after_ts = max(after_ts, min_ts)
     print(f"[fetch] Fetching intervals.icu activities after {datetime.fromtimestamp(after_ts, tz=timezone.utc).date()}...")
@@ -617,12 +620,15 @@ def main():
         if (date_str, dist_km) in already:
             continue
 
-        # Only include runs after the last Garmin entry
+        # Skip only clearly-historical cache entries. A strict "after the last
+        # classified run" guard dropped late-syncing uploads forever (e.g. a
+        # Sunday long run arriving after Monday's run was already classified);
+        # the (date, dist) dedupe above handles true duplicates.
         try:
             act_dt = datetime.strptime(act['start_date_local'][:19], '%Y-%m-%dT%H:%M:%S')
         except (ValueError, KeyError):
             continue
-        if act_dt.replace(tzinfo=timezone.utc) <= last_dt:
+        if act_dt.replace(tzinfo=timezone.utc) <= last_dt - timedelta(hours=72):
             continue
 
         name = act.get('name', '')

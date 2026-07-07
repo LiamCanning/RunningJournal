@@ -9,7 +9,12 @@ REPO="$HOME/RunningJournal"
 LOCAL_HTML="$ICLOUD/Dashboard/cologne-marathon-dashboard.html"
 
 cd "$REPO"
-git pull --rebase origin main
+git pull --rebase origin main || {
+    echo "[sync] pull --rebase failed — aborting rebase and resetting to origin/main"
+    git rebase --abort 2>/dev/null || true
+    git fetch origin main
+    git reset --hard origin/main
+}
 
 # Merge CI-injected data from repo's index.html into local dashboard HTML
 LOCAL_HTML="$LOCAL_HTML" python3 - << 'PYEOF'
@@ -27,21 +32,43 @@ except FileNotFoundError as e:
 
 changed = False
 
-# ── CSV_DATA: use whichever version has more data rows ──────────────────────
+# ── CSV_DATA: union-merge rows by (date, distance) key (local wins on shared
+# keys, CI-only rows added) — a row-count comparison can silently drop runs ──
 csv_pat = re.compile(r'(var CSV_DATA = `)(.*?)(`;\s*)', re.DOTALL)
 m_repo  = csv_pat.search(repo_html)
 m_local = csv_pat.search(local_html)
-if m_repo and m_local:
-    repo_csv   = m_repo.group(2)
-    local_csv  = m_local.group(2)
-    repo_rows  = len([l for l in repo_csv.strip().splitlines() if l.strip()])
-    local_rows = len([l for l in local_csv.strip().splitlines() if l.strip()])
-    if repo_rows > local_rows:
-        local_html = local_html[:m_local.start()] + m_local.group(1) + repo_csv + m_local.group(3) + local_html[m_local.end():]
-        print(f"[sync] CSV_DATA: repo has more rows ({repo_rows} vs {local_rows}) — merged in")
-        changed = True
-    else:
-        print(f"[sync] CSV_DATA: local is current ({local_rows} rows)")
+if not m_repo or not m_local:
+    print(f"[sync] ERROR: CSV_DATA block not found (repo={bool(m_repo)}, local={bool(m_local)}) — aborting to avoid publishing stale data", file=sys.stderr)
+    sys.exit(1)
+
+import csv as _csv, io as _io
+
+def _csv_rows(block):
+    lines = [l for l in block.strip().splitlines() if l.strip()]
+    parsed = list(_csv.reader(lines))
+    return (parsed[0], parsed[1:]) if parsed else ([], [])
+
+def _row_key(r):
+    try:
+        return (r[1][:10], round(float(r[4].replace(',', '.')), 1))
+    except (IndexError, ValueError):
+        return ('raw', ','.join(r))
+
+header_l, rows_l = _csv_rows(m_local.group(2))
+header_r, rows_r = _csv_rows(m_repo.group(2))
+local_keys = {_row_key(r) for r in rows_l}
+new_rows   = [r for r in rows_r if _row_key(r) not in local_keys]
+if new_rows:
+    merged = sorted(rows_l + new_rows, key=lambda r: r[1] if len(r) > 1 else '')
+    buf = _io.StringIO()
+    w = _csv.writer(buf)
+    w.writerow(header_l or header_r)
+    w.writerows(merged)
+    local_html = local_html[:m_local.start()] + m_local.group(1) + '\n' + buf.getvalue() + m_local.group(3) + local_html[m_local.end():]
+    print(f"[sync] CSV_DATA: merged {len(new_rows)} new CI row(s) (local {len(rows_l)} -> {len(merged)})")
+    changed = True
+else:
+    print(f"[sync] CSV_DATA: local is current ({len(rows_l)} rows, repo {len(rows_r)})")
 
 # ── LAPS_DATA: merge by date key (local overrides, new CI dates added) ──────
 START = 'var LAPS_DATA = '

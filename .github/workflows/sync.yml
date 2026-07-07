@@ -13,6 +13,10 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Uses GH_PAT (set 2026-05-26) rather than GITHUB_TOKEN so pushes trigger
+    # the pages-build-deployment workflow. If runs suddenly fail at checkout,
+    # the PAT has expired — regenerate at github.com/settings/tokens.
     permissions:
       contents: write        # to commit dashboard back to repo
 
@@ -77,7 +81,10 @@ jobs:
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         run: |
-          curl -s -X POST https://slack.com/api/chat.postMessage \
+          resp=$(curl -s -X POST https://slack.com/api/chat.postMessage \
             -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
             -H "Content-Type: application/json" \
-            -d "{\"channel\":\"C0B3VDBP9LG\",\"text\":\"*intervals.icu sync failed after 3 retries* :x: Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}"
+            -d "{\"channel\":\"C0B3VDBP9LG\",\"text\":\"*intervals.icu sync failed after 3 retries* :x: Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\"}")
+          # Fail the step if Slack rejected the message, so a dead token or
+          # missing channel is visible as a red X instead of a silent no-op.
+          echo "$resp" | grep -q '"ok":true' || { echo "Slack alert delivery failed: $resp"; exit 1; }
