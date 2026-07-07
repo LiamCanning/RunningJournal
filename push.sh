@@ -94,6 +94,17 @@ if si_r >= 0 and ei_r > si_r and si_l >= 0 and ei_l > si_l:
     except json.JSONDecodeError as e:
         print(f"[sync] LAPS_DATA: merge skipped (parse error: {e})")
 
+# ── Wellness blocks: CI-owned (intervals.icu wellness -> VO2max + predictions).
+# The repo copy is always the freshest; the local pipeline no longer writes
+# these, so repo wins wholesale. Single-line vars - no semicolons inside. ──
+for _var in ('GARMIN_VO2MAX', 'GARMIN_RACE_PRED', 'GARMIN_LATEST_PRED'):
+    _pat = re.compile(r'var ' + _var + r' = .*?;')
+    _mr, _ml = _pat.search(repo_html), _pat.search(local_html)
+    if _mr and _ml and _mr.group(0) != _ml.group(0):
+        local_html = local_html[:_ml.start()] + _mr.group(0) + local_html[_ml.end():]
+        print(f"[sync] {_var}: refreshed from CI")
+        changed = True
+
 # ── CLUB_SESSIONS: merge by week key (repo/routine wins, preserves injected club sessions) ──
 CSTART = 'var CLUB_SESSIONS = '
 CEND   = '/*__CLUB_SESSIONS_END__*/'

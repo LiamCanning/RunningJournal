@@ -586,7 +586,108 @@ def build_laps_data(cache):
     return result
 
 
-def rebuild_dashboard(headers, rows, cache):
+# ── Wellness (VO2max) + derived race predictions ─────────────────────────────
+def fetch_wellness(days=30):
+    """Daily wellness from intervals.icu (fed by the Garmin partner push).
+    Enrichment only - any failure returns [] and the sync carries on."""
+    oldest = (datetime.now(timezone.utc) - timedelta(days=days)).strftime('%Y-%m-%d')
+    newest = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+    try:
+        resp = _get_with_retry(f'{API_BASE}/athlete/{ATHLETE_ID}/wellness.json',
+                               params={'oldest': oldest, 'newest': newest})
+        if resp.status_code != 200:
+            print(f"[wellness] HTTP {resp.status_code} - skipping.", file=sys.stderr)
+            return []
+        data = resp.json() or []
+        with_vo2 = [w for w in data if w.get('vo2max')]
+        print(f"[wellness] {len(data)} day(s) fetched, {len(with_vo2)} with vo2max.")
+        return data
+    except SystemExit:
+        raise
+    except Exception as e:
+        print(f"[wellness] fetch failed ({e}) - skipping.", file=sys.stderr)
+        return []
+
+
+def vdot_predictions(vo2max):
+    """Race-time predictions from VO2max: Daniels' VDOT curve, calibrated to
+    Garmin's race predictor.
+
+    Raw VDOT treats a watch VO2max as race-proven fitness and comes out far
+    too fast (18:22 5K at vo2 55 vs an actual 19:19 PB). Garmin's own model -
+    which nailed the 5K - mapped vo2 55 to 19:16 / 40:37 / 1:32:01 / 3:24:59
+    on 2026-03-29, so each distance is scaled to pass through that anchor.
+    The VDOT curve then supplies the correct sensitivity to VO2max change,
+    with a growing endurance discount at longer distances."""
+    import math
+
+    def vo2_at(v):  # v in m/min
+        return -4.60 + 0.182258 * v + 0.000104 * v * v
+
+    def frac(t_min):  # sustainable fraction of VO2max for a t_min effort
+        return (0.8 + 0.1894393 * math.exp(-0.012778 * t_min)
+                + 0.2989558 * math.exp(-0.1932605 * t_min))
+
+    def race_time(dist_m):
+        lo, hi = 4.0, 400.0  # minutes
+        for _ in range(60):
+            mid = (lo + hi) / 2
+            if vo2_at(dist_m / mid) > vo2max * frac(mid):
+                lo = mid   # required VO2 exceeds sustainable -> must go slower
+            else:
+                hi = mid
+        return (lo + hi) / 2 * 60
+
+    # garmin_time / raw_vdot_time at the vo2-55 anchor point
+    CAL = {'t5k': 1156 / 1102.0, 't10k': 2437 / 2286.0,
+           'thm': 5521 / 5056.0, 'tmar': 12299 / 10555.0}
+    dists = {'t5k': 5000, 't10k': 10000, 'thm': 21097.5, 'tmar': 42195}
+    return {k: int(round(race_time(d) * CAL[k])) for k, d in dists.items()}
+
+
+def inject_wellness(html, wellness):
+    """Merge fresh VO2max readings into GARMIN_VO2MAX, extend GARMIN_RACE_PRED
+    with VDOT-derived predictions per day, refresh GARMIN_LATEST_PRED."""
+    import re as _re
+    days = sorted((w for w in wellness if w.get('vo2max') and w.get('id')),
+                  key=lambda w: w['id'])
+    if not days:
+        return html
+
+    def merge_array(html, var, new_entries):
+        m = _re.search(r'(var ' + var + r' = )(\[.*?\])(;)', html)
+        if not m:
+            print(f"[wellness] WARNING: {var} block not found.", file=sys.stderr)
+            return html
+        try:
+            existing = json.loads(m.group(2))
+        except json.JSONDecodeError:
+            print(f"[wellness] WARNING: {var} unparseable - left untouched.", file=sys.stderr)
+            return html
+        by_date = {e['date']: e for e in existing}
+        by_date.update({e['date']: e for e in new_entries})
+        merged = [by_date[k] for k in sorted(by_date)]
+        blob = json.dumps(merged, ensure_ascii=False, separators=(',', ':'))
+        print(f"[wellness] {var}: {len(existing)} -> {len(merged)} entries "
+              f"(latest {merged[-1]['date']}).")
+        return html[:m.start()] + m.group(1) + blob + m.group(3) + html[m.end():]
+
+    html = merge_array(html, 'GARMIN_VO2MAX',
+                       [{'date': w['id'], 'vo2': round(float(w['vo2max']), 1)} for w in days])
+    html = merge_array(html, 'GARMIN_RACE_PRED',
+                       [dict(date=w['id'], **vdot_predictions(float(w['vo2max']))) for w in days])
+
+    latest = vdot_predictions(float(days[-1]['vo2max']))
+    m = _re.search(r'(var GARMIN_LATEST_PRED = )(\{.*?\})(;)', html)
+    if m:
+        html = (html[:m.start()] + m.group(1)
+                + json.dumps(latest, separators=(',', ':')) + m.group(3) + html[m.end():])
+        print(f"[wellness] GARMIN_LATEST_PRED refreshed from vo2max "
+              f"{days[-1]['vo2max']} ({days[-1]['id']}).")
+    return html
+
+
+def rebuild_dashboard(headers, rows, cache, wellness=None):
     if not os.path.exists(DASHBOARD_HTML):
         print("[dashboard] index.html not found — skipping rebuild.", file=sys.stderr)
         return
@@ -632,6 +733,9 @@ def rebuild_dashboard(headers, rows, cache):
               f"{len(merged)} total date entries).")
     else:
         print("[dashboard] WARNING: LAPS_DATA sentinel not found.", file=sys.stderr)
+
+    if wellness:
+        html = inject_wellness(html, wellness)
 
     with open(DASHBOARD_HTML, 'w', encoding='utf-8') as f:
         f.write(html)
@@ -761,8 +865,9 @@ def main():
             writer.writerows(rows)
         print(f"[csv] classified_runs.csv updated ({len(new_rows)} new rows, {len(rows)} total).")
 
-    # 7. Rebuild dashboard
-    rebuild_dashboard(headers, rows, cache)
+    # 7. Wellness (VO2max -> race predictions), then rebuild dashboard
+    wellness = fetch_wellness()
+    rebuild_dashboard(headers, rows, cache, wellness)
     print("=== Done ===")
 
 
