@@ -152,6 +152,67 @@ def _compute_km_splits(activity_id):
         return []
 
 
+# Per-activity segment cache so detect_structure doesn't refetch what
+# update_cache already pulled.
+_SEG_CACHE = {}
+
+
+def _fetch_segments(activity_id):
+    """intervals.icu auto-detected segments (warm-up / reps / recoveries)."""
+    if activity_id in _SEG_CACHE:
+        return _SEG_CACHE[activity_id]
+    segs = []
+    try:
+        resp = _get_with_retry(f'{API_BASE}/activity/{activity_id}/intervals')
+        if resp.status_code == 200:
+            for i in (resp.json() or {}).get('icu_intervals') or []:
+                dur = i.get('moving_time') or i.get('elapsed_time') or 0
+                if dur <= 0:
+                    continue
+                segs.append({
+                    'dur': dur,
+                    'dist': i.get('distance') or 0,
+                    'speed': i.get('average_speed') or 0,
+                    'hr': i.get('average_heartrate'),
+                    'cad': i.get('average_cadence'),
+                    'elev': i.get('total_elevation_gain'),
+                })
+    except Exception as e:
+        print(f"  [segments] fetch failed for {activity_id}: {e}", file=sys.stderr)
+    _SEG_CACHE[activity_id] = segs
+    return segs
+
+
+def _fast_reps(segs):
+    """Segments clearly faster than the whole-run average = the work reps."""
+    total_t = sum(s['dur'] for s in segs)
+    total_d = sum(s['dist'] for s in segs)
+    if total_t <= 0 or total_d <= 0:
+        return []
+    overall = total_d / total_t
+    return [s for s in segs if s['speed'] >= overall * 1.13 and s['dur'] >= 15]
+
+
+def _is_structured(segs):
+    """True when the run has a real rep structure (not just strides)."""
+    if len(segs) < 3:
+        return False
+    fast = _fast_reps(segs)
+    if not fast:
+        return False
+    if len(fast) <= 5 and all(s['dur'] <= 35 for s in fast):
+        return False   # strides on an easy run
+    return True
+
+
+def _segment_laps(segs):
+    """Convert segments to the dashboard's lap schema (variable-length laps:
+    warm-up, each rep, each recovery, cool-down)."""
+    return [{'n': j + 1, 'dist_m': s['dist'], 'moving_time': s['dur'],
+             'avg_speed': s['speed'], 'avg_hr': s['hr'], 'avg_cad': s['cad'],
+             'elevation_gain': s['elev']} for j, s in enumerate(segs)]
+
+
 def update_cache(cache, activities):
     """Merge new activities into cache. Returns list of newly added.
     Cache entries keep the exact schema the Strava sync used, so everything
@@ -166,6 +227,7 @@ def update_cache(cache, activities):
                 avg_speed = act.get('average_speed')
                 if not avg_speed and dist_m and moving:
                     avg_speed = dist_m / moving
+                segs = _fetch_segments(aid)
                 cache[aid] = {
                     'id': aid,
                     'name': act.get('name', ''),
@@ -181,7 +243,9 @@ def update_cache(cache, activities):
                     'description': act.get('description') or '',
                     'decoupling': act.get('decoupling'),
                     'splits_metric': _compute_km_splits(aid),
-                    'laps': [],
+                    # Structured sessions get real segment laps (WU / reps /
+                    # recoveries / CD); steady runs keep per-km splits.
+                    'laps': _segment_laps(segs) if _is_structured(segs) else [],
                 }
                 print(f"  [cache] +{aid} {cache[aid]['start_date_local'][:10]} {dist_m/1000:.2f}km — {cache[aid]['name']}")
                 new.append(cache[aid])
@@ -368,33 +432,17 @@ def detect_structure(activity_id):
     SPEED CONTRAST vs the run's overall average, not by the type field.
     Returns "Intervals – 8x1'" / "Tempo Run" / None (fall back to classifier)."""
     try:
-        resp = _get_with_retry(f'{API_BASE}/activity/{activity_id}/intervals')
-        if resp.status_code != 200:
+        segs = _fetch_segments(activity_id)
+        if not _is_structured(segs):
             return None
-        ivs = (resp.json() or {}).get('icu_intervals') or []
-        segs = [(i.get('moving_time') or i.get('elapsed_time') or 0,
-                 i.get('distance') or 0,
-                 i.get('average_speed') or 0) for i in ivs]
-        segs = [s for s in segs if s[0] > 0 and s[2] > 0]
-        if len(segs) < 3:
-            return None
-        total_t = sum(s[0] for s in segs)
-        total_d = sum(s[1] for s in segs)
-        if total_t <= 0 or total_d <= 0:
-            return None
-        overall = total_d / total_t
-        # Reps: clearly faster than the whole-run average (incl. recoveries)
-        fast = [s for s in segs if s[2] >= overall * 1.13 and s[0] >= 15]
-        # Strides guard: a few very short pickups on an easy run are not a session
-        if fast and len(fast) <= 5 and all(s[0] <= 35 for s in fast):
-            return None
+        fast = _fast_reps(segs)
         if len(fast) >= 3:
-            durs = sorted(s[0] for s in fast)
+            durs = sorted(s['dur'] for s in fast)
             med = durs[len(durs) // 2]
             if durs[-1] <= durs[0] * 1.8:
                 return f"Intervals – {len(fast)}x{_fmt_rep_time(med)}"
             return f"Intervals – {len(fast)} reps"   # mixed-length fartlek
-        if fast and all(s[0] >= 480 for s in fast):
+        if all(s['dur'] >= 480 for s in fast):
             return "Tempo Run"                       # 1-2 sustained fast blocks
         return None
     except Exception as e:
