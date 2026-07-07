@@ -1836,7 +1836,8 @@ var STALE_DAYS = 10;
 function lastDateOf(arr) { return (arr && arr.length && arr[arr.length - 1].date) || null; }
 function daysSinceDate(ds) { if (!ds) return 9999; return Math.floor((new Date() - new Date(ds + 'T00:00:00')) / 864e5); }
 function isFresh(arr) { return daysSinceDate(lastDateOf(arr)) <= STALE_DAYS; }
-function asOfStamp(ds) { return ds ? '<span style="font-family:\'Geist Mono\',monospace;font-size:10px;color:var(--t3);font-weight:400;margin-left:8px">as of ' + ds + '</span>' : ''; }
+function fmtMDY(ds) { var p = (ds || '').split('-'); return p.length === 3 ? p[1] + '/' + p[2] + '/' + p[0].slice(2) : ds; } // MM DD YY per Liam's preference
+function asOfStamp(ds) { return ds ? '<span style="font-family:\'Geist Mono\',monospace;font-size:10px;color:var(--t3);font-weight:400;margin-left:8px">as of ' + fmtMDY(ds) + '</span>' : ''; }
 
 
 function parseCSV(raw) {
