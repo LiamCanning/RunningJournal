@@ -355,39 +355,47 @@ GENERIC_NAME_RE = re.compile(
 
 
 def _fmt_rep_time(secs):
-    if secs < 90:
+    if secs < 58:
         return f'{int(round(secs / 10) * 10)}"'
-    m = secs / 60.0
-    return f"{int(round(m))}'"
+    m = round(secs / 30.0) / 2.0          # nearest half-minute: 60->1', 90->1.5'
+    return f"{int(m)}'" if m == int(m) else f"{m}'"
 
 
 def detect_structure(activity_id):
-    """Classify session type from intervals.icu's auto-detected work/recovery
-    intervals (derived from the pace data itself - no title needed).
-    Returns a title like "Intervals – 6x2'" / "Tempo Run", or None to fall
-    back to the name/distance classifier. Defensive: any surprise -> None."""
+    """Classify session type from intervals.icu's auto-detected segments.
+    NOTE: icu_intervals types everything WORK (warm-up, reps and jog
+    recoveries alike - verified on real data), so reps are identified by
+    SPEED CONTRAST vs the run's overall average, not by the type field.
+    Returns "Intervals – 8x1'" / "Tempo Run" / None (fall back to classifier)."""
     try:
         resp = _get_with_retry(f'{API_BASE}/activity/{activity_id}/intervals')
         if resp.status_code != 200:
             return None
-        data = resp.json()
-        ivs = data.get('icu_intervals') or []
-        work = [i for i in ivs if (i.get('type') or '').upper() == 'WORK']
-        if not work:
+        ivs = (resp.json() or {}).get('icu_intervals') or []
+        segs = [(i.get('moving_time') or i.get('elapsed_time') or 0,
+                 i.get('distance') or 0,
+                 i.get('average_speed') or 0) for i in ivs]
+        segs = [s for s in segs if s[0] > 0 and s[2] > 0]
+        if len(segs) < 3:
             return None
-        durations = [i.get('moving_time') or i.get('elapsed_time') or 0 for i in work]
-        durations = [d for d in durations if d > 0]
-        if not durations:
+        total_t = sum(s[0] for s in segs)
+        total_d = sum(s[1] for s in segs)
+        if total_t <= 0 or total_d <= 0:
             return None
-        if len(durations) >= 3 and max(durations) <= min(durations) * 1.6:
-            # Repeated similar reps -> interval session, named like the old
-            # Strava titles ("Intervals – 6x2'") so downstream regexes match.
-            med = sorted(durations)[len(durations) // 2]
-            return f"Intervals – {len(durations)}x{_fmt_rep_time(med)}"
-        if len(durations) <= 2 and max(durations) >= 600:
-            speeds = [i.get('average_speed') or 0 for i in work]
-            if speeds and max(speeds) > 0 and (1000.0 / max(speeds)) <= 285:  # <= 4:45/km
-                return "Tempo Run"
+        overall = total_d / total_t
+        # Reps: clearly faster than the whole-run average (incl. recoveries)
+        fast = [s for s in segs if s[2] >= overall * 1.13 and s[0] >= 15]
+        # Strides guard: a few very short pickups on an easy run are not a session
+        if fast and len(fast) <= 5 and all(s[0] <= 35 for s in fast):
+            return None
+        if len(fast) >= 3:
+            durs = sorted(s[0] for s in fast)
+            med = durs[len(durs) // 2]
+            if durs[-1] <= durs[0] * 1.8:
+                return f"Intervals – {len(fast)}x{_fmt_rep_time(med)}"
+            return f"Intervals – {len(fast)} reps"   # mixed-length fartlek
+        if fast and all(s[0] >= 480 for s in fast):
+            return "Tempo Run"                       # 1-2 sustained fast blocks
         return None
     except Exception as e:
         print(f"  [detect] structure detection failed for {activity_id}: {e}", file=sys.stderr)
