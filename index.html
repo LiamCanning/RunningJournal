@@ -1913,6 +1913,7 @@ function parseCSV(raw) {
     if (!lines[i].trim()) continue;
     var vals = parseCSVLine(lines[i]);
     if (vals.length === 36) vals.splice(32, 0, '', '', '');
+    if (vals.length !== headers.length) console.warn('CSV row ' + i + ': ' + vals.length + ' cols vs ' + headers.length + ' headers - fields may misalign');
     var obj = {};
     for (var j = 0; j < headers.length; j++) obj[headers[j]] = (vals[j] || '').trim();
     rows.push(obj);
@@ -2520,7 +2521,7 @@ ints.forEach(function(iv) {
 //   Jun 14 - Carrera a Runners Ciutat (5K)
 //   Sep 26 - 15K Nocturna
 //   Oct 4  - K\u00F6ln Marathon (42K)
-var MY_VAM_KMH = 16.3; // km/h — from 1km rep capacity (3:35–3:40). Update after track test or new race PB
+var MY_VAM_KMH = 18.25; // km/h — Fernando's assigned table (vVO2max, ~4-min sustainable pace). Formal club test Sept 2026
 var VAM_PCT = [
   {pct:65,   zone:'Easy',           pace:'5:39', hr:'<140',    rpe:'2–3',   use:'Recovery / warm-up'},
   {pct:70,   zone:'Easy',           pace:'5:15', hr:'140–148', rpe:'3',     use:'Aerobic base, easy runs'},
@@ -3537,6 +3538,9 @@ document.getElementById('pg-dash').innerHTML =
 
   // 1. HERO BANNER
   (function() {
+    // Guard: an empty CI-injected array here would throw inside the page
+    // render expression and blank every page below it.
+    if (!GARMIN_TRAINING_STATUS.length || !GARMIN_READINESS.length) return '';
     var ts = GARMIN_TRAINING_STATUS[GARMIN_TRAINING_STATUS.length - 1];
     var tr = GARMIN_READINESS[GARMIN_READINESS.length - 1];
     var readinessColor = tr.score >= 70 ? 'var(--c-easy)' : tr.score >= 50 ? 'var(--c-tempo)' : 'var(--red)';
@@ -3809,6 +3813,7 @@ document.getElementById('pg-performance').innerHTML =
 
   // VO2MAX (GARMIN) - Progress tab only
   (perfTab !== 'progress' ? '' : (function() {
+    if (!GARMIN_VO2MAX.length) return '';
     var cur = GARMIN_VO2MAX[GARMIN_VO2MAX.length - 1].vo2;
     var peak = Math.max.apply(null, GARMIN_VO2MAX.map(function(d) { return d.vo2; }));
     var cat = cur >= 60 ? 'Elite' : cur >= 55 ? 'Excellent' : cur >= 50 ? 'Very good' : cur >= 45 ? 'Good' : 'Average';
@@ -4031,7 +4036,7 @@ document.getElementById('pg-performance').innerHTML =
         '<span><span class="leg-line" style="background:var(--bdr2)"></span>Weekly pace</span>' +
         '<span><span class="leg-line" style="background:var(--org)"></span>Goal pace (' + goalPaceStr + '/km)</span>' +
       '</div></div>' +
-      '<div class="perf-explain"><strong>Lower line = faster pace = improvement.</strong> The orange line is your <strong>3:25 marathon goal pace (' + goalPaceStr + '/km)</strong>. The green 4-week rolling average is the leading indicator: if it crosses below the goal line on tempo + long runs combined, the prediction usually follows within a few weeks.</div>' +
+      '<div class="perf-explain"><strong>Higher line = faster pace = improvement.</strong> The orange line is your <strong>3:25 marathon goal pace (' + goalPaceStr + '/km)</strong>. The green 4-week rolling average is the leading indicator: if it crosses above the goal line on tempo + long runs combined, the prediction usually follows within a few weeks.</div>' +
       '</div>';
   })()) +
 
@@ -6340,14 +6345,14 @@ function dayLabelWithDate(dayStr, wkLabel) {
 
 var planChecks = {};
 try { planChecks = JSON.parse(localStorage.getItem('planChecks') || '{}'); } catch(e) {}
-function savePlanChecks() { localStorage.setItem('planChecks', JSON.stringify(planChecks)); }
+function savePlanChecks() { try { localStorage.setItem('planChecks', JSON.stringify(planChecks)); } catch(e) { console.warn('planChecks save failed', e); } }
 
 var mbLogs = {};
 try { mbLogs = JSON.parse(localStorage.getItem('mbLogs') || '{}'); } catch(e) {}
-function saveMbLogs() { localStorage.setItem('mbLogs', JSON.stringify(mbLogs)); }
+function saveMbLogs() { try { localStorage.setItem('mbLogs', JSON.stringify(mbLogs)); } catch(e) { console.warn('mbLogs save failed', e); } }
 var mbDone = {};
 try { mbDone = JSON.parse(localStorage.getItem('mbDone') || '{}'); } catch(e) {}
-function saveMbDone() { localStorage.setItem('mbDone', JSON.stringify(mbDone)); }
+function saveMbDone() { try { localStorage.setItem('mbDone', JSON.stringify(mbDone)); } catch(e) { console.warn('mbDone save failed', e); } }
 
 var planWkIdx = 0;
 var todayDate = new Date(); todayDate.setHours(0,0,0,0);
@@ -6368,7 +6373,7 @@ function buildPaceZonesKey() {
   return '<div style="background:var(--card);border-radius:12px;border:1px solid var(--bdr);margin-bottom:24px;overflow:hidden">' +
     '<div style="padding:14px 16px 10px;border-bottom:1px solid var(--bdr)">' +
       '<span style="font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--t3)">Training zones</span>' +
-      '<span style="font-size:11px;color:var(--t3);margin-left:12px">VAM 15.5 km/h · VDOT 56 · Max HR 205 · LT2 177bpm - update paces after a new race PB</span>' +
+      '<span style="font-size:11px;color:var(--t3);margin-left:12px">VAM 18.25 km/h · VDOT 56 · Max HR 205 · LT2 177bpm - update paces after a new race PB</span>' +
     '</div>' +
     '<div style="overflow-x:auto">' +
     '<table style="width:100%;border-collapse:collapse;font-size:13px">' +
@@ -6807,7 +6812,9 @@ function buildActualTab(run, sess) {
   // Laps table
   if (lapsEntry.length) {
     var le2 = lapsEntry.reduce(function(best, l) { return Math.abs(l.dist_km - run.dist) < Math.abs(best.dist_km - run.dist) ? l : best; }, lapsEntry[0]);
-    var laps = le2.laps || [];
+    // Guard: a paused/treadmill lap can arrive without a pace string; one such
+    // lap would throw in the median calc and kill the whole modal.
+    var laps = (le2.laps || []).filter(function(l){ return l.pace && String(l.pace).indexOf(':') > 0; });
     if (laps.length > 1) {
       // Classify laps: work vs rest by comparing pace to median pace of all laps
       var paces = laps.map(function(l){ var p=l.pace.split(':'); return parseInt(p[0])*60+parseInt(p[1]); });
@@ -6918,6 +6925,7 @@ function openSessModal(sess, wk) {
 
 // Render Phase 1 (old format) - wrapped in collapsible archive
 function renderPhase1() {
+  planWkIdx = 0; // reset: keys must be stable across re-renders or planChecks ticks orphan
   var inner = plan.map(function(p) {
     return '<div class="plan-phase"><div class="phase-h ' + p.cls + '">' + p.label + '</div>' +
       (planNotes[p.phase] ? '<div class="plan-phase-note">' + planNotes[p.phase] + '</div>' : '') +
