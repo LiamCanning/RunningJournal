@@ -3069,13 +3069,15 @@ predDists.forEach(function(target) {
 var garminMarSecs = (typeof GARMIN_LATEST_PRED !== 'undefined' && GARMIN_LATEST_PRED && isFresh(GARMIN_RACE_PRED)) ? GARMIN_LATEST_PRED.tmar : null;
 var riegelMarSecs = (predictions['Marathon'] && predictions['Marathon'].time) ? Math.round(predictions['Marathon'].time) : null;
 var trainingMarSecs = currentFitnessPace ? Math.round(currentFitnessPace * marathonDist) : null;
-// Fully live forecast: Riegel (from your race-verified PBs) 2/3, training pace
-// 1/3. The Garmin watch prediction is a stale manual snapshot, so it is
-// deliberately excluded - this number now moves with every run you sync.
-var trajTotal = 0, trajW = 0;
-if (riegelMarSecs) { trajTotal += riegelMarSecs * 0.67; trajW += 0.67; }
-if (trainingMarSecs) { trajTotal += trainingMarSecs * 0.33; trajW += 0.33; }
-var trajectoryTime = trajW > 0 ? Math.round(trajTotal / trajW) : null;
+// Fully live forecast blend: race-PB Riegel 50%, recent long-run pace 30%,
+// VO2max model 20% (refreshes daily via intervals.icu wellness and drops out
+// automatically if it ever goes stale). Moves with every run you sync.
+var trajComps = [];
+if (riegelMarSecs)   trajComps.push({ name: 'Race PBs (Riegel)', t: riegelMarSecs,   w: 0.5 });
+if (trainingMarSecs) trajComps.push({ name: 'Long-run pace',     t: trainingMarSecs, w: 0.3 });
+if (garminMarSecs)   trajComps.push({ name: 'VO2max model',      t: garminMarSecs,   w: 0.2 });
+var trajW = trajComps.reduce(function(s, c) { return s + c.w; }, 0);
+var trajectoryTime = trajW > 0 ? Math.round(trajComps.reduce(function(s, c) { return s + c.t * c.w; }, 0) / trajW) : null;
 var sub330Target = 12600; // 3:30:00
 var trajProbability = null, trajDelta = null;
 if (trajectoryTime) {
@@ -3085,6 +3087,23 @@ if (trajectoryTime) {
   trajDelta = margin;
 }
 var trajTimeStr = trajectoryTime ? secsToTime(trajectoryTime) : '--';
+// One-line WHY: which component drives the gap to 3:30, weighted. Recomputed
+// from live data on every load, so the explanation can never go stale.
+var trajAnalysis = '';
+if (trajectoryTime && trajComps.length) {
+  var _tc = trajComps.map(function(c) { return { name: c.name, t: c.t, d: c.t - sub330Target, c: (c.w / trajW) * (c.t - sub330Target) }; });
+  var _over = _tc.filter(function(x) { return x.d > 0; }).sort(function(a, b) { return b.c - a.c; });
+  var _under = _tc.filter(function(x) { return x.d <= 0; }).sort(function(a, b) { return a.c - b.c; });
+  if (trajDelta < 0 && _over.length) {
+    trajAnalysis = '<strong>' + secsToTimeMS(-trajDelta) + ' over purely because ' +
+      _over.map(function(x) { return x.name + ' projects ' + secsToTime(Math.round(x.t)) + ' (+' + secsToTimeMS(Math.round(x.d)) + ')'; }).join(' and ') + '</strong>' +
+      (_under.length ? ' - ' + _under[0].name + ' (' + secsToTime(Math.round(_under[0].t)) + ') pulls it back the rest of the way.' : '.');
+  } else if (trajDelta >= 0 && _under.length) {
+    trajAnalysis = '<strong>' + secsToTimeMS(trajDelta) + ' under target, led by ' +
+      _under[0].name + ' at ' + secsToTime(Math.round(_under[0].t)) + '</strong>' +
+      (_over.length ? ' - ' + _over[0].name + ' (' + secsToTime(Math.round(_over[0].t)) + ', +' + secsToTimeMS(Math.round(_over[0].d)) + ') is the drag to close.' : '.');
+  }
+}
 var trajDeltaStr = trajDelta != null ? (trajDelta > 0 ? '▲ ' + secsToTimeMS(Math.abs(trajDelta)) + ' under target' : '▼ ' + secsToTimeMS(Math.abs(trajDelta)) + ' over target') : '';
 var trajColor = !trajProbability ? 'var(--t3)' : trajProbability >= 80 ? 'var(--grn)' : trajProbability >= 60 ? '#fbbf24' : 'var(--red)';
 
@@ -3490,10 +3509,10 @@ document.getElementById('pg-dash').innerHTML =
         '</div>' +
         '<div style="flex:1;min-width:160px">' +
           '<div style="font-size:12px;color:var(--t3);line-height:1.55">' +
-            (riegelMarSecs ? 'Riegel: <span class="mono" style="color:var(--t1)">' + secsToTime(riegelMarSecs) + '</span>' : '') +
-            (trainingMarSecs ? ' &nbsp;·&nbsp; Training pace: <span class="mono" style="color:var(--t1)">' + secsToTime(trainingMarSecs) + '</span>' : '') +
+            trajComps.map(function(c) { return c.name + ' <span class="mono" style="color:var(--t1)">' + secsToTime(Math.round(c.t)) + '</span>'; }).join(' &nbsp;·&nbsp; ') +
           '</div>' +
-          '<div style="font-size:11px;color:var(--t3);margin-top:4px">Live · recomputed from your race PBs + training pace on every sync</div>' +
+          (trajAnalysis ? '<div style="font-size:11.5px;color:var(--t2);margin-top:5px;line-height:1.5">' + trajAnalysis + '</div>' : '') +
+          '<div style="font-size:10px;color:var(--t3);margin-top:4px">Live · PBs + long-run pace update on every sync · VO2max model daily</div>' +
         '</div>' +
       '</div>' +
     '</div>'
@@ -7530,7 +7549,6 @@ document.getElementById('pg-plan').innerHTML =
   var pg = document.getElementById('pg-forecast');
   if (!pg) return;
 
-  var HISTORIC_LONGEST_KM = 30; // Sep/Oct 2025 long run, pre-data-window
   var RACE_DATE = new Date(2026, 9, 4);
 
   var TARGETS = {
@@ -7589,7 +7607,7 @@ document.getElementById('pg-plan').innerHTML =
 
   var visibleLongest = 0;
   (allRuns || []).forEach(function(r) { if (r.dist > visibleLongest) visibleLongest = r.dist; });
-  var trueLongest = Math.max(visibleLongest, HISTORIC_LONGEST_KM);
+  var trueLongest = visibleLongest; // live from the dataset (the Nov 2025 30K race is in it)
 
   var fourWkAvg = (function() {
     if (typeof weeklyMap !== 'undefined' && typeof recentWeeks !== 'undefined') {
@@ -7792,11 +7810,16 @@ document.getElementById('pg-plan').innerHTML =
       bits.push(' No ' + T.label + ' race effort on file yet - prediction relies on Riegel scaling, Garmin and Daniels.');
     }
     if (key === 'mar') {
-      bits.push(' Longest run in the dataset is ' + visibleLongest.toFixed(1) + 'km but you have a 30km long run from Sep 2025 in the bank, so the endurance ceiling is real - rebuilding it is the main driver of the projection.');
+      var endM = r.methods.filter(function(m) { return m.id === 'endurance'; })[0];
+      bits.push(' Longest run on file: <strong>' + visibleLongest.toFixed(1) + 'km</strong>; 4-week volume <strong>' + Math.round(fourWkAvg) + 'km</strong>.' +
+        (endM ? ' The endurance-adjusted model says ' + fmtTime(endM.time) + ' - the gap it adds is what long-run progression closes.' : ''));
     } else if (key === 'hm') {
-      bits.push(' HM sits in the sweet spot of your current fitness shape: enough endurance from marathon prep, with the threshold work landing well. Garmin\'s prediction here is the most trustworthy of the four distances.');
+      bits.push(' HM sits in the sweet spot of your current fitness shape: enough endurance from marathon prep, with the threshold work landing well.');
     } else if (key === 'k10') {
-      bits.push(' Your April 41:07 race shows the 10K engine is real. The newer Garmin 39:50 prediction reflects current VO2max gains. Time-trialling a clean 10K mid-build phase would tighten the projection.');
+      var g10 = (typeof GARMIN_LATEST_PRED !== 'undefined' && GARMIN_LATEST_PRED && isFresh(GARMIN_RACE_PRED)) ? GARMIN_LATEST_PRED.t10k : null;
+      bits.push((pb && pb.isRace ? ' The ' + fmtTime(pb.t) + ' race PB shows the 10K engine is real.' : '') +
+        (g10 ? ' The live VO2max model currently says <strong>' + fmtTime(g10) + '</strong>.' : '') +
+        ' Time-trialling a clean 10K mid-build would tighten the projection.');
     } else if (key === 'k5') {
       bits.push(' 5K is most volatile in projections because course, weather and tactics matter more than the model. Treat the band as a sharpness range rather than a single number.');
     }
@@ -7910,6 +7933,27 @@ document.getElementById('pg-plan').innerHTML =
     var deltaColor = deltaToGoal <= 0 ? 'var(--c-easy)' : 'var(--c-tempo)';
     var deltaLabel = deltaToGoal <= 0 ? diffStr(deltaToGoal) + ' on goal' : diffStr(deltaToGoal) + ' off goal';
 
+    // One-line WHY vs goal, from the live method ensemble - never hand-written
+    var whyLine = '';
+    (function() {
+      var comps = r.methods.map(function(m) { return { name: m.name, t: m.time, d: m.time - T.goal, c: m.weight * (m.time - T.goal) }; });
+      var over = comps.filter(function(x) { return x.d > 0; }).sort(function(a, b) { return b.c - a.c; });
+      var under = comps.filter(function(x) { return x.d <= 0; }).sort(function(a, b) { return a.c - b.c; });
+      if (deltaToGoal > 0 && over.length) {
+        whyLine = 'Over because <strong>' + over[0].name + '</strong> projects ' + fmtTime(over[0].t) + ' (+' + fmtMin(over[0].d) + ')' +
+          (over[1] ? ' and <strong>' + over[1].name + '</strong> ' + fmtTime(over[1].t) + ' (+' + fmtMin(over[1].d) + ')' : '') +
+          (under.length ? '; ' + under[0].name + ' (' + fmtTime(under[0].t) + ') pulls it back.' : '.');
+      } else if (deltaToGoal <= 0 && under.length) {
+        whyLine = 'Under goal led by <strong>' + under[0].name + '</strong> at ' + fmtTime(under[0].t) +
+          (over.length ? '; the drag is ' + over[0].name + ' (' + fmtTime(over[0].t) + ', +' + fmtMin(over[0].d) + ').' : '.');
+      }
+    })();
+    var lastRunDs = '';
+    (allRuns || []).forEach(function(rr) { if (rr.ds > lastRunDs) lastRunDs = rr.ds; });
+    var freshLine = 'Runs as of ' + fmtMDY(lastRunDs) +
+      (isFresh(GARMIN_VO2MAX) ? ' · VO2max as of ' + fmtMDY(lastDateOf(GARMIN_VO2MAX)) : '') +
+      ' · recomputes on every sync';
+
     var heroHtml = '<div class="fc-hero">' +
       '<div class="fc-hero-eyebrow">🔮 Forecast · ' + T.label + '</div>' +
       '<div class="fc-hero-title">' + T.raceLabel + ' · ' + r.methods.length + '-method ensemble · ' + daysToRace + ' days to Cologne</div>' +
@@ -7918,6 +7962,8 @@ document.getElementById('pg-plan').innerHTML =
           '<div class="fc-hero-label">Ensemble projection</div>' +
           '<div class="fc-hero-val">' + fmtTime(r.ensemble) + '</div>' +
           '<div class="fc-hero-sub"><strong style="color:var(--t1)">' + paceStr(r.ensemble, T.dist) + '</strong> · <span style="color:' + deltaColor + '">' + deltaLabel + '</span> · target ' + fmtTime(T.goal) + ' (' + paceStr(T.goal, T.dist) + ')</div>' +
+          (whyLine ? '<div class="fc-hero-sub" style="margin-top:6px;line-height:1.55">' + whyLine + '</div>' : '') +
+          '<div class="fc-hero-sub" style="margin-top:4px;font-size:10px;opacity:.8">' + freshLine + '</div>' +
         '</div>' +
         '<div class="fc-hero-side">' +
           '<div class="fc-hero-label">Best case</div>' +
