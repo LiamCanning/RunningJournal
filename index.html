@@ -6768,6 +6768,33 @@ function buildCoachComment(run, sess){
   return '<div class="sd-coach-actual"><div class="sd-coach-actual-lbl">'+"Coach's Comments"+'</div><div class="sd-coach-actual-text">'+parts.join('<br><br>')+'</div></div>';
 }
 
+// Full-session lap table for role-tagged laps (t: wu / work / rec / cd).
+// Renders the session as run: Warm Up, Rep 1..N with recoveries, Cool Down.
+var SESS_GRID = 'grid-template-columns:76px 56px 50px 56px 46px 40px';
+function buildSessionLapsHtml(laps) {
+  function t2s(t){ return t ? Math.floor(t/60) + ':' + String(Math.round(t%60)).padStart(2,'0') : '-'; }
+  function d2s(d){ return d < 0.95 ? Math.round(d*1000) + 'm' : d.toFixed(2) + 'km'; }
+  var repN = 0, rows = '';
+  laps.forEach(function(l) {
+    var role = l.t || 'steady', label, cls;
+    if (role === 'work')      { repN++; label = 'Rep ' + repN; cls = 'work'; }
+    else if (role === 'wu')   { label = 'Warm Up';   cls = 'rest'; }
+    else if (role === 'cd')   { label = 'Cool Down'; cls = 'rest'; }
+    else if (role === 'rec')  { label = 'recovery';  cls = 'rest'; }
+    else                      { label = 'Steady';    cls = ''; }
+    rows += '<div class="sd-lap-row ' + cls + '" style="' + SESS_GRID + '">' +
+      '<span class="sd-lap-n" style="font-family:inherit;font-size:10px;letter-spacing:.3px">' + label + '</span>' +
+      '<span>' + d2s(l.dist) + '</span>' +
+      '<span>' + t2s(l.time) + '</span>' +
+      '<span class="sd-lap-pace">' + (l.pace || '-') + '</span>' +
+      '<span class="sd-lap-hr">' + (l.hr ? Math.round(l.hr) : '-') + '</span>' +
+      '<span>' + (l.cad ? Math.round(l.cad) : '-') + '</span>' +
+    '</div>';
+  });
+  return '<div class="sd-laps"><div class="sd-laps-head" style="' + SESS_GRID + '">' +
+    '<span>Phase</span><span>Dist</span><span>Time</span><span>Pace</span><span>HR</span><span>Cad</span></div>' + rows + '</div>';
+}
+
 function buildActualTab(run, sess) {
   if (!run) return '';
   var html = '';
@@ -6846,7 +6873,10 @@ function buildActualTab(run, sess) {
     // Guard: a paused/treadmill lap can arrive without a pace string; one such
     // lap would throw in the median calc and kill the whole modal.
     var laps = (le2.laps || []).filter(function(l){ return l.pace && String(l.pace).indexOf(':') > 0; });
-    if (laps.length > 1) {
+    if (laps.length > 1 && laps.some(function(l){ return l.t; })) {
+      // Role-tagged laps: render the full session (Warm Up / reps / Cool Down)
+      html += buildSessionLapsHtml(laps);
+    } else if (laps.length > 1) {
       // Classify laps: work vs rest by comparing pace to median pace of all laps
       var paces = laps.map(function(l){ var p=l.pace.split(':'); return parseInt(p[0])*60+parseInt(p[1]); });
       paces.sort(function(a,b){return a-b;});
@@ -8349,6 +8379,9 @@ function renderAllRunsTab() {
              '</tr>';
       });
       h += '</table>';
+    } else if (realLaps && realLaps.some(function(l){ return l.t; })) {
+      // Role-tagged laps: render the full session (Warm Up / reps / Cool Down)
+      h += '<div class="rfi-splits-h">Full session</div>' + buildSessionLapsHtml(realLaps);
     } else if (realLaps) {
       // Filter out very short laps (< 200m) - those are usually button presses
       var validLaps = realLaps.filter(function(l) { return l.dist >= 0.2; });
