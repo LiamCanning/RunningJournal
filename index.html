@@ -4515,7 +4515,7 @@ document.getElementById('pg-volume').innerHTML =
     '</div>';
   })() +
 
-  // NEXT WEEK PREVIEW (from plan)
+  // THIS WEEK PLAN (from plan) - the current MB week and its sessions
   (function() {
     var _pm = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
     function parseWkRange(s) {
@@ -4526,7 +4526,7 @@ document.getElementById('pg-volume').innerHTML =
     // Compute next week Mon-Sun
     var nwMon = new Date(now); nwMon.setHours(0,0,0,0);
     var _dow = (nwMon.getDay() + 6) % 7;
-    nwMon.setDate(nwMon.getDate() - _dow + 7);
+    nwMon.setDate(nwMon.getDate() - _dow);  // this week (Monday)
     var nwSun = new Date(nwMon); nwSun.setDate(nwMon.getDate() + 6); nwSun.setHours(23,59,59);
     // Find plan week - check marathon block first, then Phase 1
     var nwPlan = null, nwPlanIsMB = false;
@@ -4551,7 +4551,7 @@ document.getElementById('pg-volume').innerHTML =
     var _bg = {te:'var(--grnSoft)',tq:'var(--bluGlow)',tl:'rgba(106,78,200,.08)',tr2:'transparent',tx:'var(--redGlow)',ts:'var(--orgGlow)'};
     var _rows;
     if (nwPlanIsMB && nwPlan.sessions) {
-      _rows = nwPlan.sessions.filter(function(s){return s.desc && !s.club;}).map(function(s){
+      _rows = nwPlan.sessions.filter(function(s){return s.desc && (!s.club || !/log after/i.test(s.desc));}).map(function(s){
         return '<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--bdr2)">' +
           '<div style="font-size:11px;font-weight:700;color:var(--t3);width:48px;flex-shrink:0;padding-top:2px">' + s.day.split(' ')[0] + '</div>' +
           '<div style="font-size:10px;font-weight:700;padding:2px 8px;border:none;background:' + (_bg[s.c]||'var(--bg2)') + ';color:' + (_tc[s.c]||'var(--t2)') + ';flex-shrink:0;white-space:nowrap">' + s.t + '</div>' +
@@ -4570,7 +4570,7 @@ document.getElementById('pg-volume').innerHTML =
     return '<div style="border-top:1px solid var(--bdr2);padding:16px 0 20px;margin-bottom:24px">' +
       '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px">' +
         '<div>' +
-          '<div style="font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:0.07em;text-transform:uppercase;color:var(--t3)">Next week &bull; ' + _dr + '</div>' +
+          '<div style="font-family:\'Geist Mono\',monospace;font-size:10px;letter-spacing:0.07em;text-transform:uppercase;color:var(--t3)">This week\'s plan &bull; ' + _dr + '</div>' +
           '<div style="font-size:15px;font-weight:500;color:var(--t1);margin-top:4px">' + nwPlan.wk.split('(')[0].trim() + '</div>' +
         '</div>' +
         '<div style="font-family:\'Geist Mono\',monospace;font-size:22px;font-weight:700;color:var(--t1)">' + nwPlan.vol + '</div>' +
