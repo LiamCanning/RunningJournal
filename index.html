@@ -6774,10 +6774,13 @@ var SESS_GRID = 'grid-template-columns:76px 56px 50px 56px 46px 40px';
 function buildSessionLapsHtml(laps) {
   function t2s(t){ return t ? Math.floor(t/60) + ':' + String(Math.round(t%60)).padStart(2,'0') : '-'; }
   function d2s(d){ return d < 0.95 ? Math.round(d*1000) + 'm' : d.toFixed(2) + 'km'; }
+  // 1-2 long work blocks read as a tempo, not "Rep 1"; 3+ are true reps.
+  var work = laps.filter(function(l){ return l.t === 'work'; });
+  var tempoStyle = work.length > 0 && work.length <= 2 && work.every(function(l){ return l.time >= 360; });
   var repN = 0, rows = '';
   laps.forEach(function(l) {
     var role = l.t || 'steady', label, cls;
-    if (role === 'work')      { repN++; label = 'Rep ' + repN; cls = 'work'; }
+    if (role === 'work')      { repN++; label = tempoStyle ? (work.length > 1 ? 'Tempo ' + repN : 'Tempo') : 'Rep ' + repN; cls = 'work'; }
     else if (role === 'wu')   { label = 'Warm Up';   cls = 'rest'; }
     else if (role === 'cd')   { label = 'Cool Down'; cls = 'rest'; }
     else if (role === 'rec')  { label = 'recovery';  cls = 'rest'; }
