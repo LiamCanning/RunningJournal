@@ -209,11 +209,30 @@ def _is_structured(segs):
 
 
 def _segment_laps(segs):
-    """Convert segments to the dashboard's lap schema (variable-length laps:
-    warm-up, each rep, each recovery, cool-down)."""
-    return [{'n': j + 1, 'dist_m': s['dist'], 'moving_time': s['dur'],
-             'avg_speed': s['speed'], 'avg_hr': s['hr'], 'avg_cad': s['cad'],
-             'elevation_gain': s['elev']} for j, s in enumerate(segs)]
+    """Convert segments to the dashboard's lap schema, each tagged with its
+    session role: 'wu' (warm-up), 'work' (rep), 'rec' (recovery), 'cd'
+    (cool-down), 'steady' (anything else). The dashboard renders these as the
+    full session: Warm Up / Rep 1..N with recoveries / Cool Down."""
+    fast_ids = {id(s) for s in _fast_reps(segs)}
+    work_idx = [j for j, s in enumerate(segs) if id(s) in fast_ids]
+    first_w = work_idx[0] if work_idx else None
+    last_w = work_idx[-1] if work_idx else None
+    laps = []
+    for j, s in enumerate(segs):
+        if id(s) in fast_ids:
+            role = 'work'
+        elif first_w is not None and j < first_w:
+            role = 'wu'
+        elif last_w is not None and j > last_w:
+            role = 'cd'
+        elif first_w is not None:
+            role = 'rec'
+        else:
+            role = 'steady'
+        laps.append({'n': j + 1, 'dist_m': s['dist'], 'moving_time': s['dur'],
+                     'avg_speed': s['speed'], 'avg_hr': s['hr'], 'avg_cad': s['cad'],
+                     'elevation_gain': s['elev'], 't': role})
+    return laps
 
 
 def update_cache(cache, activities):
@@ -536,12 +555,15 @@ def build_laps_data(cache):
                 if speed and speed > 0:
                     ps = round(1000.0 / speed)
                     pace = f"{ps // 60}:{ps % 60:02d}"
-                processed.append({
+                p = {
                     'n': lap.get('n', 0), 'dist': round(lap.get('dist_m', 0) / 1000, 2),
                     'time': lap.get('moving_time', 0), 'pace': pace,
                     'hr': lap.get('avg_hr'), 'cad': lap.get('avg_cad'),
                     'elev': lap.get('elevation_gain'),
-                })
+                }
+                if lap.get('t'):
+                    p['t'] = lap['t']   # session role: wu / work / rec / cd
+                processed.append(p)
 
         entry = {'dist_km': dist_km, 'laps': processed, 'desc': desc}
         if act.get('decoupling') is not None:
