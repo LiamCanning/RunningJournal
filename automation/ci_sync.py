@@ -208,6 +208,27 @@ def _is_structured(segs):
     return True
 
 
+def _short_efforts(segs):
+    """Short fast reps embedded in an otherwise easy run - strides, surges,
+    4x20" pickups. NOT a structured workout (that path is _is_structured), but
+    they should still be recognised rather than silently discarded. Returns the
+    qualifying reps, or [] when the session is a real workout or purely steady."""
+    if _is_structured(segs):
+        return []
+    return [s for s in _fast_reps(segs) if 15 <= s['dur'] <= 90]
+
+
+def _effort_label(activity_id):
+    """Title marker like '4x20"' for short efforts on an easy run, else None.
+    Needs >=2 reps so a single GPS/downhill blip never tags a run."""
+    reps = _short_efforts(_fetch_segments(activity_id))
+    if len(reps) < 2:
+        return None
+    durs = sorted(s['dur'] for s in reps)
+    med = durs[len(durs) // 2]
+    return f"{len(reps)}x{_fmt_rep_time(med)}"
+
+
 def _segment_laps(segs):
     """Convert segments to the dashboard's lap schema, each tagged with its
     session role: 'wu' (warm-up), 'work' (rep), 'rec' (recovery), 'cd'
@@ -274,8 +295,12 @@ def update_cache(cache, activities):
                     'calories': act.get('calories'),
                     'splits_metric': _compute_km_splits(aid),
                     # Structured sessions get real segment laps (WU / reps /
-                    # recoveries / CD); steady runs keep per-km splits.
-                    'laps': _segment_laps(segs) if _is_structured(segs) else [],
+                    # recoveries / CD). Easy runs with short efforts (e.g. 4x20")
+                    # also keep their effort laps so the efforts are recognised,
+                    # even though the session itself stays an "Easy Run". Purely
+                    # steady runs keep per-km splits only.
+                    'laps': _segment_laps(segs)
+                    if (_is_structured(segs) or _short_efforts(segs)) else [],
                 }
                 print(f"  [cache] +{aid} {cache[aid]['start_date_local'][:10]} {dist_m/1000:.2f}km — {cache[aid]['name']}")
                 new.append(cache[aid])
@@ -497,11 +522,21 @@ def decide_title(name, desc, dist_km, date_str, activity_id):
         # No structure found: a generic title tells us nothing, so label by
         # distance. 14km+ with no reps = the Sunday long run.
         if dist_km >= 14:
-            return f"Long Run – {dist_km:.0f}km"
-        # Otherwise blank the meaningless Garmin default so the classifier's
-        # own heuristics apply instead of "Easy Run – Valencia Carrera".
-        name = ''
-    return classify_strava_run(name, desc, dist_km)
+            base = f"Long Run – {dist_km:.0f}km"
+        else:
+            # Otherwise blank the meaningless Garmin default so the classifier's
+            # own heuristics apply instead of "Easy Run – Valencia Carrera".
+            base = classify_strava_run('', desc, dist_km)
+    else:
+        base = classify_strava_run(name, desc, dist_km)
+    # Recognise short efforts (strides / surges / 4x20") embedded in an easy or
+    # steady run: tag the title so they show up, without promoting the whole
+    # session to an interval workout (those are already caught above).
+    if not re.match(r'^(Intervals|Tempo|Progressive|Race|ParkRun)', base):
+        eff = _effort_label(activity_id)
+        if eff:
+            base = f"{base} + {eff}"
+    return base
 
 
 def pace_str(avg_speed):
