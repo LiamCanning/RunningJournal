@@ -7175,8 +7175,12 @@ function renderMarathonBlock() {
         var targetKm = parseFloat(((w.vol || '').match(/([\d.]+)/) || [])[1]) || 0;
         var actualKm = stravaKm > 0 ? stravaKm : weekLoggedKm;
         var pct = targetKm > 0 ? Math.min(100, Math.round(actualKm / targetKm * 100)) : (actualKm > 0 ? 100 : 0);
-        var volDisplay = stravaKm > 0 ? stravaKm.toFixed(1) + '\u202fkm' :
-                         weekLoggedKm > 0 ? weekLoggedKm.toFixed(1) + '\u202fkm' : w.vol;
+        // Always keep the projected weekly volume visible: mid-week shows actual / target,
+        // not just the running total. Falls back to actual-only when a week has no km target (race week).
+        var volDisplay = actualKm > 0
+          ? (targetKm > 0 ? actualKm.toFixed(1) + '\u202f/\u202f' + targetKm + '\u202fkm'
+                          : actualKm.toFixed(1) + '\u202fkm')
+          : w.vol;
         var progressHtml = '<div class="pw-progress"><div class="pw-progress-fill" style="width:' + pct + '%"></div></div>';
         var sessionsHtml = w.sessions.map(function(s) {
           var logKey = w.id + '_' + s.id;
