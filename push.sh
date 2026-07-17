@@ -58,15 +58,22 @@ header_l, rows_l = _csv_rows(m_local.group(2))
 header_r, rows_r = _csv_rows(m_repo.group(2))
 local_keys = {_row_key(r) for r in rows_l}
 new_rows   = [r for r in rows_r if _row_key(r) not in local_keys]
-if new_rows:
-    merged = sorted(rows_l + new_rows, key=lambda r: r[1] if len(r) > 1 else '')
-    buf = _io.StringIO()
-    w = _csv.writer(buf)
-    w.writerow(header_l or header_r)
-    w.writerows(merged)
-    local_html = local_html[:m_local.start()] + m_local.group(1) + '\n' + buf.getvalue() + m_local.group(3) + local_html[m_local.end():]
-    print(f"[sync] CSV_DATA: merged {len(new_rows)} new CI row(s) (local {len(rows_l)} -> {len(merged)})")
+# Always emit rows newest-first, matching ci_sync.py (reverse=True) and the order
+# classified_runs.csv is stored in. The two writers used to disagree on direction
+# (CI descending, push.sh ascending), so each rewrote the whole block in its own
+# order: a ~310-line no-op diff, a commit and a Pages deploy on every single run.
+# Sort unconditionally (not only when new_rows) so a local file already in the
+# wrong order gets normalised. Safe: the client re-sorts allRuns itself (line ~1974).
+merged = sorted(rows_l + new_rows, key=lambda r: r[1] if len(r) > 1 else '', reverse=True)
+buf = _io.StringIO()
+w = _csv.writer(buf)
+w.writerow(header_l or header_r)
+w.writerows(merged)
+_new_block = m_local.group(1) + '\n' + buf.getvalue() + m_local.group(3)
+if _new_block != m_local.group(0):
+    local_html = local_html[:m_local.start()] + _new_block + local_html[m_local.end():]
     changed = True
+    print(f"[sync] CSV_DATA: rewritten in canonical order, {len(new_rows)} new CI row(s) (local {len(rows_l)} -> {len(merged)})")
 else:
     print(f"[sync] CSV_DATA: local is current ({len(rows_l)} rows, repo {len(rows_r)})")
 
