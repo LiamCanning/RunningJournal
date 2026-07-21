@@ -684,10 +684,6 @@ def inject_wellness(html, wellness):
     """Merge fresh VO2max readings into GARMIN_VO2MAX, extend GARMIN_RACE_PRED
     with VDOT-derived predictions per day, refresh GARMIN_LATEST_PRED."""
     import re as _re
-    days = sorted((w for w in wellness if w.get('vo2max') and w.get('id')),
-                  key=lambda w: w['id'])
-    if not days:
-        return html
 
     def merge_array(html, var, new_entries):
         m = _re.search(r'(var ' + var + r' = )(\[.*?\])(;)', html)
@@ -706,6 +702,30 @@ def inject_wellness(html, wellness):
         print(f"[wellness] {var}: {len(existing)} -> {len(merged)} entries "
               f"(latest {merged[-1]['date']}).")
         return html[:m.start()] + m.group(1) + blob + m.group(3) + html[m.end():]
+
+    # Sleep / HRV / RHR: keep whatever Garmin pushed, one entry per day
+    well = []
+    for w in sorted((x for x in wellness if x.get('id')), key=lambda x: x['id']):
+        e = {'date': w['id']}
+        if w.get('restingHR'):
+            e['rhr'] = int(round(float(w['restingHR'])))
+        if w.get('hrv'):
+            e['hrv'] = round(float(w['hrv']), 1)
+        if w.get('sleepSecs'):
+            e['sleepSecs'] = int(w['sleepSecs'])
+        if w.get('sleepScore'):
+            e['sleepScore'] = int(round(float(w['sleepScore'])))
+        if len(e) > 1:
+            well.append(e)
+    if well:
+        keys = sorted(set(k for e in well for k in e) - {'date'})
+        print(f"[wellness] sleep/HR: {len(well)} day(s) with fields {keys}.")
+        html = merge_array(html, 'WELLNESS_DATA', well)
+
+    days = sorted((w for w in wellness if w.get('vo2max') and w.get('id')),
+                  key=lambda w: w['id'])
+    if not days:
+        return html
 
     html = merge_array(html, 'GARMIN_VO2MAX',
                        [{'date': w['id'], 'vo2': round(float(w['vo2max']), 1)} for w in days])
@@ -901,7 +921,7 @@ def main():
         print(f"[csv] classified_runs.csv updated ({len(new_rows)} new rows, {len(rows)} total).")
 
     # 7. Wellness (VO2max -> race predictions), then rebuild dashboard
-    wellness = fetch_wellness()
+    wellness = fetch_wellness(days=90)
     rebuild_dashboard(headers, rows, cache, wellness)
     print("=== Done ===")
 

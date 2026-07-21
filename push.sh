@@ -104,7 +104,7 @@ if si_r >= 0 and ei_r > si_r and si_l >= 0 and ei_l > si_l:
 # ── Wellness blocks: CI-owned (intervals.icu wellness -> VO2max + predictions).
 # The repo copy is always the freshest; the local pipeline no longer writes
 # these, so repo wins wholesale. Single-line vars - no semicolons inside. ──
-for _var in ('GARMIN_VO2MAX', 'GARMIN_RACE_PRED', 'GARMIN_LATEST_PRED'):
+for _var in ('GARMIN_VO2MAX', 'GARMIN_RACE_PRED', 'GARMIN_LATEST_PRED', 'WELLNESS_DATA'):
     _pat = re.compile(r'var ' + _var + r' = .*?;')
     _mr, _ml = _pat.search(repo_html), _pat.search(local_html)
     if _mr and _ml and _mr.group(0) != _ml.group(0):
