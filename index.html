@@ -4198,7 +4198,10 @@ document.getElementById('pg-health').innerHTML =
         var bh = Math.min(1, d.sleepSecs / maxSecs) * chH;
         var x = spx + i * (bw + gap), y = sh - spb - bh;
         bars += '<rect x="' + x + '" y="' + y + '" width="' + bw + '" height="' + bh + '" fill="var(--blu)" opacity=".85"><title>' + d.date + ': ' + fmtHM(d.sleepSecs) + (d.sleepScore != null ? ' · score ' + d.sleepScore : '') + '</title></rect>';
-        if (d.sleepScore != null && bw >= 18) bars += '<text x="' + (x + bw / 2) + '" y="' + (y - 4) + '" fill="var(--t3)" style="font-size:8px;font-family:Geist Mono" text-anchor="middle">' + d.sleepScore + '</text>';
+        if (bw >= 14) {
+          bars += '<text x="' + (x + bw / 2) + '" y="' + (y + 15) + '" fill="#fff" style="font-size:11px;font-weight:700;font-family:Geist Mono" text-anchor="middle">' + fmtHM(d.sleepSecs) + '</text>';
+          if (d.sleepScore != null) bars += '<text x="' + (x + bw / 2) + '" y="' + (y - 4) + '" fill="var(--t3)" style="font-size:9px;font-family:Geist Mono" text-anchor="middle">' + d.sleepScore + '</text>';
+        }
       });
       var guides = '';
       [7, 8].forEach(function(hh) {
@@ -4208,7 +4211,7 @@ document.getElementById('pg-health').innerHTML =
       });
       var xl = '<text x="' + spx + '" y="' + (sh - 4) + '" fill="var(--t3)" style="font-size:8px;font-family:Geist Mono" text-anchor="start">' + sl[0].date.slice(5) + '</text>' +
         '<text x="' + (sw - 10) + '" y="' + (sh - 4) + '" fill="var(--t3)" style="font-size:8px;font-family:Geist Mono" text-anchor="end">' + sl[n - 1].date.slice(5) + '</text>';
-      sleepChart = chartBox('Sleep - last ' + n + ' nights (bar = hours, number = score)',
+      sleepChart = chartBox('Sleep - last ' + n + ' nights (h:mm in bar, score above)',
         '<svg width="100%" viewBox="0 0 ' + sw + ' ' + sh + '" preserveAspectRatio="none" style="display:block">' + guides + bars + xl + '</svg>');
     }
 
