@@ -2,19 +2,19 @@ name: Activity Sync (intervals.icu)
 
 on:
   schedule:
-    # Offset to :05/:35 so the cron never lands on the same minute as the
-    # external every-15-min workflow_dispatch (which fires at :00/:15/:30/:45).
-    - cron: '5,35 * * * *'    # every 30 min (public repo - Actions minutes are free)
+    - cron: '15,45 * * * *'   # every 30 min (public repo - Actions minutes are free)
   workflow_dispatch:         # allow manual trigger from GitHub UI
 
-# NO concurrency group. 2026-08-06: the `activity-sync` group was the sole cause
-# of the "Run failed: All jobs were cancelled" email flood. Dispatches arrive
-# every 15 min; when GitHub's runner queue is congested a run sits pending for
-# >15 min, the next dispatch supersedes it, and GitHub cancels the older pending
-# run and emails it as a failure. Nine such emails on 2026-08-06 alone, every one
-# of them a queue artefact with zero steps executed rather than a real fault.
-# Overlapping runs are safe without the group: the push step below rebases onto
-# origin/main and retries 3x, so two concurrent syncs resolve instead of racing.
+# Queue overlapping runs instead of racing on the push to main.
+concurrency:
+  group: activity-sync
+  cancel-in-progress: false
+
+# 2026-08-06: a burst of "Run failed: All jobs were cancelled" emails came from
+# a GitHub Actions major outage (incident opened 15:22 UTC), NOT from this file.
+# The tell is runner_id: 0 and an empty steps list on the job - no runner was
+# ever allocated, so nothing here executed. Check githubstatus.com before
+# changing anything in response to that email pattern.
 
 jobs:
   sync:
