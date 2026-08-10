@@ -1862,6 +1862,12 @@ var STALE_DAYS = 10;
 // the plan week whose totals it belongs to. Without this, a long run shifted to
 // Monday lands in the next week's totals and both weeks read wrong.
 var RUN_WEEK_OVERRIDE = {'2026-08-10':'mbw10','2026-08-09':'mbw11'};
+// Explicit session -> actual run binding for sessions done on a different day.
+// Key '<weekId>_<sessionId>' -> run date. Beats day-of-week date matching, and a
+// run bound here cannot be claimed by any other session's date match.
+var SESSION_RUN = {'mbw10_long':'2026-08-10','mbw11_opener':'2026-08-09'};
+var SESSION_RUN_CLAIMED = {};
+Object.keys(SESSION_RUN).forEach(function(k){ SESSION_RUN_CLAIMED[SESSION_RUN[k]] = k; });
 function lastDateOf(arr) { return (arr && arr.length && arr[arr.length - 1].date) || null; }
 function daysSinceDate(ds) { if (!ds) return 9999; return Math.floor((new Date() - new Date(ds + 'T00:00:00')) / 864e5); }
 function isFresh(arr) { return daysSinceDate(lastDateOf(arr)) <= STALE_DAYS; }
@@ -7059,7 +7065,8 @@ function openSessModal(sess, wk) {
     planMB.forEach(function(ph){ ph.weeks.forEach(function(w){ if (w.id === wk || w.wk === wk) wkObj = w; }); });
   }
   var wkDates = wkObj ? parsePlanWeekDates(wkObj.wk) : null;
-  var stravaRun = wkDates ? findStravaRunForSession(wkDates, sess.day) : null;
+  var wkIdForKey = wkObj ? wkObj.id : wk;
+  var stravaRun = findStravaRunForSession(wkDates, sess.day, wkIdForKey + '_' + sess.id);
 
   var title = (wkObj ? wkObj.wk : wk) + ' · ' + dayLabelWithDate(sess.day, wkObj ? wkObj.wk : wk) + ' · ' + sess.t;
   document.getElementById('sess-modal-title').textContent = title;
@@ -7135,7 +7142,12 @@ function localDateStr(d) {
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
 }
 
-function findStravaRunForSession(wkDates, dayLabel) {
+function findStravaRunForSession(wkDates, dayLabel, key) {
+  if (key && SESSION_RUN[key]) {
+    var bound = allRuns.filter(function(r){ return r.ds === SESSION_RUN[key]; })
+                       .sort(function(a,b){ return b.dist - a.dist; });
+    return bound[0] || null;
+  }
   if (!wkDates) return null;
   var dayMap = {Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6};
   var targets = dayLabel.split(/\s*\/\s*/).map(function(d){ return d.trim(); });
@@ -7146,7 +7158,10 @@ function findStravaRunForSession(wkDates, dayLabel) {
     if (offset === undefined) return;
     var targetDate = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + offset);
     var ds = localDateStr(targetDate);
-    var match = allRuns.filter(function(r){ return r.ds === ds; });
+    var match = allRuns.filter(function(r){
+      // a run bound to another session is off-limits to date matching
+      return r.ds === ds && !(SESSION_RUN_CLAIMED[r.ds] && SESSION_RUN_CLAIMED[r.ds] !== key);
+    });
     candidates = candidates.concat(match);
   });
   if (!candidates.length) return null;
@@ -7159,6 +7174,14 @@ function findStravaRunForSession(wkDates, dayLabel) {
 // session object or null.
 function findPlanSessionForRun(run) {
   if (typeof planMB === 'undefined' || !run || !run.ds) return null;
+  var boundKey = SESSION_RUN_CLAIMED[run.ds];
+  if (boundKey) {
+    var bw = boundKey.slice(0, boundKey.lastIndexOf('_')), bs = boundKey.slice(boundKey.lastIndexOf('_') + 1), hit = null;
+    planMB.forEach(function(ph){ ph.weeks.forEach(function(w){
+      if (w.id === bw) (w.sessions || []).forEach(function(s){ if (s.id === bs) hit = s; });
+    }); });
+    if (hit) return hit;
+  }
   var dayMap = {Mon:0,Tue:1,Wed:2,Thu:3,Fri:4,Sat:5,Sun:6};
   var found = null;
   planMB.forEach(function(ph) {
@@ -7309,7 +7332,7 @@ function renderMarathonBlock() {
           var logKey = w.id + '_' + s.id;
           var logged = !!mbLogs[logKey];
           // Auto-match from Strava by day
-          var stravaRun = findStravaRunForSession(wkDates, s.day);
+          var stravaRun = findStravaRunForSession(wkDates, s.day, w.id + '_' + s.id);
           var stravaHtml = (!logged && stravaRun) ? renderStravaMatch(stravaRun) : '';
           var manualDone = !!mbDone[logKey];
           var logBtnHtml = '<button class="mb-log-btn' + (logged ? ' logged' : (stravaRun ? ' logged' : '')) + '" data-logopen="' + logKey + '">' + (logged ? '✓ Logged' : (stravaRun ? '✓ Synced' : '+ Log')) + '</button>';
@@ -9178,7 +9201,7 @@ setTimeout(function() {
     var k=w.id+'_'+s.id;
     if(mbLogs[k]||mbDone[k]) return true;
     var wd=parsePlanWeekDates(w.wk);
-    if(wd && findStravaRunForSession(wd,s.day)) return true;
+    if(findStravaRunForSession(wd,s.day,w.id+'_'+s.id)) return true;
     return false;
   }
   // runs indexed by day
