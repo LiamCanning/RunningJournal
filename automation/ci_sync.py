@@ -870,7 +870,7 @@ def main():
     new_rows = []
     for act in sorted(cache.values(), key=lambda x: x.get('start_date_local', '')):
         date_str = act.get('start_date_local', '')[:10]
-        dist_km = round(act.get('distance_km', 0), 1)
+        dist_km = round(float(f"{act.get('distance_km', 0):.2f}"), 1)  # match existing_dates_dists, which rounds the 2dp CSV string
         if (date_str, dist_km) in already:
             continue
 

@@ -57,7 +57,13 @@ def _row_key(r):
 header_l, rows_l = _csv_rows(m_local.group(2))
 header_r, rows_r = _csv_rows(m_repo.group(2))
 local_keys = {_row_key(r) for r in rows_l}
-new_rows   = [r for r in rows_r if _row_key(r) not in local_keys]
+_seen = set(local_keys)
+new_rows = []
+for r in rows_r:
+    k = _row_key(r)
+    if k not in _seen:
+        _seen.add(k)
+        new_rows.append(r)
 # Always emit rows newest-first, matching ci_sync.py (reverse=True) and the order
 # classified_runs.csv is stored in. The two writers used to disagree on direction
 # (CI descending, push.sh ascending), so each rewrote the whole block in its own
