@@ -9830,10 +9830,11 @@ if (!pg) return;
 
 // Body composition maths (measured 25 Aug 2026; re-measure post-Cologne)
 var NOW_KG = 79.7, NOW_BF = 13.5;
-var LEAN = NOW_KG * (1 - NOW_BF/100);            // ~68.9kg lean mass
-var TARGET_BF = 10;
-var TARGET_KG = LEAN / (1 - TARGET_BF/100);       // ~76.6kg at same lean mass
-var FAT_TO_LOSE = NOW_KG - TARGET_KG;
+var LEAN = NOW_KG * (1 - NOW_BF/100);             // ~68.9kg lean mass
+var TARGET_BF = 11;                                // abs clearly visible
+var TARGET_KG = 82.0;                              // the build target
+var TARGET_LEAN = TARGET_KG * (1 - TARGET_BF/100); // ~73.0kg lean needed
+var MUSCLE_TO_GAIN = TARGET_LEAN - LEAN;           // ~4.1kg of new muscle
 
 function f1(n){ return (Math.round(n*10)/10).toFixed(1); }
 
@@ -9841,29 +9842,29 @@ function f1(n){ return (Math.round(n*10)/10).toFixed(1); }
 var WA_MISSION =
 '<div class="wa-grid2">'+
  '<div class="wa-card"><h4>What the Winter ARC is</h4>'+
-  '<p>October to March. Running does not stop, it changes shape: shorter races, more speed, aerobic base maintained on fewer kilometres. The freed-up recovery budget goes to the gym. Three lifts a week, dedicated ab work, and a controlled nutrition phase to take body fat from 13-14% to ~10% while holding on to every gram of muscle.</p>'+
-  '<p>Abs are two separate jobs: <strong>build the muscle</strong> in the gym (weighted, progressive, like any other muscle) and <strong>reveal it</strong> in the kitchen (a small, patient calorie deficit). Do both and they appear. Do only one and they do not.</p></div>'+
- '<div class="wa-card"><h4>The body-fat maths</h4>'+
-  '<p>At '+f1(NOW_KG)+'kg and ~'+f1(NOW_BF)+'% body fat, lean mass is roughly <strong>'+f1(LEAN)+'kg</strong>. Holding that lean mass, 10% body fat lands at <strong>~'+f1(TARGET_KG)+'kg</strong>. That is about <strong>'+f1(FAT_TO_LOSE)+'kg of pure fat</strong> to lose, nothing more.</p>'+
-  '<p>At a sensible 0.25-0.4kg per week (a 300-500 kcal daily deficit), that is <strong>8-12 weeks of actual cutting</strong>. Start mid-October after Cologne recovery and the abs milestone lands mid-to-late January, leaving February and March to eat at maintenance, train hard and consolidate.</p>'+
-  '<p>Re-measure body fat post-October and these numbers recalibrate. Visible abs for most men arrive at 10-12%; sharp, popping abs at ~10% with developed rectus abdominis underneath.</p></div>'+
+  '<p>October to March. Running does not stop, it changes shape: shorter races, more speed, aerobic base maintained on fewer kilometres. The freed-up recovery budget goes to the gym. Three lifts a week, dedicated ab work, and a nutrition plan that builds the body up rather than cutting it down.</p>'+
+  '<p>The goal is not a lighter runner - it is a bigger, stronger one: <strong>~82kg with abs on show</strong>. That means two jobs in sequence: <strong>recomposition</strong> (train hard at maintenance calories so body fat drifts down and the abs appear) and then a <strong>lean build</strong> (a small surplus, heavy lifting, and the scale climbing slowly for the right reasons).</p></div>'+
+ '<div class="wa-card"><h4>The muscle maths</h4>'+
+  '<p>At '+f1(NOW_KG)+'kg and ~'+f1(NOW_BF)+'% body fat, lean mass is roughly <strong>'+f1(LEAN)+'kg</strong>. To sit at <strong>'+f1(TARGET_KG)+'kg with visible abs (~'+TARGET_BF+'% body fat)</strong>, lean mass has to reach <strong>~'+f1(TARGET_LEAN)+'kg</strong> - that is <strong>+'+f1(MUSCLE_TO_GAIN)+'kg of new muscle</strong>, not fat.</p>'+
+  '<p>Muscle arrives at 0.5-1kg a month for a newer lifter doing three quality sessions a week, slower as training age grows. The recomposition phases get the abs out by late January without losing size; the build phase then adds weight at ~0.25kg a week so almost all of it is lean. 82kg lands through spring and summer 2027 - the arc sets the foundation, it does not rush the scale.</p>'+
+  '<p>Re-measure body fat post-Cologne and these numbers recalibrate. Visible abs for most men arrive at 10-12% with a developed rectus underneath - which is exactly what the ab circuits are for.</p></div>'+
 '</div>';
 var WA_PHASES =
 '<div class="wa-card" style="padding:0;overflow-x:auto"><table class="wa-tbl">'+
  '<tr><th>Phase</th><th>Dates</th><th>Focus</th><th class="num">Target</th></tr>'+
  '<tr><td>Recover + baseline</td><td class="num">6 - 19 Oct</td><td>Post-marathon recovery. Easy running only. DEXA or caliper body-fat measurement, gym re-entry at light loads to regroove patterns.</td><td class="num">Baseline set</td></tr>'+
- '<tr><td>Cut 1</td><td class="num">20 Oct - 14 Dec</td><td>Main fat-loss phase. 400-500 kcal deficit, protein high, three lifts a week, abs three times a week. Running 40-45km with one speed session.</td><td class="num">~78.0kg · ~11.5%</td></tr>'+
- '<tr><td>Christmas hold</td><td class="num">15 Dec - 4 Jan</td><td>Maintenance, deliberately. Enjoy Christmas, keep protein and lifting, do not attempt to cut through it. Holding weight over Christmas is a win.</td><td class="num">Hold ~78kg</td></tr>'+
- '<tr><td>Cut 2</td><td class="num">5 Jan - 8 Feb</td><td>Final push to target. Same deficit, tighter weekends. This is where the abs arrive.</td><td class="num">~'+f1(TARGET_KG)+'kg · ~10%</td></tr>'+
- '<tr><td>Lean maintenance</td><td class="num">9 Feb - Mar</td><td>Back to maintenance calories. Lift heavier (surplus of recovery, not food), race short and fast, hold the leanness. Spring recomposition.</td><td class="num">Stay ≤11%</td></tr>'+
+ '<tr><td>Recomp 1</td><td class="num">20 Oct - 14 Dec</td><td>Maintenance calories, protein high, three lifts a week, abs three times a week. Weight holds ~79-80kg while body fat drifts down and lifts climb. Running 40-45km with one speed session.</td><td class="num">~79.5kg · ~12.5%</td></tr>'+
+ '<tr><td>Christmas hold</td><td class="num">15 Dec - 4 Jan</td><td>Enjoy Christmas, keep protein and lifting. Holding weight and strength over Christmas is a win.</td><td class="num">Hold ~79.5kg</td></tr>'+
+ '<tr><td>Recomp 2</td><td class="num">5 Jan - 8 Feb</td><td>Same approach, tighter weekends. This is where the abs arrive - through training quality and consistency, not a deficit.</td><td class="num">~79.5kg · ~11.5% · abs</td></tr>'+
+ '<tr><td>Lean build</td><td class="num">9 Feb onwards</td><td>Add a 250-300 kcal surplus. Lift heavier, race short and fast, let the scale climb ~0.25kg a week. '+f1(TARGET_KG)+'kg with abs lands through spring and summer 2027.</td><td class="num">\u2192 '+f1(TARGET_KG)+'kg · ~'+TARGET_BF+'%</td></tr>'+
 '</table></div>';
 var WA_NONNEG =
 '<div class="wa-card">'+
- '<div class="wa-check"><span class="wa-check-n">01</span><span><strong>Protein first, every day:</strong> 160-175g. This is the single biggest muscle-retention lever in a deficit. Miss it and the cut eats muscle, not fat.</span></div>'+
- '<div class="wa-check"><span class="wa-check-n">02</span><span><strong>Deficit stays small:</strong> 300-500 kcal, never more. Aggressive cutting on a running programme wrecks sessions, sleep and lean mass. Patience is the strategy.</span></div>'+
- '<div class="wa-check"><span class="wa-check-n">03</span><span><strong>Lift heavy, keep lifting heavy:</strong> the loads that built the muscle are the loads that keep it. The gym does not get easier because you are dieting.</span></div>'+
- '<div class="wa-check"><span class="wa-check-n">04</span><span><strong>Weigh daily, judge weekly:</strong> log every morning after the bathroom, before food. Only the 7-day average means anything. Single days are noise.</span></div>'+
- '<div class="wa-check"><span class="wa-check-n">05</span><span><strong>Fuel the hard sessions:</strong> club Tuesdays and Thursdays get carbs before and after, deficit or not. The deficit lives on the easy days.</span></div>'+
+ '<div class="wa-check"><span class="wa-check-n">01</span><span><strong>Protein first, every day:</strong> 170-180g (~2.2g/kg). It is the raw material of the whole project - miss it and the gym work has nothing to build with.</span></div>'+
+ '<div class="wa-check"><span class="wa-check-n">02</span><span><strong>No cutting, no crash surplus:</strong> recomp phases eat at maintenance; the build phase adds 250-300 kcal, never more. A big surplus on a running programme adds fat, not muscle.</span></div>'+
+ '<div class="wa-check"><span class="wa-check-n">03</span><span><strong>Progressive overload is the plan:</strong> the scale only earns the right to climb if the lifts are climbing first. Log every session; add reps, then weight.</span></div>'+
+ '<div class="wa-check"><span class="wa-check-n">04</span><span><strong>Weigh daily, judge weekly:</strong> log every morning after the bathroom, before food. Only the 7-day average means anything. In the build, +0.2-0.3kg a week is perfect; faster means fat.</span></div>'+
+ '<div class="wa-check"><span class="wa-check-n">05</span><span><strong>Fuel the hard sessions:</strong> club Tuesdays and Thursdays get carbs before and after. The extra calories of the build land around training, not on the sofa.</span></div>'+
 '</div>';
 var overview =
 '<div class="wa-sec">Explore</div>'+
@@ -9903,7 +9904,7 @@ function sess(badge, badgeCls, title, sub, body){
    '<div class="wa-sess-body">'+body+'</div></details>';
 }
 var gym =
-'<div class="wa-note"><strong>The system: double progression.</strong> Every exercise has a rep range. Start at the bottom of the range with a weight you could lift for 2-3 more reps. Add reps each week until you hit the top of the range on all sets, then add 2.5kg and drop back to the bottom. Log every session. If a lift stalls for three weeks, drop the weight 10% and rebuild. In a deficit, holding your numbers IS progress.</div>'+
+'<div class="wa-note"><strong>The system: double progression.</strong> Every exercise has a rep range. Start at the bottom of the range with a weight you could lift for 2-3 more reps. Add reps each week until you hit the top of the range on all sets, then add 2.5kg and drop back to the bottom. Log every session. If a lift stalls for three weeks, drop the weight 10% and rebuild. During recomp the lifts climbing while the scale holds IS the abs arriving.</div>'+
 sess('Mon','', 'Upper A · Push bias','~50min + abs A',
  ex('Barbell bench press','Touch the chest, drive up hard. The week\'s main pressing strength work.','4 × 6-8','3min rest')+
  ex('Incline dumbbell press','30-45 degree bench. Upper chest is what makes a lean torso look built.','3 × 8-10','2min rest')+
@@ -9958,11 +9959,11 @@ sess('Circuit C','abs','Friday · Mixed + obliques','after Lower · ~10min',
 var nut =
 '<div class="wa-sec">The numbers</div>'+
 '<div class="wa-stats" style="margin-top:0">'+
- '<div class="wa-stat"><div class="wa-stat-l">Maintenance (winter volume)</div><div class="wa-stat-v">~2,850</div><div class="wa-stat-s">kcal/day · 40-45km running + 3 lifts</div></div>'+
- '<div class="wa-stat"><div class="wa-stat-l">Cutting target</div><div class="wa-stat-v acc">2,400-2,500</div><div class="wa-stat-s">kcal/day · 400 kcal deficit</div></div>'+
- '<div class="wa-stat"><div class="wa-stat-l">Protein</div><div class="wa-stat-v acc">165g</div><div class="wa-stat-s">~2.1g/kg · every day, non-negotiable</div></div>'+
+ '<div class="wa-stat"><div class="wa-stat-l">Recomp target (Oct-Feb)</div><div class="wa-stat-v">~2,850</div><div class="wa-stat-s">kcal/day maintenance · 40-45km running + 3 lifts</div></div>'+
+ '<div class="wa-stat"><div class="wa-stat-l">Build target (from Feb)</div><div class="wa-stat-v acc">3,050-3,150</div><div class="wa-stat-s">kcal/day · +250-300 surplus, lifts must be climbing</div></div>'+
+ '<div class="wa-stat"><div class="wa-stat-l">Protein</div><div class="wa-stat-v acc">170-180g</div><div class="wa-stat-s">~2.2g/kg · every day, non-negotiable</div></div>'+
  '<div class="wa-stat"><div class="wa-stat-l">Fat</div><div class="wa-stat-v">70-80g</div><div class="wa-stat-s">hormones + satiety floor</div></div>'+
- '<div class="wa-stat"><div class="wa-stat-l">Carbs</div><div class="wa-stat-v">230-280g</div><div class="wa-stat-s">cycled: high on club days, lower on rest days</div></div>'+
+ '<div class="wa-stat"><div class="wa-stat-l">Carbs</div><div class="wa-stat-v">280-330g</div><div class="wa-stat-s">cycled: high on club days, lower on rest days</div></div>'+
 '</div>'+
 '<div class="wa-note"><strong>Carb cycling, kept simple:</strong> on club-session and long-run days eat at the top of the carb range with a pre-session snack and carbs in the post-session meal. On rest and easy days drop to ~200g and let vegetables and protein fill the plate. Calories stay roughly level; the carbs just move to where the work is.</div>'+
 '<div class="wa-sec">Foods to build the winter around</div>'+
@@ -10019,7 +10020,7 @@ function renderTracker(){
     var pts = data.map(function(r,i){ return X(i)+','+Y(r.w); }).join(' ');
     var ty = Y(TARGET_KG);
     var dots = data.map(function(r,i){ return '<circle cx="'+X(i)+'" cy="'+Y(r.w)+'" r="3.5" fill="#0F766E"/>'; }).join('');
-    html += '<div class="wa-chart"><div class="wa-stat-l" style="margin-bottom:10px">Weight trend · target '+f1(TARGET_KG)+'kg @ 10% BF</div>'+
+    html += '<div class="wa-chart"><div class="wa-stat-l" style="margin-bottom:10px">Weight trend · building to '+f1(TARGET_KG)+'kg @ ~'+TARGET_BF+'% BF</div>'+
      '<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block">'+
      '<line x1="'+P+'" y1="'+ty+'" x2="'+(W-P)+'" y2="'+ty+'" stroke="#B45309" stroke-dasharray="5 4" stroke-width="1.5"/>'+
      '<text x="'+(W-P)+'" y="'+(ty-6)+'" text-anchor="end" font-size="10" font-family="Geist Mono,monospace" fill="#B45309">'+f1(TARGET_KG)+'kg target</text>'+
@@ -10058,22 +10059,22 @@ var tracker =
 var WA_BACK = '<button class="wa-back" data-wa="ov">\u2190 Winter Arc</button>';
 pg.innerHTML =
 '<div class="wa-hero"><div class="wa-hero-kicker">Winter ARC · October 2026 - March 2027</div>'+
-'<h2>Fast, strong, and shredded by spring</h2>'+
-'<p>The off-season with a job to do: keep the aerobic engine earned in the marathon block, sharpen 5K-10K speed, and run a disciplined six-month body recomposition. Three lifts a week, abs trained like a real muscle, and a kitchen that does the revealing.</p>'+
+'<h2>Bigger engine, bigger frame, abs on show</h2>'+
+'<p>The off-season with a job to do: keep the aerobic engine earned in the marathon block, sharpen 5K-10K speed, and build the body up - not cut it down. Recomposition first so the abs show, then a patient lean build towards ~82kg. Three lifts a week, abs trained like a real muscle, and a kitchen that fuels the build.</p>'+
 '<div class="wa-jt" id="wa-jt" title="Tap for the full trajectory">'+
  '<div class="jt-ends">'+
   '<div><div class="jt-now-v">'+f1(NOW_KG)+'<span style="font-size:20px;color:var(--t3)"> kg</span></div><div class="jt-now-l">Now · 13-14% BF · re-measure post-Cologne</div></div>'+
-  '<div class="jt-tgt"><div class="jt-tgt-v">~'+f1(TARGET_KG)+'<span style="font-size:20px;color:var(--t3)"> kg</span></div><div class="jt-tgt-l">Target · ~10% BF · abs fully visible</div></div>'+
+  '<div class="jt-tgt"><div class="jt-tgt-v">~'+f1(TARGET_KG)+'<span style="font-size:20px;color:var(--t3)"> kg</span></div><div class="jt-tgt-l">Target · ~11% BF · abs on show</div></div>'+
  '</div>'+
  '<div class="jt-track"><div class="jt-fill" id="jt-fill"></div><div class="jt-dot" id="jt-dot" style="left:0%"></div><div class="jt-flag"></div></div>'+
  '<div class="jt-phases">'+
   '<div class="jt-ph" style="flex:14;background:#8B7E6E">Recover</div>'+
-  '<div class="jt-ph" style="flex:56;background:var(--accent)">Cut 1 · to ~78.0</div>'+
+  '<div class="jt-ph" style="flex:56;background:var(--accent)">Recomp 1 · abs emerge</div>'+
   '<div class="jt-ph dim" style="flex:21;background:var(--ochre)">Hold</div>'+
-  '<div class="jt-ph" style="flex:35;background:var(--accent)">Cut 2 · to ~76.6</div>'+
-  '<div class="jt-ph" style="flex:28;background:var(--grn)">Maintain</div>'+
+  '<div class="jt-ph" style="flex:35;background:var(--accent)">Recomp 2 · abs locked</div>'+
+  '<div class="jt-ph" style="flex:28;background:var(--grn)">Build · to 82</div>'+
  '</div>'+
- '<div class="jt-cap"><span><b>-3.0 kg already banked</b> across the marathon block</span><span><b>'+f1(FAT_TO_LOSE)+' kg of pure fat to go</b> · lean mass ~'+f1(LEAN)+' kg protected</span></div>'+
+ '<div class="jt-cap"><span><b>Abs first</b> - recomposition at maintenance, no cutting</span><span><b>+'+f1(MUSCLE_TO_GAIN)+' kg of lean muscle to build</b> · '+f1(LEAN)+' \u2192 ~'+f1(TARGET_LEAN)+' kg lean</span></div>'+
  '<div class="ix-hint">Tap for trajectory →</div>'+
 '</div></div>'+
 '<div class="wa-panel on" id="wa-p-ov">'+overview+'</div>'+
@@ -10143,9 +10144,9 @@ var SMOOTHIES = [
   {n:'The Big Rebuild', kcal:700, prot:36, col:'#D9A441', when:'Double-session days or when eating fell short',
    liq:'300ml almond milk', pow:'100g vanilla gainer (4 scoops)', fruit:'1 banana + 40g oats blended straight in',
    note:'The weight-regain weapon.'},
-  {n:'Cut-Season Half Scoop', kcal:280, prot:17, col:'#7A5E8C', when:'Cut 1 and Cut 2 - a snack, not a meal',
+  {n:'Recomp Half Scoop', kcal:280, prot:17, col:'#7A5E8C', when:'Recomp days - a snack, not a meal',
    liq:'250ml almond milk', pow:'50g vanilla gainer (2 scoops)', fruit:'100g frozen berries',
-   note:'The same shake dialled down for the cutting phases.'}
+   note:'The same shake dialled down for recomp days at maintenance calories.'}
 ];
 function smGlass(col, frac) {
   var fillH = Math.round(40 * frac), y = 54 - fillH;
@@ -10196,8 +10197,7 @@ function smGlass(col, frac) {
 (function() {
   var jt = document.getElementById('wa-jt');
   if (!jt) return;
-  var START_KG = NOW_KG + 3.0; // marathon block started ~82.7
-  var pct = Math.max(3, Math.min(100, Math.round((START_KG - NOW_KG) / (START_KG - TARGET_KG) * 100)));
+  var pct = Math.max(3, Math.min(100, Math.round((NOW_KG - 79.7) / (TARGET_KG - 79.7) * 100)));
   window.inView(jt, function() {
     var fill = document.getElementById('jt-fill'), dot = document.getElementById('jt-dot');
     requestAnimationFrame(function(){ requestAnimationFrame(function(){ fill.style.width = pct + '%'; dot.style.left = pct + '%'; }); });
@@ -10205,15 +10205,15 @@ function smGlass(col, frac) {
   jt.addEventListener('click', function() {
     var W = 720, H = 300, PL = 54, PR = 20, PT = 24, PB = 40;
     var pts = [
-      {d:'Jun', kg:START_KG}, {d:'25 Aug', kg:NOW_KG, now:true}, {d:'19 Oct', kg:NOW_KG},
-      {d:'14 Dec', kg:78.0}, {d:'4 Jan', kg:78.0}, {d:'8 Feb', kg:TARGET_KG}, {d:'Mar', kg:TARGET_KG}
+      {d:'25 Aug', kg:NOW_KG, now:true}, {d:'19 Oct', kg:NOW_KG}, {d:'14 Dec', kg:79.5},
+      {d:'4 Jan', kg:79.5}, {d:'8 Feb', kg:79.4}, {d:'31 Mar', kg:80.3}, {d:'Jun 27', kg:TARGET_KG}
     ];
-    var kgMin = TARGET_KG - 0.6, kgMax = START_KG + 0.5;
+    var kgMin = 78.8, kgMax = TARGET_KG + 0.4;
     function X(i){ return PL + i / (pts.length - 1) * (W - PL - PR); }
     function Y(kg){ return PT + (kgMax - kg) / (kgMax - kgMin) * (H - PT - PB); }
     var path = pts.map(function(pt2, i){ return (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(pt2.kg).toFixed(1); }).join(' ');
     var grid2 = '', lbls = '';
-    [82, 80, 78, TARGET_KG].forEach(function(kg) {
+    [79, 80, 81, TARGET_KG].forEach(function(kg) {
       grid2 += '<line x1="' + PL + '" x2="' + (W - PR) + '" y1="' + Y(kg).toFixed(1) + '" y2="' + Y(kg).toFixed(1) + '" stroke="var(--bdr)"/>' +
         '<text x="' + (PL - 8) + '" y="' + (Y(kg) + 4).toFixed(1) + '" text-anchor="end" font-size="12" font-family="Geist Mono,monospace" fill="var(--t3)">' + (Math.round(kg*10)/10) + '</text>';
     });
@@ -10222,11 +10222,11 @@ function smGlass(col, frac) {
       return '<circle cx="' + X(i).toFixed(1) + '" cy="' + Y(pt2.kg).toFixed(1) + '" r="' + (pt2.now ? 8 : 5) + '" fill="' + (pt2.now ? 'var(--accent)' : 'var(--card)') + '" stroke="var(--accent)" stroke-width="2.5"/>' +
         (pt2.now ? '<text x="' + X(i).toFixed(1) + '" y="' + (Y(pt2.kg) - 16).toFixed(1) + '" text-anchor="middle" font-size="13" font-weight="700" fill="var(--accent)" font-family="Inter,sans-serif">You are here</text>' : '');
     }).join('');
-    window.openSheet('The road to ~' + f1(TARGET_KG) + ' kg',
+    window.openSheet('The build to ~' + f1(TARGET_KG) + ' kg',
       '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;height:auto;display:block">' + grid2 +
         '<path d="' + path + '" fill="none" stroke="var(--accent)" stroke-width="3" stroke-linejoin="round"/>' + dots + lbls + '</svg>' +
       '<div style="height:1px;background:var(--bdr);margin:18px 0"></div>' +
-      '<div style="font-size:15px;color:var(--t2);line-height:1.7">At ' + f1(NOW_KG) + 'kg and ~13.5% body fat, lean mass is roughly <strong>' + f1(LEAN) + 'kg</strong>. Holding that lean mass, 10% body fat lands at <strong>~' + f1(TARGET_KG) + 'kg</strong> - about <strong>' + f1(FAT_TO_LOSE) + 'kg of pure fat</strong> to lose across Cut 1 (20 Oct - 14 Dec) and Cut 2 (5 Jan - 8 Feb), with Christmas held at maintenance in between. At 0.25-0.4kg per week that is 8-12 weeks of actual cutting, and 3.0kg is already banked from the marathon block.</div>');
+      '<div style="font-size:15px;color:var(--t2);line-height:1.7">At ' + f1(NOW_KG) + 'kg and ~13.5% body fat, lean mass is roughly <strong>' + f1(LEAN) + 'kg</strong>. To reach <strong>' + f1(TARGET_KG) + 'kg with abs (~' + TARGET_BF + '% body fat)</strong>, lean mass must grow to <strong>~' + f1(TARGET_LEAN) + 'kg</strong> - that is <strong>+' + f1(MUSCLE_TO_GAIN) + 'kg of new muscle</strong>. Recomp 1 and 2 (Oct - Feb) hold the scale at maintenance while the abs come out; the lean build from February adds ~0.25kg a week around training. The arc ends around 80.3kg with abs and the build rolling - ' + f1(TARGET_KG) + 'kg lands through spring and summer 2027.</div>');
   });
 })();
 })();
