@@ -98,6 +98,25 @@ h1,h2,h3,h4{font-family:var(--serif);font-weight:700;letter-spacing:-0.015em;col
 .wa-panel.on{animation:waSlide .32s cubic-bezier(.22,.9,.3,1)}
 @keyframes waSlide{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.wa-panel.on,.jt-fill,.jt-dot,.sm-bar-f{animation:none;transition:none}}
+/* Chapter launcher (replaces horizontal tabs) */
+.wa-chaps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:1000px){.wa-chaps{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.wa-chaps{grid-template-columns:1fr}}
+.wa-chap{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:18px 16px;box-shadow:var(--shadow);text-align:left;font-family:'Inter',sans-serif}
+.wa-chap-e{font-size:28px;width:54px;height:54px;display:flex;align-items:center;justify-content:center;background:var(--bg2);border-radius:14px;flex-shrink:0}
+.wa-chap-n{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--t1);letter-spacing:-0.01em}
+.wa-chap-d{font-size:13px;color:var(--t3);margin-top:3px;line-height:1.45}
+.wa-back{display:inline-flex;align-items:center;gap:8px;font-family:'Inter',sans-serif;font-size:14.5px;font-weight:600;color:var(--t2);background:var(--card);border:1px solid var(--bdr);border-radius:999px;padding:9px 18px;cursor:pointer;margin-bottom:20px;transition:box-shadow .18s,color .18s}
+.wa-back:hover{color:var(--t1);box-shadow:var(--shadow)}
+.wa-ch .wa-hero{display:none}
+/* Info cards (mission / phases / rules -> sheets) */
+.wa-info-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:900px){.wa-info-row{grid-template-columns:1fr}}
+.wa-info{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:18px 16px;box-shadow:var(--shadow);text-align:left;font-family:'Inter',sans-serif}
+/* Food cards with emoji tile */
+.wa-food{display:grid;grid-template-columns:46px 1fr;column-gap:14px;row-gap:4px;align-items:start}
+.wa-food-e{grid-row:1/3}
+.wa-food-e{font-size:24px;width:46px;height:46px;display:flex;align-items:center;justify-content:center;background:var(--card);border-radius:12px;flex-shrink:0;box-shadow:var(--shadow)}
 .mono{font-family:'Geist Mono',monospace;font-feature-settings:"zero","ss05"}
 
 /* LAYOUT */
@@ -7677,7 +7696,8 @@ document.getElementById('pg-plan').innerHTML =
   });
   var keys = Object.keys(byMonth).sort();
   if (!keys.length) {
-    pg.innerHTML = '<div class="monthly-header"><div class="monthly-name">Monthly Snapshot</div><div class="monthly-tagline">No 2026 runs yet</div></div>';
+    var WA_BACK = '<button class="wa-back" data-wa="ov">\u2190 Winter Arc</button>';
+pg.innerHTML = '<div class="monthly-header"><div class="monthly-name">Monthly Snapshot</div><div class="monthly-tagline">No 2026 runs yet</div></div>';
     return;
   }
   var monthly = keys.map(function(k) {
@@ -9819,8 +9839,7 @@ var FAT_TO_LOSE = NOW_KG - TARGET_KG;
 function f1(n){ return (Math.round(n*10)/10).toFixed(1); }
 
 // ---------- OVERVIEW ----------
-var overview =
-'<div class="wa-sec">The mission</div>'+
+var WA_MISSION =
 '<div class="wa-grid2">'+
  '<div class="wa-card"><h4>What the Winter ARC is</h4>'+
   '<p>October to March. Running does not stop, it changes shape: shorter races, more speed, aerobic base maintained on fewer kilometres. The freed-up recovery budget goes to the gym. Three lifts a week, dedicated ab work, and a controlled nutrition phase to take body fat from 13-14% to ~10% while holding on to every gram of muscle.</p>'+
@@ -9829,8 +9848,8 @@ var overview =
   '<p>At '+f1(NOW_KG)+'kg and ~'+f1(NOW_BF)+'% body fat, lean mass is roughly <strong>'+f1(LEAN)+'kg</strong>. Holding that lean mass, 10% body fat lands at <strong>~'+f1(TARGET_KG)+'kg</strong>. That is about <strong>'+f1(FAT_TO_LOSE)+'kg of pure fat</strong> to lose, nothing more.</p>'+
   '<p>At a sensible 0.25-0.4kg per week (a 300-500 kcal daily deficit), that is <strong>8-12 weeks of actual cutting</strong>. Start mid-October after Cologne recovery and the abs milestone lands mid-to-late January, leaving February and March to eat at maintenance, train hard and consolidate.</p>'+
   '<p>Re-measure body fat post-October and these numbers recalibrate. Visible abs for most men arrive at 10-12%; sharp, popping abs at ~10% with developed rectus abdominis underneath.</p></div>'+
-'</div>'+
-'<div class="wa-sec">Phase plan · Oct 2026 - Mar 2027</div>'+
+'</div>';
+var WA_PHASES =
 '<div class="wa-card" style="padding:0;overflow-x:auto"><table class="wa-tbl">'+
  '<tr><th>Phase</th><th>Dates</th><th>Focus</th><th class="num">Target</th></tr>'+
  '<tr><td>Recover + baseline</td><td class="num">6 - 19 Oct</td><td>Post-marathon recovery. Easy running only. DEXA or caliper body-fat measurement, gym re-entry at light loads to regroove patterns.</td><td class="num">Baseline set</td></tr>'+
@@ -9838,7 +9857,23 @@ var overview =
  '<tr><td>Christmas hold</td><td class="num">15 Dec - 4 Jan</td><td>Maintenance, deliberately. Enjoy Christmas, keep protein and lifting, do not attempt to cut through it. Holding weight over Christmas is a win.</td><td class="num">Hold ~78kg</td></tr>'+
  '<tr><td>Cut 2</td><td class="num">5 Jan - 8 Feb</td><td>Final push to target. Same deficit, tighter weekends. This is where the abs arrive.</td><td class="num">~'+f1(TARGET_KG)+'kg · ~10%</td></tr>'+
  '<tr><td>Lean maintenance</td><td class="num">9 Feb - Mar</td><td>Back to maintenance calories. Lift heavier (surplus of recovery, not food), race short and fast, hold the leanness. Spring recomposition.</td><td class="num">Stay ≤11%</td></tr>'+
-'</table></div>'+
+'</table></div>';
+var WA_NONNEG =
+'<div class="wa-card">'+
+ '<div class="wa-check"><span class="wa-check-n">01</span><span><strong>Protein first, every day:</strong> 160-175g. This is the single biggest muscle-retention lever in a deficit. Miss it and the cut eats muscle, not fat.</span></div>'+
+ '<div class="wa-check"><span class="wa-check-n">02</span><span><strong>Deficit stays small:</strong> 300-500 kcal, never more. Aggressive cutting on a running programme wrecks sessions, sleep and lean mass. Patience is the strategy.</span></div>'+
+ '<div class="wa-check"><span class="wa-check-n">03</span><span><strong>Lift heavy, keep lifting heavy:</strong> the loads that built the muscle are the loads that keep it. The gym does not get easier because you are dieting.</span></div>'+
+ '<div class="wa-check"><span class="wa-check-n">04</span><span><strong>Weigh daily, judge weekly:</strong> log every morning after the bathroom, before food. Only the 7-day average means anything. Single days are noise.</span></div>'+
+ '<div class="wa-check"><span class="wa-check-n">05</span><span><strong>Fuel the hard sessions:</strong> club Tuesdays and Thursdays get carbs before and after, deficit or not. The deficit lives on the easy days.</span></div>'+
+'</div>';
+var overview =
+'<div class="wa-sec">Explore</div>'+
+'<div class="wa-chaps">'+
+ '<button class="wa-chap ix-card" data-wa="gym"><span class="wa-chap-e">\uD83C\uDFCB\uFE0F</span><span><span class="wa-chap-n">Gym</span><div class="wa-chap-d">Three lifts a week, double progression</div></span></button>'+
+ '<button class="wa-chap ix-card" data-wa="abs"><span class="wa-chap-e">\uD83D\uDD25</span><span><span class="wa-chap-n">Abs</span><div class="wa-chap-d">Three circuits, trained like a real muscle</div></span></button>'+
+ '<button class="wa-chap ix-card" data-wa="nut"><span class="wa-chap-e">\uD83E\uDD57</span><span><span class="wa-chap-n">Nutrition</span><div class="wa-chap-d">The numbers, the plates, the smoothie bar</div></span></button>'+
+ '<button class="wa-chap ix-card" data-wa="trk"><span class="wa-chap-e">\uD83D\uDCC8</span><span><span class="wa-chap-n">Tracker</span><div class="wa-chap-d">Daily weigh-ins, weekly trend</div></span></button>'+
+'</div>'+
 '<div class="wa-sec">The training week</div>'+
 '<div class="wa-week">'+
  '<div class="wa-day gym"><div class="wa-day-n">Mon</div><div class="wa-day-t">Gym · Upper push</div><div class="wa-day-s">+ Abs circuit A. Legs fresh for Tuesday club.</div></div>'+
@@ -9850,13 +9885,11 @@ var overview =
  '<div class="wa-day run"><div class="wa-day-n">Sun</div><div class="wa-day-t">Long-ish run</div><div class="wa-day-s">70-90min steady. The aerobic maintenance dose. Not a marathon long run.</div></div>'+
 '</div>'+
 '<div class="wa-note"><strong>Why the gym days sit where they do:</strong> upper-body work never interferes with running, so it fills Monday and Wednesday. The one lower-body day goes on Friday, after Thursday\'s club session and with a full 48 hours before Sunday\'s longer run. Heavy legs on Wednesday would poison Thursday\'s session; on Friday they cost you nothing.</div>'+
-'<div class="wa-sec">Non-negotiables</div>'+
-'<div class="wa-card">'+
- '<div class="wa-check"><span class="wa-check-n">01</span><span><strong>Protein first, every day:</strong> 160-175g. This is the single biggest muscle-retention lever in a deficit. Miss it and the cut eats muscle, not fat.</span></div>'+
- '<div class="wa-check"><span class="wa-check-n">02</span><span><strong>Deficit stays small:</strong> 300-500 kcal, never more. Aggressive cutting on a running programme wrecks sessions, sleep and lean mass. Patience is the strategy.</span></div>'+
- '<div class="wa-check"><span class="wa-check-n">03</span><span><strong>Lift heavy, keep lifting heavy:</strong> the loads that built the muscle are the loads that keep it. The gym does not get easier because you are dieting.</span></div>'+
- '<div class="wa-check"><span class="wa-check-n">04</span><span><strong>Weigh daily, judge weekly:</strong> log every morning after the bathroom, before food. Only the 7-day average means anything. Single days are noise.</span></div>'+
- '<div class="wa-check"><span class="wa-check-n">05</span><span><strong>Fuel the hard sessions:</strong> club Tuesdays and Thursdays get carbs before and after, deficit or not. The deficit lives on the easy days.</span></div>'+
+'<div class="wa-sec">The brief</div>'+
+'<div class="wa-info-row">'+
+ '<button class="wa-info ix-card" data-washeet="mission"><span class="wa-chap-e">\uD83C\uDFAF</span><span><span class="wa-chap-n">The mission</span><div class="wa-chap-d">What the Winter ARC is, and the body-fat maths</div></span></button>'+
+ '<button class="wa-info ix-card" data-washeet="phases"><span class="wa-chap-e">\uD83D\uDDFA\uFE0F</span><span><span class="wa-chap-n">Phase plan</span><div class="wa-chap-d">Oct to Mar \u00b7 five phases \u00b7 dates and targets</div></span></button>'+
+ '<button class="wa-info ix-card" data-washeet="rules"><span class="wa-chap-e">\uD83D\uDCCC</span><span><span class="wa-chap-n">Non-negotiables</span><div class="wa-chap-d">The five rules the whole plan stands on</div></span></button>'+
 '</div>';
 
 // ---------- GYM ----------
@@ -9935,14 +9968,14 @@ var nut =
 '<div class="wa-note"><strong>Carb cycling, kept simple:</strong> on club-session and long-run days eat at the top of the carb range with a pre-session snack and carbs in the post-session meal. On rest and easy days drop to ~200g and let vegetables and protein fill the plate. Calories stay roughly level; the carbs just move to where the work is.</div>'+
 '<div class="wa-sec">Foods to build the winter around</div>'+
 '<div class="wa-food-grid">'+
- '<div class="wa-food"><div class="wa-food-h">🍗 Lean protein anchors</div><div class="wa-food-b">Chicken breast, turkey, merluza and other white fish, prawns, lean beef (5%), atún. Every main meal is built around 40g+ of protein.</div></div>'+
- '<div class="wa-food"><div class="wa-food-h">🥚 Eggs + dairy</div><div class="wa-food-b">Eggs, Greek yoghurt 0% or skyr, cottage cheese, queso fresco. The easiest protein snacks in any Spanish supermarket.</div></div>'+
- '<div class="wa-food"><div class="wa-food-h">🐟 Oily fish 2x/week</div><div class="wa-food-b">Salmon, sardinas, caballa. Covers the fat target with omega-3s that earn their calories.</div></div>'+
- '<div class="wa-food"><div class="wa-food-h">🍚 Smart carbs</div><div class="wa-food-b">Oats, arroz, patata and boniato, lentejas, garbanzos, good bread in measured amounts. Around sessions, not by default.</div></div>'+
- '<div class="wa-food"><div class="wa-food-h">🥦 Volume vegetables</div><div class="wa-food-b">Half the plate at lunch and dinner. Huge volume, trivial calories: the practical difference between a hungry cut and an easy one.</div></div>'+
- '<div class="wa-food"><div class="wa-food-h">🫒 Fats, measured</div><div class="wa-food-b">Olive oil is the stealth calorie in Spain: 1 tbsp = 120 kcal. Measure it. Nuts capped at a 30g handful. Avocado counted, not free.</div></div>'+
- '<div class="wa-food"><div class="wa-food-h">🍊 Fruit, freely</div><div class="wa-food-b">Naranjas, plátanos around training, berries with yoghurt. Fruit has never made anyone fat; the pastry aisle has.</div></div>'+
- '<div class="wa-food"><div class="wa-food-h">🍺 The honest list</div><div class="wa-food-b">Alcohol is the single biggest lever: ~200 kcal a pint plus the food decisions that follow it. Cap it at 2-3 drinks a week through the cut phases and the abs arrive weeks earlier.</div></div>'+
+ '<div class="wa-food"><div class="wa-food-e">🍗</div><div class="wa-food-h">Lean protein anchors</div><div class="wa-food-b">Chicken breast, turkey, merluza and other white fish, prawns, lean beef (5%), atún. Every main meal is built around 40g+ of protein.</div></div>'+
+ '<div class="wa-food"><div class="wa-food-e">🥚</div><div class="wa-food-h">Eggs + dairy</div><div class="wa-food-b">Eggs, Greek yoghurt 0% or skyr, cottage cheese, queso fresco. The easiest protein snacks in any Spanish supermarket.</div></div>'+
+ '<div class="wa-food"><div class="wa-food-e">🐟</div><div class="wa-food-h">Oily fish 2x/week</div><div class="wa-food-b">Salmon, sardinas, caballa. Covers the fat target with omega-3s that earn their calories.</div></div>'+
+ '<div class="wa-food"><div class="wa-food-e">🍚</div><div class="wa-food-h">Smart carbs</div><div class="wa-food-b">Oats, arroz, patata and boniato, lentejas, garbanzos, good bread in measured amounts. Around sessions, not by default.</div></div>'+
+ '<div class="wa-food"><div class="wa-food-e">🥦</div><div class="wa-food-h">Volume vegetables</div><div class="wa-food-b">Half the plate at lunch and dinner. Huge volume, trivial calories: the practical difference between a hungry cut and an easy one.</div></div>'+
+ '<div class="wa-food"><div class="wa-food-e">🫒</div><div class="wa-food-h">Fats, measured</div><div class="wa-food-b">Olive oil is the stealth calorie in Spain: 1 tbsp = 120 kcal. Measure it. Nuts capped at a 30g handful. Avocado counted, not free.</div></div>'+
+ '<div class="wa-food"><div class="wa-food-e">🍊</div><div class="wa-food-h">Fruit, freely</div><div class="wa-food-b">Naranjas, plátanos around training, berries with yoghurt. Fruit has never made anyone fat; the pastry aisle has.</div></div>'+
+ '<div class="wa-food"><div class="wa-food-e">🍺</div><div class="wa-food-h">The honest list</div><div class="wa-food-b">Alcohol is the single biggest lever: ~200 kcal a pint plus the food decisions that follow it. Cap it at 2-3 drinks a week through the cut phases and the abs arrive weeks earlier.</div></div>'+
 '</div>'+
 '<div class="wa-sec">A day on the plan · training day, ~2,500 kcal</div>'+
 '<div class="wa-grid2">'+
@@ -10043,28 +10076,32 @@ pg.innerHTML =
  '<div class="jt-cap"><span><b>-3.0 kg already banked</b> across the marathon block</span><span><b>'+f1(FAT_TO_LOSE)+' kg of pure fat to go</b> · lean mass ~'+f1(LEAN)+' kg protected</span></div>'+
  '<div class="ix-hint">Tap for trajectory →</div>'+
 '</div></div>'+
-'<div class="wa-tabs">'+
- '<button class="wa-tab on" data-wa="ov">Overview</button>'+
- '<button class="wa-tab" data-wa="gym">Gym</button>'+
- '<button class="wa-tab" data-wa="abs">Abs</button>'+
- '<button class="wa-tab" data-wa="nut">Nutrition</button>'+
- '<button class="wa-tab" data-wa="trk">Tracker</button>'+
-'</div>'+
 '<div class="wa-panel on" id="wa-p-ov">'+overview+'</div>'+
-'<div class="wa-panel" id="wa-p-gym">'+gym+'</div>'+
-'<div class="wa-panel" id="wa-p-abs">'+abs+'</div>'+
-'<div class="wa-panel" id="wa-p-nut">'+nut+'</div>'+
-'<div class="wa-panel" id="wa-p-trk">'+tracker+'</div>';
+'<div class="wa-panel" id="wa-p-gym">'+WA_BACK+gym+'</div>'+
+'<div class="wa-panel" id="wa-p-abs">'+WA_BACK+abs+'</div>'+
+'<div class="wa-panel" id="wa-p-nut">'+WA_BACK+nut+'</div>'+
+'<div class="wa-panel" id="wa-p-trk">'+WA_BACK+tracker+'</div>';
 
 pg.addEventListener('click', function(e){
-  var t = e.target.closest('.wa-tab');
+  var t = e.target.closest('.wa-chap, .wa-back');
   if (t) {
-    pg.querySelectorAll('.wa-tab').forEach(function(b){ b.classList.remove('on'); });
     pg.querySelectorAll('.wa-panel').forEach(function(p){ p.classList.remove('on'); });
-    t.classList.add('on');
     var panel = document.getElementById('wa-p-' + t.dataset.wa);
     if (panel) panel.classList.add('on');
+    pg.classList.toggle('wa-ch', t.dataset.wa !== 'ov');
     if (t.dataset.wa === 'trk') renderTracker();
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    return;
+  }
+  var inf = e.target.closest('.wa-info');
+  if (inf) {
+    var sheets = {
+      mission: ['The mission', WA_MISSION],
+      phases: ['Phase plan \u00b7 Oct 2026 - Mar 2027', WA_PHASES],
+      rules: ['Non-negotiables', WA_NONNEG]
+    };
+    var sh = sheets[inf.dataset.washeet];
+    if (sh) window.openSheet(sh[0], sh[1]);
     return;
   }
   var del = e.target.closest('.wa-track-del');
