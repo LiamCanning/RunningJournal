@@ -7155,6 +7155,27 @@ function fmtDur(secs) {
 // Group per-km splits under the run structure Garmin recorded (warm-up, reps,
 // recoveries, cool-down). Block times are the block duration, never cumulative.
 function buildBlockLapsHtml(blocks, kmLaps) {
+  // Drop GPS noise blocks, then merge consecutive blocks sharing a role so a
+  // split warm-up reads as one Warm-up rather than two.
+  blocks = (blocks || []).filter(function(b) {
+    return (b.dist || 0) >= 0.03 || (b.time || 0) >= 10;
+  });
+  var merged = [];
+  blocks.forEach(function(b) {
+    var last = merged[merged.length - 1];
+    if (last && last.t === b.t && b.t !== 'work') {
+      var td = (last.dist || 0) + (b.dist || 0), tt = (last.time || 0) + (b.time || 0);
+      if (last.hr && b.hr && tt > 0) last.hr = (last.hr * last.time + b.hr * b.time) / tt;
+      last.dist = td; last.time = tt;
+      if (td > 0 && tt > 0) {
+        var ps = Math.round(tt / td);
+        last.pace = Math.floor(ps / 60) + ':' + pad(ps % 60);
+      }
+    } else {
+      merged.push({ n: b.n, dist: b.dist, time: b.time, pace: b.pace, hr: b.hr, t: b.t });
+    }
+  });
+  blocks = merged;
   var bounds = [], acc = 0;
   blocks.forEach(function(b) {
     bounds.push({ b: b, from: acc, to: acc + (b.dist || 0) });
