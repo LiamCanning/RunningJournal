@@ -96,8 +96,21 @@ if si_r >= 0 and ei_r > si_r and si_l >= 0 and ei_l > si_l:
         local_obj = json.loads(local_laps_str)
         # Merge: repo provides base, local overrides (preserves manual edits)
         merged = {**repo_obj, **local_obj}
+        # Local wins for existing dates (preserves manual lap edits), EXCEPT
+        # when CI has added block structure the local copy lacks - otherwise a
+        # backfill that enriches an existing date is silently thrown away.
+        enriched = []
+        def _has_blocks(v):
+            e = v[0] if isinstance(v, list) and v else v
+            return bool(isinstance(e, dict) and e.get('blocks'))
+        for k, rv in repo_obj.items():
+            if k in local_obj and _has_blocks(rv) and not _has_blocks(local_obj[k]):
+                merged[k] = rv
+                enriched.append(k)
         new_dates = [k for k in repo_obj if k not in local_obj]
-        if new_dates:
+        if enriched:
+            print(f"[sync] LAPS_DATA: block structure adopted from CI for {', '.join(sorted(enriched))}")
+        if new_dates or enriched:
             merged_json = json.dumps(merged, ensure_ascii=False, separators=(',', ':'))
             local_html = local_html[:si_l + len(START)] + merged_json + local_html[ei_l:]
             print(f"[sync] LAPS_DATA: added {len(new_dates)} new date(s) from CI: {', '.join(sorted(new_dates)[-3:])}")
