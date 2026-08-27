@@ -921,8 +921,16 @@ def main():
             act_dt = datetime.strptime(act['start_date_local'][:19], '%Y-%m-%dT%H:%M:%S')
         except (ValueError, KeyError):
             continue
-        if (not os.environ.get('BACKFILL_SINCE', '').strip()
-                and act_dt.replace(tzinfo=timezone.utc) <= last_dt - timedelta(hours=72)):
+        # A backfill widens the fetch window but must NOT open the floodgates:
+        # this loop walks the WHOLE cache, so disabling the guard outright adds
+        # every historical activity that was never classified (it once pulled in
+        # 153 runs back to 2020). With BACKFILL_SINCE set, the floor becomes that
+        # date instead of the rolling 72h rule.
+        _bf_since = os.environ.get('BACKFILL_SINCE', '').strip()
+        if _bf_since:
+            if date_str < _bf_since:
+                continue
+        elif act_dt.replace(tzinfo=timezone.utc) <= last_dt - timedelta(hours=72):
             continue
 
         name = act.get('name', '')
