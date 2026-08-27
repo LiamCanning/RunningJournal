@@ -921,7 +921,8 @@ def main():
             act_dt = datetime.strptime(act['start_date_local'][:19], '%Y-%m-%dT%H:%M:%S')
         except (ValueError, KeyError):
             continue
-        if act_dt.replace(tzinfo=timezone.utc) <= last_dt - timedelta(hours=72):
+        if (not os.environ.get('BACKFILL_SINCE', '').strip()
+                and act_dt.replace(tzinfo=timezone.utc) <= last_dt - timedelta(hours=72)):
             continue
 
         name = act.get('name', '')
