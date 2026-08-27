@@ -235,6 +235,16 @@ def _segment_laps(segs):
     (cool-down), 'steady' (anything else). The dashboard renders these as the
     full session: Warm Up / Rep 1..N with recoveries / Cool Down."""
     fast_ids = {id(s) for s in _fast_reps(segs)}
+    if not fast_ids:
+        # Fallback for long-run MP/tempo blocks: they sit only ~6% above the
+        # run average so _fast_reps never sees them, but they ARE the work.
+        # Classify relative to the fastest block instead, and only when the
+        # run genuinely has a fast/slow spread (a plain easy run stays steady).
+        spds = [s['speed'] for s in segs if s['speed'] > 0]
+        if len(segs) >= 3 and spds and max(spds) / min(spds) >= 1.15:
+            top = max(spds)
+            fast_ids = {id(s) for s in segs
+                        if s['speed'] >= top * 0.97 and s['dur'] >= 300}
     work_idx = [j for j, s in enumerate(segs) if id(s) in fast_ids]
     first_w = work_idx[0] if work_idx else None
     last_w = work_idx[-1] if work_idx else None
