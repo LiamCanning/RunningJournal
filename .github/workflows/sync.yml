@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: '15,45 * * * *'   # every 30 min (public repo - Actions minutes are free)
   workflow_dispatch:         # allow manual trigger from GitHub UI
+    inputs:
+      backfill_since:
+        description: 'Re-fetch activities from this date (YYYY-MM-DD). Leave blank for normal sync.'
+        required: false
+        default: ''
 
 # Queue overlapping runs instead of racing on the push to main.
 concurrency:
@@ -48,6 +53,7 @@ jobs:
         env:
           INTERVALS_ATHLETE_ID: ${{ secrets.INTERVALS_ATHLETE_ID }}
           INTERVALS_API_KEY: ${{ secrets.INTERVALS_API_KEY }}
+          BACKFILL_SINCE: ${{ github.event.inputs.backfill_since }}
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
         run: |
           ok=0

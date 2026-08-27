@@ -833,6 +833,16 @@ def main():
     after_ts = int(last_dt.timestamp()) - 3 * 86400
     min_ts   = int((datetime.now(timezone.utc) - timedelta(days=14)).timestamp())
     after_ts = max(after_ts, min_ts)
+    # One-off backfill: BACKFILL_SINCE=YYYY-MM-DD widens the window so an older
+    # activity can be re-fetched after its cache entry is evicted (e.g. to pick
+    # up newly-stored fields like block structure).
+    _bf = os.environ.get('BACKFILL_SINCE', '').strip()
+    if _bf:
+        try:
+            after_ts = int(datetime.strptime(_bf, '%Y-%m-%d').replace(tzinfo=timezone.utc).timestamp())
+            print(f"[fetch] BACKFILL_SINCE set - widening window to {_bf}")
+        except ValueError:
+            print(f"[fetch] BACKFILL_SINCE={_bf!r} unparseable - ignoring", file=sys.stderr)
     print(f"[fetch] Fetching intervals.icu activities after {datetime.fromtimestamp(after_ts, tz=timezone.utc).date()}...")
 
     # 3. Fetch new activities
