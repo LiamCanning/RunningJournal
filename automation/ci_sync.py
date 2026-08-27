@@ -301,6 +301,12 @@ def update_cache(cache, activities):
                     # steady runs keep per-km splits only.
                     'laps': _segment_laps(segs)
                     if (_is_structured(segs) or _short_efforts(segs)) else [],
+                    # Garmin/intervals.icu block structure (warm-up, reps,
+                    # recoveries, cool-down) kept for EVERY run with >1 segment,
+                    # not only "structured" ones. An MP block inside a long run
+                    # is only ~6% faster than the run average so it never passes
+                    # _is_structured, yet it is exactly what we want to group by.
+                    'blocks': _segment_laps(segs) if len(segs) > 1 else [],
                 }
                 print(f"  [cache] +{aid} {cache[aid]['start_date_local'][:10]} {dist_m/1000:.2f}km — {cache[aid]['name']}")
                 new.append(cache[aid])
@@ -601,6 +607,19 @@ def build_laps_data(cache):
                 processed.append(p)
 
         entry = {'dist_km': dist_km, 'laps': processed, 'desc': desc}
+        blocks = []
+        for b in (act.get('blocks') or []):
+            spd = b.get('avg_speed')
+            bp = None
+            if spd and spd > 0:
+                ps = round(1000.0 / spd)
+                bp = f"{ps // 60}:{ps % 60:02d}"
+            blocks.append({'n': b.get('n', 0), 'dist': round(b.get('dist_m', 0) / 1000, 2),
+                           'time': b.get('moving_time', 0), 'pace': bp,
+                           'hr': b.get('avg_hr'), 'cad': b.get('avg_cad'),
+                           't': b.get('t') or 'steady'})
+        if len(blocks) > 1:
+            entry['blocks'] = blocks
         if act.get('decoupling') is not None:
             entry['dec'] = round(act['decoupling'], 1)
         # Per-run analysis (intervals.icu): shown as stat tiles + HR zone bar
