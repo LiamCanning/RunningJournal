@@ -7741,6 +7741,31 @@ function renderBlockLog(planData) {
 }
 
 // Build the full page
+// ===== 10K BLOCK PAGE (post-Koln -> Ibercaja, Sun 10 Jan 2027) =====
+function build10kHeader() {
+  var race = new Date(2027, 0, 10);
+  var days = Math.ceil((race - new Date()) / 864e5);
+  var countdown = days > 0 ? days + ' days to Ibercaja' : (days === 0 ? 'Race day' : 'Ibercaja done');
+  var totalKm = 0, totalWk = 0;
+  plan10k.forEach(function(ph){ ph.weeks.forEach(function(w){
+    totalWk++; totalKm += (w.sessions||[]).reduce(function(a,x){ return a + (parseFloat(x.km)||0); }, 0);
+  }); });
+  return '<div class="ph1-archive" style="margin-bottom:22px"><div style="padding:18px 20px">' +
+    '<div style="font-family:\'Geist Mono\',monospace;font-size:12.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--t3)">Next block \u00b7 ' + countdown + '</div>' +
+    '<div style="font-family:\'Archivo\',sans-serif;font-stretch:110%;font-size:26px;font-weight:700;color:var(--t1);margin-top:6px">10K Valencia Ibercaja \u00b7 Sun 10 Jan 2027</div>' +
+    '<div style="font-size:14.5px;color:var(--t2);line-height:1.7;margin-top:10px">' +
+      '<strong>Target: sub-40:00 = 3:59/km.</strong> PB is 41:27, so this needs 87 seconds, VDOT 52.8 to 55.0. ' +
+      'Flat, fast, former world-record course. ' + totalWk + ' weeks, ~' + Math.round(totalKm) + 'km, peaking at 54km.' +
+    '</div>' +
+    '<div style="font-size:14.5px;color:var(--t2);line-height:1.7;margin-top:10px">' +
+      'Secondary target is <strong>sub-19:00 for 5K</strong> in W8, late November. That is the best 5K window of the year: full marathon base, six weeks of sharpening, and the Winter Arc lean build has not started so bodyweight is still ~79.5kg.' +
+    '</div>' +
+    '<div style="font-size:14px;color:var(--t3);line-height:1.7;margin-top:10px">' +
+      'Runs alongside Winter Arc. Recomp 1 and Recomp 2 hold bodyweight at ~79.5kg while body fat drifts down, so there is no conflict before the race. The lean build to 82kg starts 9 Feb, a month after Ibercaja. Gym stays as programmed: upper push Monday, upper pull Wednesday, lower Friday.' +
+    '</div>' +
+  '</div></div>';
+}
+
 // Both plan pages rebuild together so a log or done-tick on either stays in sync.
 function refreshPlanPages() {
   document.getElementById('pg-plan').innerHTML =
