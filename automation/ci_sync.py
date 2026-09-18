@@ -90,7 +90,28 @@ def fetch_recent(after_ts):
     for a in activities:
         print(f"  [raw] {str(a.get('start_date_local',''))[:10]} "
               f"id={a.get('id')} type={a.get('type')!r} name={a.get('name','')!r}")
-    return [a for a in activities if a.get('type') in RUN_TYPES]
+    runs = [a for a in activities if a.get('type') in RUN_TYPES]
+    # An activity Strava has handed over but intervals.icu has not finished
+    # ingesting comes back as a stub: bare numeric id, type None, empty name.
+    # The detail endpoint usually resolves once the file lands, so retry there
+    # rather than silently dropping the run. Seen 2026-09-18 on a phone-recorded
+    # run that sat as a stub for over an hour.
+    known = {a.get('id') for a in runs}
+    for a in activities:
+        if a.get('type') is not None or a.get('id') in known:
+            continue
+        try:
+            d = _get_with_retry(f"{API_BASE}/activity/{a.get('id')}").json()
+        except Exception as e:
+            print(f"  [stub] {a.get('id')}: detail fetch failed ({e})")
+            continue
+        if d.get('type') in RUN_TYPES:
+            print(f"  [stub] {a.get('id')}: resolved via detail endpoint -> {d.get('type')}")
+            runs.append(d)
+        else:
+            print(f"  [stub] {a.get('id')}: still not ingested by intervals.icu "
+                  f"(type={d.get('type')!r}) - will retry next sync")
+    return runs
 
 
 # ── 3. Load / update Strava cache ─────────────────────────────────────────────
