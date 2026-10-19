@@ -179,7 +179,7 @@ button.row:hover{background:rgba(240,231,213,.45)}
 .wd.g .n{color:rgba(255,255,255,.7)}
 .sess-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:22px;row-gap:0;align-items:stretch}
 /* subgrid: every exercise row lines up across the three cards */
-.sess{display:grid;grid-template-rows:subgrid;grid-row:span 9;row-gap:0;background:var(--card);border:1px solid var(--rule);border-radius:var(--r);padding:22px 22px 12px}
+.sess{display:grid;grid-template-rows:subgrid;grid-row:span 10;row-gap:0;background:var(--card);border:1px solid var(--rule);border-radius:var(--r);padding:22px 22px 12px}
 .sess-top{padding-bottom:14px}
 .sess-top .day{font-size:12.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--carmin)}
 .sess-t{font-family:var(--serif);font-size:28px;font-weight:800;line-height:1.1;margin:4px 0 2px}
@@ -1248,6 +1248,21 @@ function runSheet(r){
 
 // ===== EXERCISE LIBRARY (how-to text; photos from free-exercise-db) =====
 var EX_LIB = {
+"Cable overhead triceps extension": {img:'Cable_Rope_Overhead_Triceps_Extension', targets:'Triceps (long head)', alt:'Dumbbell overhead extension, seated, one dumbbell in both hands.',
+ setup:["Rope on a high pulley. Face away from the stack, one foot forward, rope held behind the head.","Elbows up by the ears, pointing forward."],
+ exec:["Extend the arms forward and up until they lock out.","Let the rope travel back behind the head under control until the triceps are fully stretched."],
+ cue:"Only the forearms move. The elbows stay where they are.",
+ mistake:"Cutting the stretch short. The bottom of the rep is where this exercise earns its place."},
+"Rope pushdown": {img:'Triceps_Pushdown_-_Rope_Attachment', targets:'Triceps', alt:'Straight-bar or V-bar pushdown.',
+ setup:["Rope on a high pulley, stand tall, slight forward lean.","Elbows tucked to your sides."],
+ exec:["Push down until the arms are straight and spread the rope ends apart at the bottom.","Let the hands rise to about chest height, elbows still pinned."],
+ cue:"Squeeze for a second at the bottom of every rep.",
+ mistake:"Leaning over the rope and pushing with body weight. If the shoulders move, it is too heavy."},
+"Incline dumbbell curl": {img:'Incline_Dumbbell_Curl', targets:'Biceps (long head)', alt:'Bayesian cable curl: face away from a low pulley and curl with the arm behind you.',
+ setup:["Bench at 45 degrees, sit back, head and shoulders on the pad.","Arms hang straight down behind the body, palms forward."],
+ exec:["Curl both dumbbells up without moving the upper arm forward.","Lower slowly all the way to a full stretch."],
+ cue:"Keep the elbows pointing at the floor and the shoulders on the bench.",
+ mistake:"Swinging the elbows forward to finish the rep. Go lighter than a standing curl; it is meant to feel hard."},
 "Barbell bench press": {img:'Barbell_Bench_Press_-_Medium_Grip', view:'front', hi:['chest','shoulders'], targets:'Chest · Shoulders · Triceps', equip:'Barbell', alt:'Machine chest press, or Smith machine bench press if no spotter is free.',
  setup:["Bench flat under a rack, feet flat on the floor, eyes under the bar.","Grip just wider than shoulder width.","Squeeze the shoulder blades together and pin them to the bench before unracking."],
  exec:["Lower the bar under control to the mid-chest, elbows at roughly 45° to the torso.","Touch the chest without bouncing, then drive the bar straight up until the arms lock out."],
@@ -1474,26 +1489,29 @@ var EX_LIB = {
 // ===== GYM CONTENT =====
 var GYM = [
 // ex: [name, sets x reps, heavy, cue, photo folder, EX_LIB key]; abs: [name, sets x reps, cue, photo folder, EX_LIB key]
-// No direct biceps or triceps work: pressing and pulling already train them.
- {day:'Mon', name:'Upper push', focus:'Chest · shoulders · about 55 min', ex:[
+// Arms: two direct exercises each (one in the stretched position), on the two upper days.
+ {day:'Mon', name:'Upper push', focus:'Chest · shoulders · triceps · about 60 min', ex:[
   ['Bench press','3 × 5-8',1,'Your strength lift. Touch the chest, drive up hard. 3 min rest.','Barbell_Bench_Press_-_Medium_Grip','Barbell bench press'],
   ['Incline dumbbell press','3 × 8-12',0,'Upper chest, the angle the flat bench misses. 2 min rest.','Incline_Dumbbell_Press','Incline dumbbell press'],
   ['Seated shoulder press','3 × 8-12',0,'Dumbbells, strict, no leg drive. 2 min rest.','Dumbbell_Shoulder_Press','Seated dumbbell shoulder press'],
   ['Lateral raise','3 × 12-15',0,'Light and controlled. Shoulder width is what makes you look athletic.','Side_Lateral_Raise','Lateral raise'],
-  ['Cable fly','3 × 12-15',0,'Slow stretch, squeeze in the middle. Chest work without the arms. 60s rest.','Flat_Bench_Cable_Flyes','Cable fly']],
+  ['Overhead triceps extension','3 × 10-15',0,'Rope, facing away from the stack. The deep stretch behind the head is what grows the biggest part of the triceps. 60s rest.','Cable_Rope_Overhead_Triceps_Extension','Cable overhead triceps extension'],
+  ['Rope pushdown','3 × 12-15',0,'Elbows pinned to your sides, spread the rope at the bottom. 60s rest.','Triceps_Pushdown_-_Rope_Attachment','Rope pushdown']],
   abs:[['Cable crunch','3 × 10-15','Add weight over the weeks, like any other lift.','Cable_Crunch','Cable crunch'],['Hanging knee raise','3 × 10-15','Curl the pelvis up, no swinging.','Hanging_Leg_Raise','Hanging knee raise']]},
- {day:'Wed', name:'Upper pull', focus:'Back · rear shoulders · about 55 min', ex:[
+ {day:'Wed', name:'Upper pull', focus:'Back · rear shoulders · biceps · about 60 min', ex:[
   ['Pull-ups','3 × 5-8',1,'Full hang to chin over. Add weight once 3 × 8 is easy. 3 min rest.','Pullups','Pull-ups'],
   ['Chest-supported row','3 × 8-12',0,'Pull to the lower chest and squeeze. 2 min rest.','Dumbbell_Incline_Row','Dumbbell chest-supported row'],
   ['Lat pulldown','3 × 10-12',0,'Lead with the elbows. 90s rest.','Wide-Grip_Lat_Pulldown','Lat pulldown'],
-  ['Single-arm dumbbell row','3 × 10 / side',0,'Brace on the bench, drive the elbow to the hip. 90s rest.','One-Arm_Dumbbell_Row','Dumbbell row'],
-  ['Face pull','3 × 15-20',0,'Keeps the shoulders healthy after Monday’s pressing.','Face_Pull','Face pull']],
+  ['Face pull','3 × 15-20',0,'Keeps the shoulders healthy after Monday’s pressing.','Face_Pull','Face pull'],
+  ['Incline dumbbell curl','3 × 8-12',0,'Bench at 45°, arms hanging behind you. The stretch at the bottom makes it the best curl for growth. 60s rest.','Incline_Dumbbell_Curl','Incline dumbbell curl'],
+  ['Hammer curl','3 × 10-12',0,'Thumbs up. Builds the brachialis, which pushes the biceps up and thickens the arm. 60s rest.','Hammer_Curls','Hammer curl']],
   abs:[['Ab wheel rollout','3 × 8-12','From the knees. No sagging lower back.','Ab_Roller','Ab wheel rollout'],['Pallof press','3 × 10 / side','Resist the twist: the posture that holds your form late in a race.','Pallof_Press','Pallof press']]},
- {day:'Fri', name:'Lower', focus:'Hamstrings · glutes · quads · calves · about 50 min', ex:[
+ {day:'Fri', name:'Lower', focus:'Hamstrings · glutes · quads · calves · about 55 min', ex:[
   ['Romanian deadlift','3 × 6-8',1,'Hips back, flat back, feel the hamstrings stretch. 3 min rest.','Romanian_Deadlift','Romanian deadlift'],
   ['Leg press','3 × 8-12',0,'Full range. Quad strength without loading the spine. 2 min rest.','Leg_Press','Leg press'],
   ['Bulgarian split squat','3 × 8-10 / leg',0,'Single-leg strength is running strength.','Split_Squat_with_Dumbbells','Bulgarian split squat'],
   ['Hip thrust','3 × 8-12',0,'Glute power for the last 5km of a race.','Barbell_Hip_Thrust','Hip thrust'],
+  ['Seated leg curl','3 × 10-12',0,'Seated beats lying: the hamstrings work stretched. Your best protection against hamstring strains when you run fast. 90s rest.','Seated_Leg_Curl','Leg curl'],
   ['Standing calf raise','3 × 10-15',0,'Slow, pause at the bottom. Protects the Achilles.','Standing_Calf_Raises','Standing calf raise']],
   abs:[['Hanging leg raise','3 × 8-12','Straight legs once knee raises are easy.','Hanging_Pike',''],['Side plank','2 × 30-45s / side','Hips high, body straight.','Side_Bridge','']]}
 ];
@@ -1697,13 +1715,13 @@ function renderGym(){
     '<div class="answer">3 × 8-12 or heavy 6-8? <em>Both, in that order.</em></div>' +
     '<div class="rules">' +
       '<div class="rule"><p><b>Start heavy.</b> One big lift per session at 5-8 reps (bench, pull-ups, Romanian deadlift). This is what makes you strong.</p></div>' +
-      '<div class="rule"><p><b>Then build.</b> The next lifts at 8-12 reps, small muscles (shoulders, calves, abs) at 12-15. Muscle grows across all of these ranges as long as the sets are hard.</p></div>' +
+      '<div class="rule"><p><b>Then build.</b> The next lifts at 8-12 reps, small muscles (shoulders, arms, calves) at 10-15. Muscle grows across all of these ranges as long as the sets are hard.</p></div>' +
       '<div class="rule"><p><b>Make every set count.</b> Stop with 1-2 reps left in the tank. If you could have done five more, the set did not count.</p></div>' +
       '<div class="rule"><p><b>Add weight when you earn it.</b> Hit the top of the rep range on all 3 sets, then add 2.5kg (5kg on legs) next time and start again from the bottom.</p></div>' +
       '<div class="rule"><p><b>Skip sets of 1-3.</b> That is for powerlifters peaking for a meet. More injury risk and fatigue, no extra muscle, and it would cost your running.</p></div>' +
       '<div class="rule"><p><b>Abs are built here and revealed in the kitchen.</b> Two loaded ab exercises at the end of every session. They show at about 11% body fat, which comes from protein and calories, not more crunches.</p></div>' +
     '</div>' +
-    '<p class="muted" style="margin-top:14px;font-size:14.5px">Three hard sets of five exercises gives each muscle 6-9 hard sets a week: enough to grow while running 40-50km.</p>' +
+    '<p class="muted" style="margin-top:14px;font-size:14.5px">Three hard sets of six exercises gives each muscle 6-9 hard sets a week, arms included: enough to grow while running 40-50km.</p>' +
     sec('The three sessions') +
     '<p class="muted" style="margin:-4px 0 18px;font-size:14.5px">Tap any exercise for bigger photos and how to do it.</p>' +
     '<div class="sess-grid">' + GYM.map(function(g, gi){
