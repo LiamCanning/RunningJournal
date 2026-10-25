@@ -36,6 +36,7 @@ DASHBOARD_HTML = os.path.join(REPO_DIR, 'index.html')
 def _get_with_retry(url, params=None, retries=3, backoff=15):
     """GET from intervals.icu with retry on 5xx. Exits gracefully on rate limit."""
     last_429 = None
+    last_5xx = None
     for attempt in range(retries):
         try:
             resp = requests.get(url, auth=AUTH, headers={'User-Agent': UA}, params=params, timeout=30)
@@ -56,6 +57,7 @@ def _get_with_retry(url, params=None, retries=3, backoff=15):
                 resp.raise_for_status()
             if resp.status_code < 500:
                 return resp
+            last_5xx = resp
             print(f"[retry] intervals.icu GET {resp.status_code} (attempt {attempt+1}/{retries})", file=sys.stderr)
         except requests.exceptions.RequestException as e:
             print(f"[retry] network error: {e} (attempt {attempt+1}/{retries})", file=sys.stderr)
@@ -63,6 +65,15 @@ def _get_with_retry(url, params=None, retries=3, backoff=15):
                 raise
         if attempt < retries - 1:
             time.sleep(backoff * (attempt + 1))
+    # Persistent 5xx is intervals.icu being down, not something we can fix; the
+    # next run (every 15 min) re-fetches the same window, so no data is lost.
+    # Exit cleanly rather than emailing/Slacking on every upstream blip
+    # (2026-10-25: a 4-minute 503 outage failed a run). 401/403 and code
+    # errors still fail loudly above.
+    if last_5xx is not None and last_429 is None:
+        print(f"[upstream] intervals.icu still {last_5xx.status_code} after {retries} tries. "
+              f"Exiting cleanly; next scheduled run retries.")
+        sys.exit(0)
     # All retries exhausted on 429 — exit cleanly; next hourly run retries
     if last_429 is not None:
         print("[rate-limit] All retries exhausted on 429. Exiting cleanly.")
