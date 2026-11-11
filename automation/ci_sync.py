@@ -423,7 +423,9 @@ RACE_CALENDAR = {
     '2026-09-20': ('Barris de Sant Marti', 5),
     '2026-09-26': ('Nocturna Valencia',   15),
     '2026-10-04': ('Köln Marathon',       42),
-    '2026-11-08': ('Mitja Marató Gandia', 21),
+    '2026-11-08': ('5K Carrera por la Solidaridad | 19:13 PB', 5),
+    '2026-12-13': ('Pas Ras 10K',          10),
+    '2027-01-10': ('Valencia Ibercaja 10K', 10),
 }
 PARKRUN_RE = re.compile(r'[Pp]ark\s*[Rr]un')
 
